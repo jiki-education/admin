@@ -30,9 +30,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   login: async (credentials: LoginCredentials) => {
     try {
       set({ isLoading: true, error: null });
-      
+
       const user = await apiLogin(credentials);
-      
+
       set({
         user,
         isAuthenticated: true,
@@ -56,9 +56,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   signup: async (userData: SignupData) => {
     try {
       set({ isLoading: true, error: null });
-      
+
       const user = await apiSignup(userData);
-      
+
       set({
         user,
         isAuthenticated: true,
@@ -82,9 +82,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   logout: async () => {
     try {
       set({ isLoading: true, error: null });
-      
+
       await apiLogout();
-      
+
       set({
         user: null,
         isAuthenticated: false,
@@ -101,7 +101,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         error: null,
         hasCheckedAuth: true
       });
-      
+
       console.error("Logout error:", error);
     }
   },
@@ -109,9 +109,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   checkAuth: async () => {
     try {
       set({ isLoading: true, error: null });
-      
+
       const isValid = await validateToken();
-      
+
       if (isValid) {
         // Token is valid, but we don't have user data
         // In a real app, you might call a "me" endpoint here
@@ -139,7 +139,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         error: null,
         hasCheckedAuth: true
       });
-      
+
       console.error("Auth check error:", error);
     }
   },

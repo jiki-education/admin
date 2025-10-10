@@ -14,7 +14,7 @@ const sizeClasses = {
   medium: "h-10 w-10 max-w-10",
   large: "h-12 w-12 max-w-12",
   xlarge: "h-14 w-14 max-w-14",
-  xxlarge: "h-16 w-16 max-w-16",
+  xxlarge: "h-16 w-16 max-w-16"
 };
 
 const statusSizeClasses = {
@@ -23,32 +23,20 @@ const statusSizeClasses = {
   medium: "h-2.5 w-2.5 max-w-2.5",
   large: "h-3 w-3 max-w-3",
   xlarge: "h-3.5 w-3.5 max-w-3.5",
-  xxlarge: "h-4 w-4 max-w-4",
+  xxlarge: "h-4 w-4 max-w-4"
 };
 
 const statusColorClasses = {
   online: "bg-success-500",
   offline: "bg-error-400",
-  busy: "bg-warning-500",
+  busy: "bg-warning-500"
 };
 
-const Avatar: React.FC<AvatarProps> = ({
-  src,
-  alt = "User Avatar",
-  size = "medium",
-  status = "none",
-}) => {
+const Avatar: React.FC<AvatarProps> = ({ src, alt = "User Avatar", size = "medium", status = "none" }) => {
   return (
     <div className={`relative  rounded-full ${sizeClasses[size]}`}>
       {/* Avatar Image */}
-      <Image
-        width="0"
-        height="0"
-        sizes="100vw"
-        src={src}
-        alt={alt}
-        className="object-cover w-full rounded-full"
-      />
+      <Image width="0" height="0" sizes="100vw" src={src} alt={alt} className="object-cover w-full rounded-full" />
 
       {/* Status Indicator */}
       {status !== "none" && (

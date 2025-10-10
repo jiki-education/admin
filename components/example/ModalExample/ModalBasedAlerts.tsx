@@ -39,11 +39,7 @@ export default function ModalBasedAlerts() {
         </button>
       </div>
       {/* Success Modal */}
-      <Modal
-        isOpen={successModal.isOpen}
-        onClose={successModal.closeModal}
-        className="max-w-[600px] p-5 lg:p-10"
-      >
+      <Modal isOpen={successModal.isOpen} onClose={successModal.closeModal} className="max-w-[600px] p-5 lg:p-10">
         <div className="text-center">
           <div className="relative flex items-center justify-center z-1 mb-7">
             <svg
@@ -79,12 +75,10 @@ export default function ModalBasedAlerts() {
               </svg>
             </span>
           </div>
-          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90 sm:text-title-sm">
-            Well Done!
-          </h4>
+          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90 sm:text-title-sm">Well Done!</h4>
           <p className="text-sm leading-6 text-gray-500 dark:text-gray-400">
-            Lorem ipsum dolor sit amet consectetur. Feugiat ipsum libero tempor
-            felis risus nisi non. Quisque eu ut tempor curabitur.
+            Lorem ipsum dolor sit amet consectetur. Feugiat ipsum libero tempor felis risus nisi non. Quisque eu ut
+            tempor curabitur.
           </p>
 
           <div className="flex items-center justify-center w-full gap-3 mt-7">
@@ -98,11 +92,7 @@ export default function ModalBasedAlerts() {
         </div>
       </Modal>
       {/* Info Modal */}
-      <Modal
-        isOpen={infoModal.isOpen}
-        onClose={infoModal.closeModal}
-        className="max-w-[600px] p-5 lg:p-10"
-      >
+      <Modal isOpen={infoModal.isOpen} onClose={infoModal.closeModal} className="max-w-[600px] p-5 lg:p-10">
         <div className="text-center">
           <div className="relative flex items-center justify-center z-1 mb-7">
             <svg
@@ -143,8 +133,8 @@ export default function ModalBasedAlerts() {
             Information Alert!
           </h4>
           <p className="text-sm leading-6 text-gray-500 dark:text-gray-400">
-            Lorem ipsum dolor sit amet consectetur. Feugiat ipsum libero tempor
-            felis risus nisi non. Quisque eu ut tempor curabitur.
+            Lorem ipsum dolor sit amet consectetur. Feugiat ipsum libero tempor felis risus nisi non. Quisque eu ut
+            tempor curabitur.
           </p>
 
           <div className="flex items-center justify-center w-full gap-3 mt-7">
@@ -158,11 +148,7 @@ export default function ModalBasedAlerts() {
         </div>
       </Modal>
       {/* Warning Modal */}
-      <Modal
-        isOpen={warningModal.isOpen}
-        onClose={warningModal.closeModal}
-        className="max-w-[600px] p-5 lg:p-10"
-      >
+      <Modal isOpen={warningModal.isOpen} onClose={warningModal.closeModal} className="max-w-[600px] p-5 lg:p-10">
         <div className="text-center">
           <div className="relative flex items-center justify-center z-1 mb-7">
             <svg
@@ -203,8 +189,8 @@ export default function ModalBasedAlerts() {
             Warning Alert!
           </h4>
           <p className="text-sm leading-6 text-gray-500 dark:text-gray-400">
-            Lorem ipsum dolor sit amet consectetur. Feugiat ipsum libero tempor
-            felis risus nisi non. Quisque eu ut tempor curabitur.
+            Lorem ipsum dolor sit amet consectetur. Feugiat ipsum libero tempor felis risus nisi non. Quisque eu ut
+            tempor curabitur.
           </p>
 
           <div className="flex items-center justify-center w-full gap-3 mt-7">
@@ -218,11 +204,7 @@ export default function ModalBasedAlerts() {
         </div>
       </Modal>
       {/* Error Modal */}
-      <Modal
-        isOpen={errorModal.isOpen}
-        onClose={errorModal.closeModal}
-        className="max-w-[600px] p-5 lg:p-10"
-      >
+      <Modal isOpen={errorModal.isOpen} onClose={errorModal.closeModal} className="max-w-[600px] p-5 lg:p-10">
         <div className="text-center">
           <div className="relative flex items-center justify-center z-1 mb-7">
             <svg
@@ -263,8 +245,8 @@ export default function ModalBasedAlerts() {
             Danger Alert!
           </h4>
           <p className="text-sm leading-6 text-gray-500 dark:text-gray-400">
-            Lorem ipsum dolor sit amet consectetur. Feugiat ipsum libero tempor
-            felis risus nisi non. Quisque eu ut tempor curabitur.
+            Lorem ipsum dolor sit amet consectetur. Feugiat ipsum libero tempor felis risus nisi non. Quisque eu ut
+            tempor curabitur.
           </p>
 
           <div className="flex items-center justify-center w-full gap-3 mt-7">

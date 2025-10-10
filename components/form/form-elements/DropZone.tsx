@@ -15,8 +15,8 @@ const DropzoneComponent: React.FC = () => {
       "image/png": [],
       "image/jpeg": [],
       "image/webp": [],
-      "image/svg+xml": [],
-    },
+      "image/svg+xml": []
+    }
   });
   return (
     <ComponentCard title="Dropzone">
@@ -64,9 +64,7 @@ const DropzoneComponent: React.FC = () => {
               Drag and drop your PNG, JPG, WebP, SVG images here or browse
             </span>
 
-            <span className="font-medium underline text-theme-sm text-brand-500">
-              Browse File
-            </span>
+            <span className="font-medium underline text-theme-sm text-brand-500">Browse File</span>
           </div>
         </form>
       </div>

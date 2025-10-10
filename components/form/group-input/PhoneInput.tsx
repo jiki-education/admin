@@ -17,7 +17,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
   countries,
   placeholder = "+1 (555) 000-0000",
   onChange,
-  selectPosition = "start", // Default position is 'start'
+  selectPosition = "start" // Default position is 'start'
 }) => {
   const [selectedCountry, setSelectedCountry] = useState<string>("US");
   const [phoneNumber, setPhoneNumber] = useState<string>("+1");

@@ -19,7 +19,7 @@ const TextArea: React.FC<TextareaProps> = ({
   className = "", // Additional custom styles
   disabled = false, // Disabled state
   error = false, // Error state
-  hint = "", // Default hint text
+  hint = "" // Default hint text
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (onChange) {
@@ -48,13 +48,7 @@ const TextArea: React.FC<TextareaProps> = ({
         className={textareaClasses}
       />
       {hint && (
-        <p
-          className={`mt-2 text-sm ${
-            error ? "text-error-500" : "text-gray-500 dark:text-gray-400"
-          }`}
-        >
-          {hint}
-        </p>
+        <p className={`mt-2 text-sm ${error ? "text-error-500" : "text-gray-500 dark:text-gray-400"}`}>{hint}</p>
       )}
     </div>
   );

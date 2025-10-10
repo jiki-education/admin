@@ -24,21 +24,15 @@ const AvatarText: React.FC<AvatarTextProps> = ({ name, className = "" }) => {
       "bg-green-100 text-green-600",
       "bg-purple-100 text-purple-600",
       "bg-yellow-100 text-yellow-600",
-      "bg-error-100 text-error-600",
+      "bg-error-100 text-error-600"
     ];
 
-    const index = name
-      .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const index = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return colors[index % colors.length];
   };
 
   return (
-    <div
-      className={`flex h-10 w-10 ${className} items-center justify-center rounded-full ${getColorClass(
-        name
-      )}`}
-    >
+    <div className={`flex h-10 w-10 ${className} items-center justify-center rounded-full ${getColorClass(name)}`}>
       <span className="text-sm font-medium">{initials}</span>
     </div>
   );
