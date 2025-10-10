@@ -1,21 +1,24 @@
-import type { Metadata } from "next";
-import { AuthProvider } from "@/components/auth/AuthProvider";
-import "./globals.css";
+import { Outfit } from 'next/font/google';
+import './globals.css';
 
-export const metadata: Metadata = {
-  title: "Jiki Admin",
-  description: "Admin dashboard for Jiki"
-};
+import { SidebarProvider } from '@/context/SidebarContext';
+import { ThemeProvider } from '@/context/ThemeContext';
+
+const outfit = Outfit({
+  subsets: ["latin"],
+});
 
 export default function RootLayout({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
-        <AuthProvider>{children}</AuthProvider>
+      <body className={`${outfit.className} dark:bg-gray-900`}>
+        <ThemeProvider>
+          <SidebarProvider>{children}</SidebarProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
