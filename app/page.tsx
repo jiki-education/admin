@@ -1,18 +1,29 @@
-import Link from "next/link";
+"use client";
+
+import { useRequireAuth } from "@/lib/auth/hooks";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function HomePage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Jiki Admin</h1>
-        <p className="text-gray-600 mb-8">Welcome to the admin dashboard</p>
-        <Link
-          href="/dashboard"
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Go to Dashboard
-        </Link>
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useRequireAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [isAuthenticated, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return null; // Will redirect to /auth/login or /dashboard
 }
