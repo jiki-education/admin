@@ -4,7 +4,7 @@ type BadgeVariant = "light" | "solid";
 type BadgeSize = "sm" | "md";
 type BadgeColor = "primary" | "success" | "error" | "warning" | "info" | "light" | "dark";
 
-interface UnusedBadgeProps {
+interface BadgeProps {
   variant?: BadgeVariant; // Light or solid variant
   size?: BadgeSize; // Badge size
   color?: BadgeColor; // Badge color
@@ -20,7 +20,7 @@ export function Badge({
   startIcon,
   endIcon,
   children
-}) {
+}: BadgeProps) {
   const baseStyles = "inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium";
 
   // Define size styles

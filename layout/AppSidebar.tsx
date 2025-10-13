@@ -82,13 +82,13 @@ function AppSidebar() {
           {nav.subItems ? (
             <button
               onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`menu-item group  ${openSubmenu?.type === menuType && openSubmenu?.index === index
+              className={`menu-item group  ${openSubmenu?.type === menuType && openSubmenu.index === index
                 ? "menu-item-active"
                 : "menu-item-inactive"
                 } cursor-pointer ${!isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"}`}
             >
               <span
-                className={` ${openSubmenu?.type === menuType && openSubmenu?.index === index
+                className={` ${openSubmenu?.type === menuType && openSubmenu.index === index
                   ? "menu-item-icon-active"
                   : "menu-item-icon-inactive"
                   }`}
@@ -98,7 +98,7 @@ function AppSidebar() {
               {(isExpanded || isHovered || isMobileOpen) && <span className={`menu-item-text`}>{nav.name}</span>}
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200  ${openSubmenu?.type === menuType && openSubmenu?.index === index ? "rotate-180 text-brand-500" : ""
+                  className={`ml-auto w-5 h-5 transition-transform duration-200  ${openSubmenu?.type === menuType && openSubmenu.index === index ? "rotate-180 text-brand-500" : ""
                     }`}
                 />
               )}
@@ -124,7 +124,7 @@ function AppSidebar() {
               className="overflow-hidden transition-all duration-300"
               style={{
                 height:
-                  openSubmenu?.type === menuType && openSubmenu?.index === index
+                  openSubmenu?.type === menuType && openSubmenu.index === index
                     ? `${subMenuHeight[`${menuType}-${index}`]}px`
                     : "0px"
               }}
@@ -179,28 +179,25 @@ function AppSidebar() {
 
   useEffect(() => {
     // Check if the current path matches any submenu item
-    let submenuMatched = false;
+    let matchingSubmenu: { type: "main" | "others"; index: number } | null = null;
+    
     ["main", "others"].forEach((menuType) => {
       const items = menuType === "main" ? navItems : othersItems;
       items.forEach((nav, index) => {
-        if (nav.subItems) {
+        if (nav.subItems && !matchingSubmenu) {
           nav.subItems.forEach((subItem) => {
             if (isActive(subItem.path)) {
-              setOpenSubmenu({
+              matchingSubmenu = {
                 type: menuType as "main" | "others",
                 index
-              });
-              submenuMatched = true;
+              };
             }
           });
         }
       });
     });
 
-    // If no submenu item matches, close the open submenu
-    if (!submenuMatched) {
-      setOpenSubmenu(null);
-    }
+    setOpenSubmenu(matchingSubmenu);
   }, [pathname, isActive]);
 
   useEffect(() => {
