@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useSidebar } from "../context/SidebarContext";
+import { useSidebar, SIDEBAR_WIDTH_EXPANDED, SIDEBAR_WIDTH_COLLAPSED } from "../context/SidebarContext";
 import {
   BoxCubeIcon,
   ChevronDownIcon,
@@ -226,7 +226,7 @@ function AppSidebar() {
   return (
     <aside
       className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
-        ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[290px]" : "w-[90px]"}
+        ${isExpanded || isMobileOpen ? `w-[${SIDEBAR_WIDTH_EXPANDED}px]` : isHovered ? `w-[${SIDEBAR_WIDTH_EXPANDED}px]` : `w-[${SIDEBAR_WIDTH_COLLAPSED}px]`}
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}

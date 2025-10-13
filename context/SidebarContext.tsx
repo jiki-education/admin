@@ -1,6 +1,10 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+// Sidebar width constants
+export const SIDEBAR_WIDTH_EXPANDED = 290;
+export const SIDEBAR_WIDTH_COLLAPSED = 90;
+
 interface SidebarContextType {
   isExpanded: boolean;
   isMobileOpen: boolean;
@@ -12,6 +16,7 @@ interface SidebarContextType {
   setIsHovered: (isHovered: boolean) => void;
   setActiveItem: (item: string | null) => void;
   toggleSubmenu: (item: string) => void;
+  getSidebarWidth: () => number;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -61,6 +66,18 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setOpenSubmenu((prev) => (prev === item ? null : item));
   };
 
+  const getSidebarWidth = () => {
+    if (isMobile) {
+      return 0; // Mobile sidebar overlays, doesn't affect main content width
+    }
+    
+    if (isExpanded || isHovered) {
+      return SIDEBAR_WIDTH_EXPANDED;
+    }
+    
+    return SIDEBAR_WIDTH_COLLAPSED;
+  };
+
   return (
     <SidebarContext.Provider
       value={{
@@ -73,7 +90,8 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
         toggleMobileSidebar,
         setIsHovered,
         setActiveItem,
-        toggleSubmenu
+        toggleSubmenu,
+        getSidebarWidth
       }}
     >
       {children}
