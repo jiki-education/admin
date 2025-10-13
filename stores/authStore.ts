@@ -33,6 +33,10 @@ export const useAuthStore = create<AuthStore>((set, _get) => ({
 
       const apiUser = await apiLogin(credentials);
 
+      // Store email in sessionStorage for session restoration
+      const { setUserEmail } = await import("@/lib/auth/storage");
+      setUserEmail(apiUser.email);
+
       // Use email from API response, but only store email
       const user: User = { email: apiUser.email };
 
@@ -61,6 +65,10 @@ export const useAuthStore = create<AuthStore>((set, _get) => ({
       set({ isLoading: true, error: null });
 
       const apiUser = await apiSignup(userData);
+
+      // Store email in sessionStorage for session restoration
+      const { setUserEmail } = await import("@/lib/auth/storage");
+      setUserEmail(apiUser.email);
 
       // Use email from API response, but only store email
       const user: User = { email: apiUser.email };
@@ -119,27 +127,24 @@ export const useAuthStore = create<AuthStore>((set, _get) => ({
       const isValid = await validateToken();
 
       if (isValid) {
-        // Token is valid, extract user data from JWT
+        // Token is valid, get user email from sessionStorage
         try {
-          const { getToken, parseJwtPayload } = await import("@/lib/auth/storage");
-          const token = getToken();
+          const { getUserEmail } = await import("@/lib/auth/storage");
+          const email = getUserEmail();
           
-          if (token) {
-            const payload = parseJwtPayload(token);
-            if (payload?.email) {
-              const user: User = { email: payload.email };
-              set({
-                user,
-                isAuthenticated: true,
-                isLoading: false,
-                error: null,
-                hasCheckedAuth: true
-              });
-              return;
-            }
+          if (email) {
+            const user: User = { email };
+            set({
+              user,
+              isAuthenticated: true,
+              isLoading: false,
+              error: null,
+              hasCheckedAuth: true
+            });
+            return;
           }
         } catch (userError) {
-          console.error("Failed to extract user from JWT:", userError);
+          console.error("Failed to get user email from storage:", userError);
         }
       }
 
