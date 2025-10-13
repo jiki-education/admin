@@ -31,7 +31,10 @@ export const useAuthStore = create<AuthStore>((set, _get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const user = await apiLogin(credentials);
+      const apiUser = await apiLogin(credentials);
+
+      // Use email from API response, but only store email
+      const user: User = { email: apiUser.email };
 
       set({
         user,
@@ -57,7 +60,10 @@ export const useAuthStore = create<AuthStore>((set, _get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const user = await apiSignup(userData);
+      const apiUser = await apiSignup(userData);
+
+      // Use email from API response, but only store email
+      const user: User = { email: apiUser.email };
 
       set({
         user,
@@ -113,24 +119,38 @@ export const useAuthStore = create<AuthStore>((set, _get) => ({
       const isValid = await validateToken();
 
       if (isValid) {
-        // Token is valid, but we don't have user data
-        // In a real app, you might call a "me" endpoint here
-        // For now, we'll just set authenticated without user data
-        set({
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-          hasCheckedAuth: true
-        });
-      } else {
-        set({
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: null,
-          hasCheckedAuth: true
-        });
+        // Token is valid, extract user data from JWT
+        try {
+          const { getToken, parseJwtPayload } = await import("@/lib/auth/storage");
+          const token = getToken();
+          
+          if (token) {
+            const payload = parseJwtPayload(token);
+            if (payload?.email) {
+              const user: User = { email: payload.email };
+              set({
+                user,
+                isAuthenticated: true,
+                isLoading: false,
+                error: null,
+                hasCheckedAuth: true
+              });
+              return;
+            }
+          }
+        } catch (userError) {
+          console.error("Failed to extract user from JWT:", userError);
+        }
       }
+
+      // Token invalid or no user data found
+      set({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: null,
+        hasCheckedAuth: true
+      });
     } catch (error) {
       set({
         user: null,

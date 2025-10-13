@@ -6,18 +6,14 @@ import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import {
   BoxCubeIcon,
-  CalenderIcon,
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  ListIcon,
   PageIcon,
   PieChartIcon,
   PlugInIcon,
-  TableIcon,
   UserCircleIcon
 } from "../icons/index";
-import SidebarWidget from "./SidebarWidget";
 
 interface NavItem {
   name: string;
@@ -30,66 +26,47 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }]
-  },
-  {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar"
+    path: "/dashboard"
   },
   {
     icon: <UserCircleIcon />,
-    name: "User Profile",
-    path: "/profile"
-  },
-
-  {
-    name: "Forms",
-    icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }]
-  },
-  {
-    name: "Tables",
-    icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }]
-  },
-  {
-    name: "Pages",
-    icon: <PageIcon />,
+    name: "Users",
     subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false }
+      { name: "User Management", path: "/users", pro: false },
+      { name: "Permissions", path: "/users/permissions", pro: false }
     ]
+  },
+  {
+    icon: <PageIcon />,
+    name: "Content",
+    subItems: [
+      { name: "Content Moderation", path: "/content", pro: false },
+      { name: "Reports", path: "/content/reports", pro: false }
+    ]
+  },
+  {
+    icon: <PieChartIcon />,
+    name: "Analytics",
+    path: "/analytics"
   }
 ];
 
 const othersItems: NavItem[] = [
   {
-    icon: <PieChartIcon />,
-    name: "Charts",
-    subItems: [
-      { name: "Line Chart", path: "/line-chart", pro: false },
-      { name: "Bar Chart", path: "/bar-chart", pro: false }
-    ]
-  },
-  {
     icon: <BoxCubeIcon />,
-    name: "UI Elements",
+    name: "System",
     subItems: [
-      { name: "Alerts", path: "/alerts", pro: false },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Badge", path: "/badge", pro: false },
-      { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false }
+      { name: "Settings", path: "/system/settings", pro: false },
+      { name: "Logs", path: "/system/logs", pro: false },
+      { name: "Monitoring", path: "/system/monitoring", pro: false }
     ]
   },
   {
     icon: <PlugInIcon />,
-    name: "Authentication",
+    name: "Account",
     subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false }
+      { name: "Profile", path: "/profile", pro: false },
+      { name: "Sign Out", path: "/signout", pro: false }
     ]
   }
 ];
@@ -105,27 +82,24 @@ function AppSidebar() {
           {nav.subItems ? (
             <button
               onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`menu-item group  ${
-                openSubmenu?.type === menuType && openSubmenu?.index === index
-                  ? "menu-item-active"
-                  : "menu-item-inactive"
-              } cursor-pointer ${!isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"}`}
+              className={`menu-item group  ${openSubmenu?.type === menuType && openSubmenu?.index === index
+                ? "menu-item-active"
+                : "menu-item-inactive"
+                } cursor-pointer ${!isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"}`}
             >
               <span
-                className={` ${
-                  openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? "menu-item-icon-active"
-                    : "menu-item-icon-inactive"
-                }`}
+                className={` ${openSubmenu?.type === menuType && openSubmenu?.index === index
+                  ? "menu-item-icon-active"
+                  : "menu-item-icon-inactive"
+                  }`}
               >
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && <span className={`menu-item-text`}>{nav.name}</span>}
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200  ${
-                    openSubmenu?.type === menuType && openSubmenu?.index === index ? "rotate-180 text-brand-500" : ""
-                  }`}
+                  className={`ml-auto w-5 h-5 transition-transform duration-200  ${openSubmenu?.type === menuType && openSubmenu?.index === index ? "rotate-180 text-brand-500" : ""
+                    }`}
                 />
               )}
             </button>
@@ -160,26 +134,23 @@ function AppSidebar() {
                   <li key={subItem.name}>
                     <Link
                       href={subItem.path}
-                      className={`menu-dropdown-item ${
-                        isActive(subItem.path) ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"
-                      }`}
+                      className={`menu-dropdown-item ${isActive(subItem.path) ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"
+                        }`}
                     >
                       {subItem.name}
                       <span className="flex items-center gap-1 ml-auto">
                         {subItem.new && (
                           <span
-                            className={`ml-auto ${
-                              isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge `}
+                            className={`ml-auto ${isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
+                              } menu-dropdown-badge `}
                           >
                             new
                           </span>
                         )}
                         {subItem.pro && (
                           <span
-                            className={`ml-auto ${
-                              isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge `}
+                            className={`ml-auto ${isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
+                              } menu-dropdown-badge `}
                           >
                             pro
                           </span>
@@ -286,9 +257,8 @@ function AppSidebar() {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-                }`}
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+                  }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? "Menu" : <HorizontaLDots />}
               </h2>
@@ -297,9 +267,8 @@ function AppSidebar() {
 
             <div className="">
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-                }`}
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+                  }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? "Others" : <HorizontaLDots />}
               </h2>
@@ -307,7 +276,6 @@ function AppSidebar() {
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
       </div>
     </aside>
   );

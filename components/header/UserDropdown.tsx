@@ -35,17 +35,18 @@ export default function UserDropdown() {
     <div className="relative">
       <button onClick={toggleDropdown} className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle">
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <Image width={44} height={44} src="/images/user/owner.jpg" alt="User" />
+          <Image width={44} height={44} src="/images/user/jeremy-walker.jpg" alt="User" />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">
-          {user ? `${user.firstName} ${user.lastName}` : "User"}
-        </span>
+        <div className="mr-1">
+          <span className="block text-xs text-gray-500 dark:text-gray-400">
+            {user?.email || "user@example.com"}
+          </span>
+        </div>
 
         <svg
-          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
           width="18"
           height="20"
           viewBox="0 0 18 20"
@@ -68,9 +69,6 @@ export default function UserDropdown() {
         className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
       >
         <div>
-          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {user ? `${user.firstName} ${user.lastName}` : "User"}
-          </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
             {user?.email || "user@example.com"}
           </span>
