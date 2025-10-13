@@ -7,10 +7,10 @@ This plan outlines the implementation of a comprehensive email template manageme
 ## Phase 1: Foundation & Navigation
 
 ### Tasks:
-- [ ] Add "Email Templates" navigation item to the sidebar under "System" section
-- [ ] Create base route structure (`/dashboard/email-templates`)
-- [ ] Set up API integration using existing auth patterns
-- [ ] Create basic page layout following dashboard patterns
+- [x] Add "Email Templates" navigation item to the sidebar under "System" section
+- [x] Create base route structure (`/dashboard/email-templates`)
+- [x] Set up API integration using existing auth patterns
+- [x] Create basic page layout following dashboard patterns
 
 ### Technical Details:
 - Update `layout/AppSidebar.tsx` to include email templates menu item
