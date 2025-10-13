@@ -57,6 +57,7 @@ const othersItems: NavItem[] = [
     name: "System",
     subItems: [
       { name: "Settings", path: "/system/settings", pro: false },
+      { name: "Email Templates", path: "/dashboard/email-templates", pro: false },
       { name: "Logs", path: "/system/logs", pro: false },
       { name: "Monitoring", path: "/system/monitoring", pro: false }
     ]
