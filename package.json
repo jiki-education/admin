@@ -14,6 +14,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "mjml": "^4.16.1",
     "next": "15.5.2",
     "react": "19.2.0",
     "react-apexcharts": "^1.7.0",
@@ -26,6 +27,7 @@
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4",
     "@types/jest": "^30.0.0",
+    "@types/mjml": "^4.7.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

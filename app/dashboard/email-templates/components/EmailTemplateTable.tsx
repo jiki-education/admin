@@ -1,21 +1,25 @@
 import React from "react";
+import { useRouter } from "next/navigation";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
 import Button from "@/components/ui/button/Button";
 import type { EmailTemplate } from "../types";
 
 interface EmailTemplateTableProps {
   templates: EmailTemplate[];
-  onEdit: (template: EmailTemplate) => Promise<void>;
   onDelete: (template: EmailTemplate) => void;
   loading?: boolean;
 }
 
 export default function EmailTemplateTable({
   templates,
-  onEdit,
   onDelete,
   loading = false
 }: EmailTemplateTableProps) {
+  const router = useRouter();
+
+  const handleEdit = (template: EmailTemplate) => {
+    router.push(`/dashboard/email-templates/edit/${template.id}`);
+  };
   if (loading) {
     return (
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -118,7 +122,7 @@ export default function EmailTemplateTable({
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => void onEdit(template)}
+                        onClick={() => handleEdit(template)}
                       >
                         Edit
                       </Button>

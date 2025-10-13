@@ -1,0 +1,151 @@
+"use client";
+import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import Button from "@/components/ui/button/Button";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter, useParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { getEmailTemplate, updateEmailTemplate, getEmailTemplateTypes } from "@/lib/api/email-templates";
+import EmailTemplateForm from "../../components/EmailTemplateForm";
+import type { EmailTemplate, EmailTemplateType } from "../../types";
+
+export default function EditEmailTemplate() {
+  const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
+  const router = useRouter();
+  const params = useParams();
+  const templateId = parseInt(params.id as string);
+
+  const [template, setTemplate] = useState<EmailTemplate | null>(null);
+  const [templateTypes, setTemplateTypes] = useState<EmailTemplateType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!hasCheckedAuth) {
+      void checkAuth();
+    }
+  }, [hasCheckedAuth, checkAuth]);
+
+  useEffect(() => {
+    if (hasCheckedAuth && !isAuthenticated) {
+      router.push("/signin");
+    }
+  }, [isAuthenticated, hasCheckedAuth, router]);
+
+  const loadTemplate = useCallback(async () => {
+    if (!templateId || isNaN(templateId)) {
+      setError("Invalid template ID");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const [templateData, types] = await Promise.all([
+        getEmailTemplate(templateId),
+        getEmailTemplateTypes()
+      ]);
+      setTemplate(templateData);
+      setTemplateTypes(types);
+    } catch (err) {
+      console.error("Failed to load template:", err);
+      setError(err instanceof Error ? err.message : "Failed to load template");
+    } finally {
+      setLoading(false);
+    }
+  }, [templateId]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      void loadTemplate();
+    }
+  }, [isAuthenticated, loadTemplate]);
+
+  const handleSaveTemplate = useCallback(async (templateData: EmailTemplate) => {
+    setSaving(true);
+    try {
+      await updateEmailTemplate(templateData.id, templateData);
+      router.push("/dashboard/email-templates");
+    } catch (error) {
+      console.error("Failed to update template:", error);
+      throw error;
+    } finally {
+      setSaving(false);
+    }
+  }, [router]);
+
+  const handleBack = useCallback(() => {
+    router.push("/dashboard/email-templates");
+  }, [router]);
+
+  if (!hasCheckedAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading template...</div>
+      </div>
+    );
+  }
+
+  if (error || !template) {
+    return (
+      <div>
+        <PageBreadcrumb pageTitle="Edit Email Template" />
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+              Edit Email Template
+            </h1>
+            <Button variant="outline" onClick={handleBack}>
+              Back to Templates
+            </Button>
+          </div>
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800">
+            <p className="text-red-700 dark:text-red-400">{error || "Template not found"}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <PageBreadcrumb pageTitle="Edit Email Template" />
+      
+      <div className="space-y-6">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+              Edit Email Template
+            </h1>
+            <Button variant="outline" onClick={handleBack}>
+              Back to Templates
+            </Button>
+          </div>
+
+          <EmailTemplateForm
+            isOpen={true}
+            onClose={() => {}}
+            onSave={handleSaveTemplate}
+            template={template}
+            templateTypes={templateTypes}
+            loading={saving}
+            isPage={true}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

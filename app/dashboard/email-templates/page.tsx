@@ -9,7 +9,7 @@ import TemplateFilters from "./components/TemplateFilters";
 import EmailTemplateForm from "./components/EmailTemplateForm";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
 import type { EmailTemplate, EmailTemplateFilters, EmailTemplateType } from "./types";
-import { getEmailTemplates, getEmailTemplateTypes, getEmailTemplate, createEmailTemplate, updateEmailTemplate, deleteEmailTemplate } from "@/lib/api/email-templates";
+import { getEmailTemplates, getEmailTemplateTypes, createEmailTemplate, deleteEmailTemplate } from "@/lib/api/email-templates";
 import { useModal } from "@/hooks/useModal";
 
 export default function EmailTemplates() {
@@ -24,10 +24,9 @@ export default function EmailTemplates() {
 
   // Modal states
   const createModal = useModal();
-  const editModal = useModal();
   const deleteModal = useModal();
 
-  // Selected template for edit/delete
+  // Selected template for delete
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
   const [operationLoading, setOperationLoading] = useState(false);
 
@@ -87,21 +86,6 @@ export default function EmailTemplates() {
     setFilters({});
   }, []);
 
-  const handleEditTemplate = useCallback(async (template: EmailTemplate) => {
-    try {
-      setOperationLoading(true);
-      // Fetch full template data including body content
-      const fullTemplate = await getEmailTemplate(template.id);
-      setSelectedTemplate(fullTemplate);
-      editModal.openModal();
-    } catch (error) {
-      console.error("Failed to load template for editing:", error);
-      setError("Failed to load template data");
-    } finally {
-      setOperationLoading(false);
-    }
-  }, [editModal]);
-
   const handleDeleteTemplate = useCallback((template: EmailTemplate) => {
     setSelectedTemplate(template);
     deleteModal.openModal();
@@ -112,16 +96,11 @@ export default function EmailTemplates() {
     createModal.openModal();
   }, [createModal]);
 
-  const handleSaveTemplate = useCallback(async (templateData: Omit<EmailTemplate, 'id'> | EmailTemplate) => {
+  const handleSaveTemplate = useCallback(async (templateData: Omit<EmailTemplate, 'id'>) => {
     setOperationLoading(true);
     try {
-      if ('id' in templateData) {
-        // Update existing template
-        await updateEmailTemplate(templateData.id, templateData);
-      } else {
-        // Create new template
-        await createEmailTemplate(templateData);
-      }
+      // Create new template
+      await createEmailTemplate(templateData);
       // Reload templates after successful save
       await loadTemplates();
     } catch (error) {
@@ -190,7 +169,6 @@ export default function EmailTemplates() {
 
           <EmailTemplateTable
             templates={templates}
-            onEdit={handleEditTemplate}
             onDelete={handleDeleteTemplate}
             loading={loading}
           />
@@ -203,16 +181,6 @@ export default function EmailTemplates() {
         onClose={createModal.closeModal}
         onSave={handleSaveTemplate}
         template={null}
-        templateTypes={templateTypes}
-        loading={operationLoading}
-      />
-
-      {/* Edit Template Modal */}
-      <EmailTemplateForm
-        isOpen={editModal.isOpen}
-        onClose={editModal.closeModal}
-        onSave={handleSaveTemplate}
-        template={selectedTemplate}
         templateTypes={templateTypes}
         loading={operationLoading}
       />

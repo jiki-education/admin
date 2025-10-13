@@ -15,6 +15,7 @@ interface EmailTemplateFormProps {
   template?: EmailTemplate | null;
   templateTypes: EmailTemplateType[];
   loading?: boolean;
+  isPage?: boolean;
 }
 
 interface FormData {
@@ -49,7 +50,8 @@ export default function EmailTemplateForm({
   onSave,
   template,
   templateTypes,
-  loading = false
+  loading = false,
+  isPage = false
 }: EmailTemplateFormProps) {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<Partial<FormData>>({});
@@ -59,7 +61,7 @@ export default function EmailTemplateForm({
   const isEditing = !!template;
 
   useEffect(() => {
-    if (isOpen && template) {
+    if ((isOpen || isPage) && template) {
       // Populate form with existing template data
       setFormData({
         type: template.type,
@@ -69,12 +71,12 @@ export default function EmailTemplateForm({
         body_mjml: template.body_mjml,
         body_text: template.body_text
       });
-    } else if (isOpen && !template) {
+    } else if ((isOpen || isPage) && !template) {
       // Reset form for new template
       setFormData(initialFormData);
     }
     setErrors({});
-  }, [isOpen, template]);
+  }, [isOpen, isPage, template]);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<FormData> = {};
@@ -146,12 +148,13 @@ export default function EmailTemplateForm({
     }
   };
 
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-4xl p-6 lg:p-8">
-      <form onSubmit={handleSubmit}>
+  const formContent = (
+    <form onSubmit={handleSubmit}>
+      {!isPage && (
         <h4 className="mb-6 text-xl font-semibold text-gray-800 dark:text-white/90">
           {isEditing ? "Edit Email Template" : "Create New Email Template"}
         </h4>
+      )}
 
 
         <div className="space-y-6">
@@ -244,25 +247,34 @@ export default function EmailTemplateForm({
           </div>
         </div>
 
-        {/* Form Actions */}
-        <div className="mt-8 flex items-center justify-end gap-3">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={onClose}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <button
-            type="submit"
-            disabled={isSubmitting || loading}
-            className={`inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-3 text-sm bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300 ${isSubmitting || loading ? "cursor-not-allowed opacity-50" : ""}`}
-          >
-            {isSubmitting ? "Saving..." : isEditing ? "Update Template" : "Create Template"}
-          </button>
-        </div>
-      </form>
+      {/* Form Actions */}
+      <div className="mt-8 flex items-center justify-end gap-3">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={onClose}
+          disabled={isSubmitting}
+        >
+          {isPage ? "Back" : "Cancel"}
+        </Button>
+        <button
+          type="submit"
+          disabled={isSubmitting || loading}
+          className={`inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-3 text-sm bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300 ${isSubmitting || loading ? "cursor-not-allowed opacity-50" : ""}`}
+        >
+          {isSubmitting ? "Saving..." : isEditing ? "Update Template" : "Create Template"}
+        </button>
+      </div>
+    </form>
+  );
+
+  if (isPage) {
+    return formContent;
+  }
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-4xl p-6 lg:p-8">
+      {formContent}
     </Modal>
   );
 }
