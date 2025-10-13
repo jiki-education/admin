@@ -6,8 +6,11 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import EmailTemplateTable from "./components/EmailTemplateTable";
 import TemplateFilters from "./components/TemplateFilters";
+import EmailTemplateForm from "./components/EmailTemplateForm";
+import DeleteConfirmModal from "./components/DeleteConfirmModal";
 import type { EmailTemplate, EmailTemplateFilters, EmailTemplateType } from "./types";
-import { getEmailTemplates, getEmailTemplateTypes } from "@/lib/api/email-templates";
+import { getEmailTemplates, getEmailTemplateTypes, getEmailTemplate, createEmailTemplate, updateEmailTemplate, deleteEmailTemplate } from "@/lib/api/email-templates";
+import { useModal } from "@/hooks/useModal";
 
 export default function EmailTemplates() {
   const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
@@ -18,6 +21,15 @@ export default function EmailTemplates() {
   const [filters, setFilters] = useState<EmailTemplateFilters>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Modal states
+  const createModal = useModal();
+  const editModal = useModal();
+  const deleteModal = useModal();
+
+  // Selected template for edit/delete
+  const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
+  const [operationLoading, setOperationLoading] = useState(false);
 
   useEffect(() => {
     if (!hasCheckedAuth) {
@@ -75,20 +87,66 @@ export default function EmailTemplates() {
     setFilters({});
   }, []);
 
-  const handleEditTemplate = useCallback((template: EmailTemplate) => {
-    // TODO: Implement edit modal in Phase 3
-    console.warn("Edit template functionality not yet implemented:", template.id);
-  }, []);
+  const handleEditTemplate = useCallback(async (template: EmailTemplate) => {
+    try {
+      setOperationLoading(true);
+      // Fetch full template data including body content
+      const fullTemplate = await getEmailTemplate(template.id);
+      setSelectedTemplate(fullTemplate);
+      editModal.openModal();
+    } catch (error) {
+      console.error("Failed to load template for editing:", error);
+      setError("Failed to load template data");
+    } finally {
+      setOperationLoading(false);
+    }
+  }, [editModal]);
 
   const handleDeleteTemplate = useCallback((template: EmailTemplate) => {
-    // TODO: Implement delete confirmation in Phase 3  
-    console.warn("Delete template functionality not yet implemented:", template.id);
-  }, []);
+    setSelectedTemplate(template);
+    deleteModal.openModal();
+  }, [deleteModal]);
 
   const handleCreateTemplate = useCallback(() => {
-    // TODO: Implement create modal in Phase 3
-    console.warn("Create template functionality not yet implemented");
-  }, []);
+    setSelectedTemplate(null);
+    createModal.openModal();
+  }, [createModal]);
+
+  const handleSaveTemplate = useCallback(async (templateData: Omit<EmailTemplate, 'id'> | EmailTemplate) => {
+    setOperationLoading(true);
+    try {
+      if ('id' in templateData) {
+        // Update existing template
+        await updateEmailTemplate(templateData.id, templateData);
+      } else {
+        // Create new template
+        await createEmailTemplate(templateData);
+      }
+      // Reload templates after successful save
+      await loadTemplates();
+    } catch (error) {
+      console.error("Failed to save template:", error);
+      throw error; // Re-throw to let the modal handle it
+    } finally {
+      setOperationLoading(false);
+    }
+  }, [loadTemplates]);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!selectedTemplate) { return };
+
+    setOperationLoading(true);
+    try {
+      await deleteEmailTemplate(selectedTemplate.id);
+      // Reload templates after successful delete
+      await loadTemplates();
+    } catch (error) {
+      console.error("Failed to delete template:", error);
+      throw error; // Re-throw to let the modal handle it
+    } finally {
+      setOperationLoading(false);
+    }
+  }, [selectedTemplate, loadTemplates]);
 
   if (!hasCheckedAuth) {
     return (
@@ -138,6 +196,35 @@ export default function EmailTemplates() {
           />
         </div>
       </div>
+
+      {/* Create Template Modal */}
+      <EmailTemplateForm
+        isOpen={createModal.isOpen}
+        onClose={createModal.closeModal}
+        onSave={handleSaveTemplate}
+        template={null}
+        templateTypes={templateTypes}
+        loading={operationLoading}
+      />
+
+      {/* Edit Template Modal */}
+      <EmailTemplateForm
+        isOpen={editModal.isOpen}
+        onClose={editModal.closeModal}
+        onSave={handleSaveTemplate}
+        template={selectedTemplate}
+        templateTypes={templateTypes}
+        loading={operationLoading}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.closeModal}
+        onConfirm={handleConfirmDelete}
+        template={selectedTemplate}
+        loading={operationLoading}
+      />
     </div>
   );
 }

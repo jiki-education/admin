@@ -11,6 +11,7 @@ interface SelectProps {
   onChange: (value: string) => void;
   className?: string;
   defaultValue?: string;
+  value?: string;
 }
 
 function Select({
@@ -18,15 +19,20 @@ function Select({
   placeholder = "Select an option",
   onChange,
   className = "",
-  defaultValue = ""
+  defaultValue = "",
+  value
 }: SelectProps) {
-  // Manage the selected value
-  const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
+  // Use controlled value if provided, otherwise use internal state
+  const [internalValue, setInternalValue] = useState<string>(defaultValue);
+  const selectedValue = value !== undefined ? value : internalValue;
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setSelectedValue(value);
-    onChange(value); // Trigger parent handler
+    const newValue = e.target.value;
+    // Only update internal state if not controlled
+    if (value === undefined) {
+      setInternalValue(newValue);
+    }
+    onChange(newValue); // Trigger parent handler
   };
 
   return (

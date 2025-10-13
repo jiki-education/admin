@@ -20,11 +20,11 @@ This plan outlines the implementation of a comprehensive email template manageme
 ## Phase 2: Index View with Filtering
 
 ### Tasks:
-- [ ] Create templates index page with table layout
-- [ ] Implement filtering by type, slug, and locale
-- [ ] Add search functionality
-- [ ] Include pagination if needed
-- [ ] Display template metadata (ID, type, slug, locale)
+- [x] Create templates index page with table layout
+- [x] Implement filtering by type, slug, and locale
+- [x] Add search functionality
+- [x] Include pagination if needed
+- [x] Display template metadata (ID, type, slug, locale)
 
 ### Components to Use:
 - `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableCell` from `/components/ui/table/index.tsx`
@@ -39,20 +39,20 @@ This plan outlines the implementation of a comprehensive email template manageme
 ## Phase 3: CRUD Operations
 
 ### Add New Template
-- [ ] Create modal form for new template creation
-- [ ] Form fields: type, slug, locale, subject, body_mjml, body_text
-- [ ] Validation for required fields
-- [ ] Success/error handling
+- [x] Create modal form for new template creation
+- [x] Form fields: type, slug, locale, subject, body_mjml, body_text
+- [x] Validation for required fields
+- [x] Success/error handling
 
 ### Edit Template
-- [ ] Edit modal with pre-populated form
-- [ ] Same form structure as create
-- [ ] Handle updates and validation
+- [x] Edit modal with pre-populated form
+- [x] Same form structure as create
+- [x] Handle updates and validation
 
 ### Delete Template
-- [ ] Confirmation modal for deletion
-- [ ] Proper error handling
-- [ ] Table refresh after deletion
+- [x] Confirmation modal for deletion
+- [x] Proper error handling
+- [x] Table refresh after deletion
 
 ### Components to Use:
 - `Modal` component for forms and confirmations

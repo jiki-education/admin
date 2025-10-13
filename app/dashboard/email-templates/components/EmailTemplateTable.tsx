@@ -5,7 +5,7 @@ import type { EmailTemplate } from "../types";
 
 interface EmailTemplateTableProps {
   templates: EmailTemplate[];
-  onEdit: (template: EmailTemplate) => void;
+  onEdit: (template: EmailTemplate) => Promise<void>;
   onDelete: (template: EmailTemplate) => void;
   loading?: boolean;
 }
@@ -118,7 +118,7 @@ export default function EmailTemplateTable({
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => onEdit(template)}
+                        onClick={() => void onEdit(template)}
                       >
                         Edit
                       </Button>
