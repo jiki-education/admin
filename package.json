@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3062",
+    "dev": "next dev --port 3062 --turbo",
     "build": "next build",
     "start": "next start",
     "test:e2e": "node scripts/run-e2e-tests.js",
