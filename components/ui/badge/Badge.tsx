@@ -4,7 +4,7 @@ type BadgeVariant = "light" | "solid";
 type BadgeSize = "sm" | "md";
 type BadgeColor = "primary" | "success" | "error" | "warning" | "info" | "light" | "dark";
 
-interface BadgeProps {
+interface UnusedBadgeProps {
   variant?: BadgeVariant; // Light or solid variant
   size?: BadgeSize; // Badge size
   color?: BadgeColor; // Badge color

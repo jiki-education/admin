@@ -1,11 +1,11 @@
-import React, { FC } from "react";
+import React from "react";
 
 interface FileInputProps {
   className?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const FileInput: FC<FileInputProps> = ({ className, onChange }) => {
+function FileInput({ className, onChange }: FileInputProps) {
   return (
     <input
       type="file"

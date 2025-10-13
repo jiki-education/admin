@@ -1,6 +1,4 @@
 "use client";
-import { Badge } from "../ui/badge/Badge";
-import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from "@/icons";
 
 export function EcommerceMetrics() {
   return (

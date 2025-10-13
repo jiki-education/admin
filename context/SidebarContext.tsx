@@ -1,7 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-type SidebarContextType = {
+interface SidebarContextType {
   isExpanded: boolean;
   isMobileOpen: boolean;
   isHovered: boolean;
@@ -12,7 +12,7 @@ type SidebarContextType = {
   setIsHovered: (isHovered: boolean) => void;
   setActiveItem: (item: string | null) => void;
   toggleSubmenu: (item: string) => void;
-};
+}
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 

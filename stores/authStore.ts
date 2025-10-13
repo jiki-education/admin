@@ -18,7 +18,7 @@ interface AuthStore extends AuthState {
   clearError: () => void;
 }
 
-export const useAuthStore = create<AuthStore>((set, get) => ({
+export const useAuthStore = create<AuthStore>((set, _get) => ({
   // Initial state
   user: null,
   isAuthenticated: false,

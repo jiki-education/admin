@@ -1,4 +1,5 @@
-import React, { ReactNode } from "react";
+import type { ReactNode } from "react";
+import React from "react";
 
 // Props for Table
 interface TableProps {
@@ -32,27 +33,27 @@ interface TableCellProps {
 }
 
 // Table Component
-const Table: React.FC<TableProps> = ({ children, className }) => {
+function Table({ children, className }: TableProps) {
   return <table className={`min-w-full  ${className}`}>{children}</table>;
 };
 
 // TableHeader Component
-const TableHeader: React.FC<TableHeaderProps> = ({ children, className }) => {
+function TableHeader({ children, className }: TableHeaderProps) {
   return <thead className={className}>{children}</thead>;
 };
 
 // TableBody Component
-const TableBody: React.FC<TableBodyProps> = ({ children, className }) => {
+function TableBody({ children, className }: TableBodyProps) {
   return <tbody className={className}>{children}</tbody>;
 };
 
 // TableRow Component
-const TableRow: React.FC<TableRowProps> = ({ children, className }) => {
+function TableRow({ children, className }: TableRowProps) {
   return <tr className={className}>{children}</tr>;
 };
 
 // TableCell Component
-const TableCell: React.FC<TableCellProps> = ({ children, isHeader = false, className }) => {
+function TableCell({ children, isHeader = false, className }: TableCellProps) {
   const CellTag = isHeader ? "th" : "td";
   return <CellTag className={` ${className}`}>{children}</CellTag>;
 };

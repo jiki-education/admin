@@ -5,7 +5,7 @@ interface AvatarTextProps {
   className?: string;
 }
 
-const AvatarText: React.FC<AvatarTextProps> = ({ name, className = "" }) => {
+function AvatarText({ name, className = "" }: AvatarTextProps) {
   // Generate initials from name
   const initials = name
     .split(" ")

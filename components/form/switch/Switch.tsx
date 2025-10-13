@@ -9,17 +9,17 @@ interface SwitchProps {
   color?: "blue" | "gray"; // Added prop to toggle color theme
 }
 
-const Switch: React.FC<SwitchProps> = ({
+function Switch({
   label,
   defaultChecked = false,
   disabled = false,
   onChange,
   color = "blue" // Default to blue color
-}) => {
+}: SwitchProps) {
   const [isChecked, setIsChecked] = useState(defaultChecked);
 
   const handleToggle = () => {
-    if (disabled) return;
+    if (disabled) {return;}
     const newCheckedState = !isChecked;
     setIsChecked(newCheckedState);
     if (onChange) {

@@ -7,7 +7,7 @@ interface ComponentCardProps {
   desc?: string; // Description text
 }
 
-const ComponentCard: React.FC<ComponentCardProps> = ({ title, children, className = "", desc = "" }) => {
+function ComponentCard({ title, children, className = "", desc = "" }: ComponentCardProps) {
   return (
     <div
       className={`rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] ${className}`}

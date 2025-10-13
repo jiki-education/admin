@@ -1,7 +1,8 @@
 "use client";
 
 import { useAuthStore } from "@/stores/authStore";
-import { useEffect, ReactNode } from "react";
+import type { ReactNode } from "react";
+import { useEffect } from "react";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -13,7 +14,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     // Only check auth if we haven't checked yet
     if (!hasCheckedAuth) {
-      checkAuth();
+      void checkAuth();
     }
   }, [checkAuth, hasCheckedAuth]);
 

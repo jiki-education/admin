@@ -29,7 +29,7 @@ export const Dropdown: React.FC<DropdownProps> = ({ isOpen, onClose, children, c
     };
   }, [onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   return (
     <div

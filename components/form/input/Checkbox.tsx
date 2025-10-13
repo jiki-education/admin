@@ -9,7 +9,7 @@ interface CheckboxProps {
   disabled?: boolean;
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({ label, checked, id, onChange, className = "", disabled = false }) => {
+function Checkbox({ label, checked, id, onChange, className = "", disabled = false }: CheckboxProps) {
   return (
     <label
       className={`flex items-center space-x-3 group cursor-pointer ${disabled ? "cursor-not-allowed opacity-60" : ""}`}

@@ -13,13 +13,13 @@ interface SelectProps {
   defaultValue?: string;
 }
 
-const Select: React.FC<SelectProps> = ({
+function Select({
   options,
   placeholder = "Select an option",
   onChange,
   className = "",
   defaultValue = ""
-}) => {
+}: SelectProps) {
   // Manage the selected value
   const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
 

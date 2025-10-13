@@ -19,12 +19,12 @@ import {
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
 
-type NavItem = {
+interface NavItem {
   name: string;
   icon: React.ReactNode;
   path?: string;
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
-};
+}
 
 const navItems: NavItem[] = [
   {
@@ -94,7 +94,7 @@ const othersItems: NavItem[] = [
   }
 ];
 
-const AppSidebar: React.FC = () => {
+function AppSidebar() {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
 

@@ -32,7 +32,7 @@ const statusColorClasses = {
   busy: "bg-warning-500"
 };
 
-const Avatar: React.FC<AvatarProps> = ({ src, alt = "User Avatar", size = "medium", status = "none" }) => {
+function Avatar({ src, alt = "User Avatar", size = "medium", status = "none" }: AvatarProps) {
   return (
     <div className={`relative  rounded-full ${sizeClasses[size]}`}>
       {/* Avatar Image */}

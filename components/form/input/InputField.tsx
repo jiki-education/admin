@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React from "react";
 
 interface InputProps {
   type?: "text" | "number" | "email" | "password" | "date" | "time" | string;
@@ -17,7 +17,7 @@ interface InputProps {
   hint?: string; // Optional hint text
 }
 
-const Input: FC<InputProps> = ({
+function Input({
   type = "text",
   id,
   name,
@@ -32,7 +32,7 @@ const Input: FC<InputProps> = ({
   success = false,
   error = false,
   hint
-}) => {
+}: InputProps) {
   // Determine input styles based on state (disabled, success, error)
   let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${className}`;
 

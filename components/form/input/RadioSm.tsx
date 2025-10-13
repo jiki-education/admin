@@ -10,7 +10,7 @@ interface RadioProps {
   className?: string; // Optional custom classes for styling
 }
 
-const RadioSm: React.FC<RadioProps> = ({ id, name, value, checked, label, onChange, className = "" }) => {
+function RadioSm({ id, name, value, checked, label, onChange, className = "" }: RadioProps) {
   return (
     <label
       htmlFor={id}

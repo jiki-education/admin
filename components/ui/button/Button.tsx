@@ -1,4 +1,5 @@
-import React, { ReactNode } from "react";
+import type { ReactNode } from "react";
+import React from "react";
 
 interface ButtonProps {
   children: ReactNode; // Button text or content
@@ -11,7 +12,7 @@ interface ButtonProps {
   className?: string; // Disabled state
 }
 
-const Button: React.FC<ButtonProps> = ({
+function Button({
   children,
   size = "md",
   variant = "primary",
@@ -20,7 +21,7 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   className = "",
   disabled = false
-}) => {
+}: ButtonProps) {
   // Size Classes
   const sizeClasses = {
     sm: "px-4 py-3 text-sm",

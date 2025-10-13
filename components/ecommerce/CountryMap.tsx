@@ -10,14 +10,14 @@ interface CountryMapProps {
   mapColor?: string;
 }
 
-type MarkerStyle = {
+interface MarkerStyle {
   initial: {
     fill: string;
     r: number; // Radius for markers
   };
-};
+}
 
-type Marker = {
+interface Marker {
   latLng: [number, number];
   name: string;
   style?: {
@@ -27,9 +27,9 @@ type Marker = {
     stroke?: string;
     strokeOpacity?: number;
   };
-};
+}
 
-const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
+function CountryMap({ mapColor }: CountryMapProps) {
   return (
     <VectorMap
       map={worldMill}
