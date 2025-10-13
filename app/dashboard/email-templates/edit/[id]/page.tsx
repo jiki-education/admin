@@ -62,10 +62,14 @@ export default function EditEmailTemplate() {
     }
   }, [isAuthenticated, loadTemplate]);
 
-  const handleSaveTemplate = useCallback(async (templateData: EmailTemplate) => {
+  const handleSaveTemplate = useCallback(async (templateData: EmailTemplate | Omit<EmailTemplate, 'id'>) => {
     setSaving(true);
     try {
-      await updateEmailTemplate(templateData.id, templateData);
+      if ('id' in templateData) {
+        await updateEmailTemplate(templateData.id, templateData);
+      } else {
+        throw new Error("Template ID is required for editing");
+      }
       router.push("/dashboard/email-templates");
     } catch (error) {
       console.error("Failed to update template:", error);

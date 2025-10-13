@@ -4,8 +4,10 @@ import { Modal } from "@/components/ui/modal";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
-import TextArea from "@/components/form/input/TextArea";
 import Button from "@/components/ui/button/Button";
+import MJMLEditor from "./MJMLEditor";
+import TextBodyEditor from "./TextBodyEditor";
+import mjml2html from "mjml-browser";
 import type { EmailTemplate, EmailTemplateType } from "../types";
 
 interface EmailTemplateFormProps {
@@ -96,6 +98,18 @@ export default function EmailTemplateForm({
     if (!formData.body_mjml.trim() && !formData.body_text.trim()) {
       newErrors.body_mjml = "Either MJML or text body is required";
       newErrors.body_text = "Either MJML or text body is required";
+    }
+
+    // Validate MJML syntax if provided
+    if (formData.body_mjml.trim()) {
+      try {
+        const result = mjml2html(formData.body_mjml, { validationLevel: 'soft' });
+        if (result.errors.length > 0) {
+          newErrors.body_mjml = `MJML validation failed: ${result.errors[0].message}`;
+        }
+      } catch (error) {
+        newErrors.body_mjml = `Invalid MJML: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      }
     }
 
     setErrors(newErrors);
@@ -219,9 +233,7 @@ export default function EmailTemplateForm({
           {/* MJML Body */}
           <div>
             <Label htmlFor="body_mjml">MJML Body</Label>
-            <TextArea
-              placeholder="Enter MJML template content..."
-              rows={8}
+            <MJMLEditor
               value={formData.body_mjml}
               onChange={handleTextAreaChange('body_mjml')}
               error={!!errors.body_mjml}
@@ -232,9 +244,7 @@ export default function EmailTemplateForm({
           {/* Text Body */}
           <div>
             <Label htmlFor="body_text">Text Body</Label>
-            <TextArea
-              placeholder="Enter plain text template content..."
-              rows={6}
+            <TextBodyEditor
               value={formData.body_text}
               onChange={handleTextAreaChange('body_text')}
               error={!!errors.body_text}
