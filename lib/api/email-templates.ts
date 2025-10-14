@@ -24,20 +24,12 @@ interface EmailTemplateTypesResponse {
  * GET /v1/admin/email_templates
  */
 export async function getEmailTemplates(filters?: EmailTemplateFilters): Promise<EmailTemplatesResponse> {
-  const params: Record<string, string> = {};
-  
-  if (filters?.type) {
-    params.type = filters.type;
-  }
-  if (filters?.slug) {
-    params.slug = filters.slug;
-  }
-  if (filters?.locale) {
-    params.locale = filters.locale;
-  }
-  if (filters?.search) {
-    params.search = filters.search;
-  }
+  const params: Record<string, string> = {
+    ...(filters?.type && { type: filters.type }),
+    ...(filters?.slug && { slug: filters.slug }),
+    ...(filters?.locale && { locale: filters.locale }),
+    ...(filters?.search && { search: filters.search })
+  };
 
   const response = await api.get<EmailTemplatesResponse>("/admin/email_templates", { params });
   return response.data;
