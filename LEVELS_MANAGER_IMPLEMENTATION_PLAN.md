@@ -271,8 +271,8 @@ const JSONEditor = ({ value, onChange, onValidation }) => {
 
 ### Phase 2 Files
 - [x] `app/dashboard/levels/[id]/page.tsx`
-- [ ] `app/dashboard/levels/components/LessonTable.tsx`
-- [ ] `app/dashboard/levels/components/LessonReorderControls.tsx`
+- [x] `app/dashboard/levels/components/LessonTable.tsx`
+- [x] `app/dashboard/levels/components/LessonReorderControls.tsx`
 
 ### Phase 3 Files
 - [ ] `app/dashboard/levels/components/LessonEditForm.tsx`
@@ -329,8 +329,8 @@ describe('Levels Management', () => {
 ### Phase 2 Success Criteria:
 - [x] Level detail page shows level information
 - [x] Lessons are displayed in correct order
-- [ ] Reorder buttons update lesson positions
-- [ ] API calls for reordering work correctly
+- [x] Reorder buttons update lesson positions
+- [x] API calls for reordering work correctly
 
 ### Phase 3 Success Criteria:
 - [ ] Lesson edit form opens and displays current data
