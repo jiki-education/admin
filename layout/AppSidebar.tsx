@@ -32,7 +32,7 @@ const navItems: NavItem[] = [
     icon: <UserCircleIcon />,
     name: "Users",
     subItems: [
-      { name: "User Management", path: "/users", pro: false },
+      { name: "User Management", path: "/dashboard/users", pro: false },
       { name: "Permissions", path: "/users/permissions", pro: false }
     ]
   },
