@@ -1,15 +1,18 @@
 import React from "react";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
+import Button from "@/components/ui/button/Button";
 import type { User } from "../types";
 
 interface UserTableProps {
   users: User[];
   loading?: boolean;
+  onDelete?: (user: User) => void;
 }
 
 export default function UserTable({
   users,
-  loading = false
+  loading = false,
+  onDelete
 }: UserTableProps) {
   if (loading) {
     return (
@@ -37,7 +40,7 @@ export default function UserTable({
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">
-        <div className="min-w-[700px]">
+        <div className="min-w-[900px]">
           <Table>
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
@@ -70,6 +73,12 @@ export default function UserTable({
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Admin
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Actions
                 </TableCell>
               </TableRow>
             </TableHeader>
@@ -104,6 +113,18 @@ export default function UserTable({
                       <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400">
                         User
                       </span>
+                    )}
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start">
+                    {onDelete && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onDelete(user)}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                      >
+                        Delete
+                      </Button>
                     )}
                   </TableCell>
                 </TableRow>

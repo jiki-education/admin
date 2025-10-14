@@ -8,6 +8,7 @@ import { getUsers } from "@/lib/api/users";
 import UserFilters from "./components/UserFilters";
 import UserTable from "./components/UserTable";
 import UserPagination from "./components/UserPagination";
+import DeleteUserModal from "./components/DeleteUserModal";
 
 export default function Users() {
   const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
@@ -26,6 +27,11 @@ export default function Users() {
     total_count: 0,
     total_pages: 0
   });
+
+  // Delete modal state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (!hasCheckedAuth) {
@@ -74,6 +80,40 @@ export default function Users() {
     setFilters(prevFilters => ({ ...prevFilters, page }));
   }, []);
 
+  const handleDeleteUser = useCallback((user: User) => {
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
+  }, []);
+
+  const handleCloseDeleteModal = useCallback(() => {
+    setIsDeleteModalOpen(false);
+    setSelectedUser(null);
+    setDeleteLoading(false);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!selectedUser) return;
+
+    setDeleteLoading(true);
+    try {
+      // TODO: Implement actual delete API call when endpoint is available
+      // await deleteUser(selectedUser.id);
+      
+      // For now, just simulate a successful delete with a delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log(`User ${selectedUser.email} would be deleted (endpoint not implemented yet)`);
+      
+      // Reload users after successful delete
+      await loadUsers();
+      handleCloseDeleteModal();
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+      setError(err instanceof Error ? err.message : "Failed to delete user");
+      setDeleteLoading(false);
+    }
+  }, [selectedUser, loadUsers, handleCloseDeleteModal]);
+
   if (!hasCheckedAuth) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -113,6 +153,7 @@ export default function Users() {
           <UserTable
             users={users}
             loading={loading}
+            onDelete={handleDeleteUser}
           />
 
           <UserPagination
@@ -123,6 +164,15 @@ export default function Users() {
           />
         </div>
       </div>
+
+      {/* Delete User Modal */}
+      <DeleteUserModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        user={selectedUser}
+        loading={deleteLoading}
+      />
     </div>
   );
 }
