@@ -1,11 +1,14 @@
-import type { Metadata } from "next";
-import { AuthProvider } from "@/components/auth/AuthProvider";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "Jiki Admin",
-  description: "Admin dashboard for Jiki"
-};
+import AuthProvider from "@/components/auth/AuthProvider";
+import { SidebarProvider } from "@/context/SidebarContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { Toaster } from "react-hot-toast";
+
+const outfit = Outfit({
+  subsets: ["latin"]
+});
 
 export default function RootLayout({
   children
@@ -14,8 +17,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
-        <AuthProvider>{children}</AuthProvider>
+      <body className={`${outfit.className} dark:bg-gray-900`}>
+        <AuthProvider>
+          <ThemeProvider>
+            <SidebarProvider>{children}</SidebarProvider>
+          </ThemeProvider>
+        </AuthProvider>
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );

@@ -18,7 +18,7 @@ interface AuthStore extends AuthState {
   clearError: () => void;
 }
 
-export const useAuthStore = create<AuthStore>((set, get) => ({
+export const useAuthStore = create<AuthStore>((set, _get) => ({
   // Initial state
   user: null,
   isAuthenticated: false,
@@ -30,9 +30,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   login: async (credentials: LoginCredentials) => {
     try {
       set({ isLoading: true, error: null });
-      
-      const user = await apiLogin(credentials);
-      
+
+      const apiUser = await apiLogin(credentials);
+
+      // Store email in sessionStorage for session restoration
+      const { setUserEmail } = await import("@/lib/auth/storage");
+      setUserEmail(apiUser.email);
+
+      // Use email from API response, but only store email
+      const user: User = { email: apiUser.email };
+
       set({
         user,
         isAuthenticated: true,
@@ -56,9 +63,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   signup: async (userData: SignupData) => {
     try {
       set({ isLoading: true, error: null });
-      
-      const user = await apiSignup(userData);
-      
+
+      const apiUser = await apiSignup(userData);
+
+      // Store email in sessionStorage for session restoration
+      const { setUserEmail } = await import("@/lib/auth/storage");
+      setUserEmail(apiUser.email);
+
+      // Use email from API response, but only store email
+      const user: User = { email: apiUser.email };
+
       set({
         user,
         isAuthenticated: true,
@@ -82,9 +96,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   logout: async () => {
     try {
       set({ isLoading: true, error: null });
-      
+
       await apiLogout();
-      
+
       set({
         user: null,
         isAuthenticated: false,
@@ -101,7 +115,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         error: null,
         hasCheckedAuth: true
       });
-      
+
       console.error("Logout error:", error);
     }
   },
@@ -109,28 +123,39 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   checkAuth: async () => {
     try {
       set({ isLoading: true, error: null });
-      
+
       const isValid = await validateToken();
-      
+
       if (isValid) {
-        // Token is valid, but we don't have user data
-        // In a real app, you might call a "me" endpoint here
-        // For now, we'll just set authenticated without user data
-        set({
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-          hasCheckedAuth: true
-        });
-      } else {
-        set({
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: null,
-          hasCheckedAuth: true
-        });
+        // Token is valid, get user email from sessionStorage
+        try {
+          const { getUserEmail } = await import("@/lib/auth/storage");
+          const email = getUserEmail();
+          
+          if (email) {
+            const user: User = { email };
+            set({
+              user,
+              isAuthenticated: true,
+              isLoading: false,
+              error: null,
+              hasCheckedAuth: true
+            });
+            return;
+          }
+        } catch (userError) {
+          console.error("Failed to get user email from storage:", userError);
+        }
       }
+
+      // Token invalid or no user data found
+      set({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: null,
+        hasCheckedAuth: true
+      });
     } catch (error) {
       set({
         user: null,
@@ -139,7 +164,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         error: null,
         hasCheckedAuth: true
       });
-      
+
       console.error("Auth check error:", error);
     }
   },

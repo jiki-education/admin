@@ -5,6 +5,7 @@
 
 const TOKEN_KEY = "jiki_auth_token";
 const TOKEN_EXPIRY_KEY = "jiki_auth_expiry";
+const USER_EMAIL_KEY = "jiki_auth_email";
 
 /**
  * Store JWT token and optional expiry
@@ -24,6 +25,37 @@ export function setToken(token: string, expiryMs?: number): void {
     }
   } catch (error) {
     console.error("Failed to store token:", error);
+  }
+}
+
+/**
+ * Store user email
+ */
+export function setUserEmail(email: string): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    sessionStorage.setItem(USER_EMAIL_KEY, email);
+  } catch (error) {
+    console.error("Failed to store user email:", error);
+  }
+}
+
+/**
+ * Get stored user email
+ */
+export function getUserEmail(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    return sessionStorage.getItem(USER_EMAIL_KEY);
+  } catch (error) {
+    console.error("Failed to retrieve user email:", error);
+    return null;
   }
 }
 
@@ -62,6 +94,7 @@ export function removeToken(): void {
   try {
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(TOKEN_EXPIRY_KEY);
+    sessionStorage.removeItem(USER_EMAIL_KEY);
   } catch (error) {
     console.error("Failed to remove token:", error);
   }
