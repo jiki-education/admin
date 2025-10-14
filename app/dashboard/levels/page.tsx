@@ -44,7 +44,7 @@ export default function Levels() {
       setLoading(true);
       setError(null);
       const response = await getAdminLevels(filters);
-      console.log('respn', response)
+      console.debug('Response:', response)
       setLevels(response.results);
       setMeta(response.meta);
     } catch (err) {

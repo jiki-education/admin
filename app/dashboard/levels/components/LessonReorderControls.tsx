@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { updateLesson } from "@/lib/api/levels";
 import type { AdminLesson } from "../types";
 
@@ -18,7 +18,7 @@ export default function LessonReorderControls({
   const [isReordering, setIsReordering] = useState(false);
 
   const reorderLesson = async (lessonId: number, direction: "up" | "down"): Promise<void> => {
-    if (isReordering) return;
+    if (isReordering) {return;}
 
     setIsReordering(true);
     try {
@@ -35,24 +35,34 @@ export default function LessonReorderControls({
       let targetIndex: number;
 
       if (direction === "up") {
-        if (currentIndex === 0) return; // Already at top
+        if (currentIndex === 0) {
+          return; // Already at top
+        }
         targetIndex = currentIndex - 1;
       } else {
-        if (currentIndex === sortedLessons.length - 1) return; // Already at bottom
+        if (currentIndex === sortedLessons.length - 1) {
+          return; // Already at bottom
+        }
         targetIndex = currentIndex + 1;
       }
 
       const targetLesson = sortedLessons[targetIndex];
 
-      // Swap positions
+      // Swap positions using a three-step process to avoid uniqueness conflicts
       const currentPosition = currentLesson.position;
       const targetPosition = targetLesson.position;
+      
+      // Use a temporary position that won't conflict (negative number)
+      const tempPosition = -Math.max(currentPosition, targetPosition) - 1;
 
-      // Update both lessons' positions
-      await Promise.all([
-        updateLesson(levelId, currentLesson.id, { position: targetPosition }),
-        updateLesson(levelId, targetLesson.id, { position: currentPosition })
-      ]);
+      // Step 1: Move current lesson to temporary position
+      await updateLesson(levelId, currentLesson.id, { position: tempPosition });
+      
+      // Step 2: Move target lesson to current lesson's original position  
+      await updateLesson(levelId, targetLesson.id, { position: currentPosition });
+      
+      // Step 3: Move current lesson to target lesson's original position
+      await updateLesson(levelId, currentLesson.id, { position: targetPosition });
 
       // Update local state optimistically
       const updatedLessons = lessons.map(lesson => {

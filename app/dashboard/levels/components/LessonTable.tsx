@@ -32,7 +32,7 @@ export default function LessonTable({
         <div className="p-8 text-center">
           <div className="text-gray-600 dark:text-gray-400 mb-4">No lessons found</div>
           <p className="text-sm text-gray-500 dark:text-gray-500">
-            This level doesn't have any lessons yet.
+            This level doesn&apos;t have any lessons yet.
           </p>
         </div>
       </div>
