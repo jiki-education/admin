@@ -69,26 +69,27 @@ This plan outlines the implementation of a comprehensive email template manageme
 ## Phase 4: Advanced Features
 
 ### MJML Editor with Preview
-- [ ] Install `mjml` package for validation and preview
-- [ ] Create custom MJML editor component
+- [x] Install `mjml` package for validation and preview
+- [x] Create custom MJML editor component
 - [ ] Add syntax highlighting (optional enhancement)
-- [ ] Implement preview functionality that converts MJML to HTML
-- [ ] Validate MJML before allowing save
+- [x] Implement preview functionality that converts MJML to HTML
+- [x] Validate MJML before allowing save
+- [x] Add "Extract Text from MJML" functionality with proper link conversion
 
 ### Text Editor
-- [ ] Use existing `TextArea` component
-- [ ] Simple plain text editor without special features
-- [ ] Proper validation and error handling
+- [x] Use existing `TextArea` component
+- [x] Simple plain text editor without special features
+- [x] Proper validation and error handling
 
 ### Enhanced Dropdowns
-- [ ] Create searchable dropdown components for type and locale
-- [ ] Fallback to regular `Select` if search functionality is complex
-- [ ] Pre-populate options from API
+- [x] Create searchable dropdown components for type and locale
+- [x] Fallback to regular `Select` if search functionality is complex
+- [x] Pre-populate options from API
 
 ### Dependencies to Install:
 ```bash
-pnpm add mjml
-pnpm add -D @types/mjml  # if available
+pnpm add mjml-browser  # ✅ COMPLETED
+pnpm add -D @types/mjml @types/mjml-browser  # ✅ COMPLETED
 ```
 
 ## Technical Architecture

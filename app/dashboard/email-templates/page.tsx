@@ -47,7 +47,6 @@ export default function EmailTemplates() {
       setLoading(true);
       setError(null);
       const response = await getEmailTemplates(filters);
-      console.log(response)
       setTemplates(response.results);
     } catch (err) {
       console.error("Failed to load templates:", err);
