@@ -7,10 +7,12 @@ import { api } from "@/lib/api";
 import type { EmailTemplate, EmailTemplateFilters, EmailTemplateType } from "@/app/dashboard/email-templates/types";
 
 interface EmailTemplatesResponse {
-  email_templates: EmailTemplate[];
-  total_count?: number;
-  page?: number;
-  per_page?: number;
+  results: EmailTemplate[];
+  meta: {
+    current_page: number;
+    total_count: number;
+    total_pages: number;
+  };
 }
 
 interface EmailTemplateTypesResponse {
