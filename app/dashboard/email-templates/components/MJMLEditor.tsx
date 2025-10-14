@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import TextArea from "@/components/form/input/TextArea";
 import Button from "@/components/ui/button/Button";
-import mjml2html from "mjml-browser";
 
 interface MJMLEditorProps {
   value: string;
@@ -10,6 +9,7 @@ interface MJMLEditorProps {
   placeholder?: string;
   error?: boolean;
   hint?: string;
+  onExtractText?: () => void;
 }
 
 interface ValidationError {
@@ -24,14 +24,15 @@ export default function MJMLEditor({
   onChange,
   placeholder = "Enter MJML template content...",
   error = false,
-  hint
+  hint,
+  onExtractText
 }: MJMLEditorProps) {
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [htmlPreview, setHtmlPreview] = useState<string>("");
   const [showPreview, setShowPreview] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
 
-  const validateMJML = useCallback((mjmlContent: string) => {
+  const validateMJML = useCallback(async (mjmlContent: string) => {
     if (!mjmlContent.trim()) {
       setValidationErrors([]);
       setHtmlPreview("");
@@ -40,6 +41,8 @@ export default function MJMLEditor({
 
     setIsValidating(true);
     try {
+      // Dynamically import mjml-browser only on client side
+      const { default: mjml2html } = await import('mjml-browser');
       // Use soft validation to get errors without throwing
       const result = mjml2html(mjmlContent, { validationLevel: 'soft' });
       setValidationErrors(result.errors);
@@ -62,7 +65,7 @@ export default function MJMLEditor({
   // Debounced validation
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      validateMJML(value);
+      void validateMJML(value);
     }, 500); // 500ms debounce
 
     return () => clearTimeout(timeoutId);
@@ -91,16 +94,30 @@ export default function MJMLEditor({
               </span>
             )}
           </div>
-          {value.trim() && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setShowPreview(!showPreview)}
-              disabled={hasErrors}
-            >
-              {showPreview ? 'Hide Preview' : 'Show Preview'}
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {onExtractText && value.trim() && (
+              <Button
+                size="sm"
+                variant="outline"
+                type="button"
+                onClick={onExtractText}
+                disabled={hasErrors}
+              >
+                Extract Text
+              </Button>
+            )}
+            {value.trim() && (
+              <Button
+                size="sm"
+                variant="outline"
+                type="button"
+                onClick={() => setShowPreview(!showPreview)}
+                disabled={hasErrors}
+              >
+                {showPreview ? 'Hide Preview' : 'Show Preview'}
+              </Button>
+            )}
+          </div>
         </div>
 
         <TextArea

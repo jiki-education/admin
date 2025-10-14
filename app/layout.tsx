@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthProvider from "@/components/auth/AuthProvider";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { Toaster } from "react-hot-toast";
 
 const outfit = Outfit({
   subsets: ["latin"]
@@ -22,6 +23,7 @@ export default function RootLayout({
             <SidebarProvider>{children}</SidebarProvider>
           </ThemeProvider>
         </AuthProvider>
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );
