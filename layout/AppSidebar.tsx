@@ -32,22 +32,15 @@ const navItems: NavItem[] = [
     icon: <UserCircleIcon />,
     name: "Users",
     subItems: [
-      { name: "User Management", path: "/dashboard/users", pro: false },
-      { name: "Permissions", path: "/users/permissions", pro: false }
+      { name: "User Management", path: "/dashboard/users", pro: false }
     ]
   },
   {
     icon: <PageIcon />,
     name: "Content",
     subItems: [
-      { name: "Content Moderation", path: "/content", pro: false },
-      { name: "Reports", path: "/content/reports", pro: false }
+      { name: "Levels", path: "/dashboard/levels", pro: false }
     ]
-  },
-  {
-    icon: <PieChartIcon />,
-    name: "Analytics",
-    path: "/analytics"
   }
 ];
 
@@ -56,18 +49,7 @@ const othersItems: NavItem[] = [
     icon: <BoxCubeIcon />,
     name: "System",
     subItems: [
-      { name: "Settings", path: "/system/settings", pro: false },
-      { name: "Email Templates", path: "/dashboard/email-templates", pro: false },
-      { name: "Logs", path: "/system/logs", pro: false },
-      { name: "Monitoring", path: "/system/monitoring", pro: false }
-    ]
-  },
-  {
-    icon: <PlugInIcon />,
-    name: "Account",
-    subItems: [
-      { name: "Profile", path: "/profile", pro: false },
-      { name: "Sign Out", path: "/signout", pro: false }
+      { name: "Email Templates", path: "/dashboard/email-templates", pro: false }
     ]
   }
 ];
