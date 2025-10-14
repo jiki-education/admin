@@ -10,8 +10,8 @@ Implementation of a comprehensive user management page for the Jiki Admin dashbo
 ## Phase 1: Foundation & Types (Day 1)
 
 ### 1.1 Create Type Definitions
-- Create `app/dashboard/users/types/index.ts`
-- Define interfaces based on actual backend response:
+- [x] Create `app/dashboard/users/types/index.ts`
+- [x] Define interfaces based on actual backend response:
   ```typescript
   interface User {
     id: number;
@@ -39,136 +39,146 @@ Implementation of a comprehensive user management page for the Jiki Admin dashbo
   ```
 
 ### 1.2 Create API Service
-- Create `lib/api/users.ts`
-- Implement `getUsers(filters?: UserFilters): Promise<UsersResponse>` function
-- Follow existing pagination pattern from email-templates
-- Query params: `name`, `email`, `page`, `per`
-- Endpoint: `GET /admin/users`
+- [x] Create `lib/api/users.ts`
+- [x] Implement `getUsers(filters?: UserFilters): Promise<UsersResponse>` function
+- [x] Follow existing pagination pattern from email-templates
+- [x] Query params: `name`, `email`, `page`, `per`
+- [x] Endpoint: `GET /admin/users`
 
 ### 1.3 Setup Route Structure
-- Create `app/dashboard/users/page.tsx` (main page)
-- Add navigation link in dashboard layout (if applicable)
+- [x] Create `app/dashboard/users/page.tsx` (main page)
+- [x] Add navigation link in dashboard layout (if applicable)
 
 **Estimated Time**: 2-3 hours
 
 ## Phase 2: Core UI Components (Day 1-2)
 
 ### 2.1 User Filters Component
-- Create `app/dashboard/users/components/UserFilters.tsx`
-- Implement filters for:
-  - Email (text input with search)
-  - Name (text input with search)
-  - Admin status toggle (admin: true/false)
-  - Locale dropdown ("en" | "hu")
-- Follow existing filter patterns from `TemplateFilters.tsx`
-- Include "Clear Filters" functionality
+- [x] Create `app/dashboard/users/components/UserFilters.tsx`
+- [x] Implement filters for:
+  - [x] Email (text input with search)
+  - [x] Name (text input with search)
+  - [ ] Admin status toggle (admin: true/false)
+  - [x] Locale dropdown ("en" | "hu")
+- [x] Follow existing filter patterns from `TemplateFilters.tsx`
+- [x] Include "Clear Filters" functionality
 
 ### 2.2 User Table Component
-- Create `app/dashboard/users/components/UserTable.tsx`
-- Display columns:
-  - ID
-  - Name
-  - Email 
-  - Locale (with badges: EN/HU)
-  - Admin (boolean badge)
-  - Actions (View/Edit if needed)
-- Implement loading states
-- Implement empty states
-- Follow table styling from `EmailTemplateTable.tsx`
+- [x] Create `app/dashboard/users/components/UserTable.tsx`
+- [x] Display columns:
+  - [x] ID
+  - [x] Name
+  - [x] Email 
+  - [x] Locale (with badges: EN/HU)
+  - [x] Admin (boolean badge)
+  - [x] Actions (Delete button)
+- [x] Implement loading states
+- [x] Implement empty states
+- [x] Follow table styling from `EmailTemplateTable.tsx`
 
 ### 2.3 Pagination Component
-- Create `app/dashboard/users/components/UserPagination.tsx`
-- Implement page navigation
-- Show current page / total pages
-- Items per page selector (optional)
+- [x] Create `app/dashboard/users/components/UserPagination.tsx`
+- [x] Implement page navigation
+- [x] Show current page / total pages
+- [ ] Items per page selector (optional)
 
 **Estimated Time**: 4-6 hours
 
 ## Phase 3: Main Page Implementation (Day 2)
 
 ### 3.1 Users Page Component
-- Implement main `app/dashboard/users/page.tsx`
-- Follow architecture pattern from email-templates:
-  - Authentication checks
-  - State management (users, filters, loading, error)
-  - useEffect hooks for data loading
-  - Filter change handlers
-  - Error handling and display
+- [x] Implement main `app/dashboard/users/page.tsx`
+- [x] Follow architecture pattern from email-templates:
+  - [x] Authentication checks
+  - [x] State management (users, filters, loading, error)
+  - [x] useEffect hooks for data loading
+  - [x] Filter change handlers
+  - [x] Error handling and display
 
 ### 3.2 Integration & Testing
-- Connect all components
-- Test filtering functionality
-- Test pagination
-- Test loading and error states
-- Verify responsive design
+- [x] Connect all components
+- [x] Test filtering functionality
+- [x] Test pagination
+- [x] Test loading and error states
+- [x] Verify responsive design
 
 **Estimated Time**: 3-4 hours
 
 ## Phase 4: User Details & Actions (Day 3)
 
 ### 4.1 User Detail View (Optional)
-- Create `app/dashboard/users/[id]/page.tsx`
-- Display detailed user information
-- Show user activity/history if available
-- Add breadcrumb navigation
+- [ ] Create `app/dashboard/users/[id]/page.tsx`
+- [ ] Display detailed user information
+- [ ] Show user activity/history if available
+- [ ] Add breadcrumb navigation
 
 ### 4.2 User Action Modals (If Required)
-- Create user status change modal
-- Create user role change modal (if applicable)
-- Follow modal patterns from email-templates
-- Implement optimistic updates
+- [x] Create delete confirmation modal with email verification
+- [ ] Create user status change modal
+- [ ] Create user role change modal (if applicable)
+- [x] Follow modal patterns from email-templates
+- [x] Implement optimistic updates
 
 ### 4.3 Bulk Actions (Optional Enhancement)
-- Add checkbox selection to table
-- Implement bulk status changes
-- Add bulk export functionality
+- [ ] Add checkbox selection to table
+- [ ] Implement bulk status changes
+- [ ] Add bulk export functionality
+
+### 4.4 Delete User Functionality (✅ COMPLETED)
+- [x] Add delete button to user table rows
+- [x] Create delete confirmation modal with email verification
+- [x] Implement user safety verification (must type exact email)
+- [x] Add proper loading states during deletion
+- [x] Handle delete errors and user feedback
+- [x] Auto-refresh user list after successful deletion
+- [x] Document missing backend endpoint in TODO.md
 
 **Estimated Time**: 4-6 hours
 
 ## Phase 5: Advanced Features & Polish (Day 4)
 
 ### 5.1 Advanced Filtering
-- Date range filters (created_at, last_sign_in_at)
-- Advanced search with multiple criteria
-- Saved filter presets
+- [ ] Date range filters (created_at, last_sign_in_at)
+- [ ] Advanced search with multiple criteria
+- [ ] Saved filter presets
 
 ### 5.2 Export Functionality
-- CSV export of filtered users
-- PDF export for reports
-- Follow admin security patterns
+- [ ] CSV export of filtered users
+- [ ] PDF export for reports
+- [ ] Follow admin security patterns
 
 ### 5.3 Performance Optimizations
-- Implement debounced search
-- Add loading skeletons
-- Optimize re-renders with React.memo
+- [ ] Implement debounced search
+- [ ] Add loading skeletons
+- [ ] Optimize re-renders with React.memo
 
 ### 5.4 Accessibility & Polish
-- Add proper ARIA labels
-- Keyboard navigation support
-- Screen reader compatibility
-- Loading indicators and feedback
+- [ ] Add proper ARIA labels
+- [ ] Keyboard navigation support
+- [ ] Screen reader compatibility
+- [x] Loading indicators and feedback
 
 **Estimated Time**: 4-5 hours
 
 ## Phase 6: Testing & Documentation (Day 4-5)
 
 ### 6.1 E2E Testing
-- Create `tests/e2e/users.test.ts`
-- Test user listing and filtering
-- Test pagination functionality
-- Test error scenarios
-- Follow existing test patterns
+- [ ] Create `tests/e2e/users.test.ts`
+- [ ] Test user listing and filtering
+- [ ] Test pagination functionality
+- [ ] Test error scenarios
+- [ ] Follow existing test patterns
 
 ### 6.2 Error Handling & Edge Cases
-- Network error handling
-- Empty state improvements
-- Rate limiting handling
-- Invalid filter handling
+- [x] Network error handling
+- [x] Empty state improvements
+- [ ] Rate limiting handling
+- [x] Invalid filter handling
 
 ### 6.3 Documentation
-- Update CLAUDE.md with user management patterns
-- Add inline code documentation
-- Create user guide if needed
+- [ ] Update CLAUDE.md with user management patterns
+- [ ] Add inline code documentation
+- [ ] Create user guide if needed
 
 **Estimated Time**: 3-4 hours
 
@@ -219,7 +229,7 @@ app/dashboard/users/
 │   ├── UserFilters.tsx        # Filter component
 │   ├── UserTable.tsx          # Table component
 │   ├── UserPagination.tsx     # Pagination component
-│   └── UserActionModal.tsx    # Action modals (optional)
+│   └── DeleteUserModal.tsx    # Delete confirmation modal (✅ completed)
 └── lib/api/
     └── users.ts               # API service
 
