@@ -275,9 +275,9 @@ const JSONEditor = ({ value, onChange, onValidation }) => {
 - [x] `app/dashboard/levels/components/LessonReorderControls.tsx`
 
 ### Phase 3 Files
-- [ ] `app/dashboard/levels/components/LessonEditForm.tsx`
-- [ ] `app/dashboard/levels/components/JSONEditor.tsx`
-- [ ] `app/dashboard/levels/components/LessonEditModal.tsx`
+- [x] `app/dashboard/levels/components/LessonEditForm.tsx`
+- [x] `app/dashboard/levels/components/JSONEditor.tsx`
+- [x] `app/dashboard/levels/[id]/lessons/[lessonId]/edit/page.tsx` (instead of modal)
 
 ### Phase 4 Files
 - [ ] Enhanced drag & drop functionality
@@ -333,11 +333,11 @@ describe('Levels Management', () => {
 - [x] API calls for reordering work correctly
 
 ### Phase 3 Success Criteria:
-- [ ] Lesson edit form opens and displays current data
-- [ ] Title and description editing works
-- [ ] Type dropdown functions
-- [ ] JSON editor validates and saves data
-- [ ] Changes persist after save
+- [x] Lesson edit form opens and displays current data
+- [x] Title and description editing works
+- [x] Type dropdown functions
+- [x] JSON editor validates and saves data
+- [x] Changes persist after save
 
 ### Phase 4 Success Criteria:
 - [ ] Drag & drop reordering is smooth

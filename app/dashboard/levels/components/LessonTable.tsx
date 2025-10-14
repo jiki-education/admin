@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "next/navigation";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
 import Button from "@/components/ui/button/Button";
 import type { AdminLesson } from "../types";
@@ -7,15 +8,16 @@ interface LessonTableProps {
   lessons: AdminLesson[];
   loading?: boolean;
   onReorder: (lessonId: number, direction: "up" | "down") => Promise<void>;
-  onEdit?: (lesson: AdminLesson) => void;
+  levelId: number;
 }
 
 export default function LessonTable({
   lessons,
   loading = false,
   onReorder,
-  onEdit
+  levelId
 }: LessonTableProps) {
+  const router = useRouter();
   if (loading) {
     return (
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -51,6 +53,10 @@ export default function LessonTable({
 
   const canMoveUp = (index: number) => index > 0;
   const canMoveDown = (index: number) => index < sortedLessons.length - 1;
+  
+  const handleEditLesson = (lesson: AdminLesson) => {
+    router.push(`/dashboard/levels/${levelId}/lessons/${lesson.id}/edit`);
+  };
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -144,15 +150,13 @@ export default function LessonTable({
                       >
                         ↓
                       </button>
-                      {onEdit && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => onEdit(lesson)}
-                        >
-                          Edit
-                        </Button>
-                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditLesson(lesson)}
+                      >
+                        Edit
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
