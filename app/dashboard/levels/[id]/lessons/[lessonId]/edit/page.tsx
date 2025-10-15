@@ -1,0 +1,160 @@
+"use client";
+import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import Button from "@/components/ui/button/Button";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter, useParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { getLevelLessons, updateLesson } from "@/lib/api/levels";
+import LessonEditForm from "../../../../components/LessonEditForm";
+import type { AdminLesson } from "../../../../types";
+
+export default function EditLesson() {
+  const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
+  const router = useRouter();
+  const params = useParams();
+  const levelId = parseInt(params.id as string);
+  const lessonId = parseInt(params.lessonId as string);
+
+  const [lesson, setLesson] = useState<AdminLesson | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!hasCheckedAuth) {
+      void checkAuth();
+    }
+  }, [hasCheckedAuth, checkAuth]);
+
+  useEffect(() => {
+    if (hasCheckedAuth && !isAuthenticated) {
+      router.push("/signin");
+    }
+  }, [isAuthenticated, hasCheckedAuth, router]);
+
+  const loadLesson = useCallback(async () => {
+    if (!levelId || isNaN(levelId) || !lessonId || isNaN(lessonId)) {
+      setError("Invalid level or lesson ID");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const lessonsData = await getLevelLessons(levelId);
+      const foundLesson = lessonsData.find(l => l.id === lessonId);
+      
+      if (!foundLesson) {
+        setError("Lesson not found");
+        return;
+      }
+      
+      setLesson(foundLesson);
+    } catch (err) {
+      console.error("Failed to load lesson:", err);
+      setError(err instanceof Error ? err.message : "Failed to load lesson");
+    } finally {
+      setLoading(false);
+    }
+  }, [levelId, lessonId]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      void loadLesson();
+    }
+  }, [isAuthenticated, loadLesson]);
+
+  const handleSaveLesson = useCallback(async (lessonData: Partial<AdminLesson>) => {
+    setSaving(true);
+    try {
+      await updateLesson(levelId, lessonId, lessonData);
+      router.push(`/dashboard/levels/${levelId}`);
+    } catch (error) {
+      console.error("Failed to update lesson:", error);
+      throw error;
+    } finally {
+      setSaving(false);
+    }
+  }, [router, levelId, lessonId]);
+
+  const handleBack = useCallback(() => {
+    router.push(`/dashboard/levels/${levelId}`);
+  }, [router, levelId]);
+
+  const handleCancel = useCallback(() => {
+    router.push(`/dashboard/levels/${levelId}`);
+  }, [router, levelId]);
+
+  if (!hasCheckedAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading lesson...</div>
+      </div>
+    );
+  }
+
+  if (error || !lesson) {
+    return (
+      <div>
+        <PageBreadcrumb pageTitle="Edit Lesson" />
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+              Edit Lesson
+            </h1>
+            <Button variant="outline" onClick={handleBack}>
+              Back to Level
+            </Button>
+          </div>
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800">
+            <p className="text-red-700 dark:text-red-400">{error || "Lesson not found"}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <PageBreadcrumb pageTitle="Edit Lesson" />
+      
+      <div className="space-y-6">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+                Edit Lesson: {lesson.title}
+              </h1>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Level ID: {levelId} • Lesson ID: {lessonId} • Position: {lesson.position}
+              </p>
+            </div>
+            <Button variant="outline" onClick={handleBack}>
+              Back to Level
+            </Button>
+          </div>
+
+          <LessonEditForm
+            lesson={lesson}
+            onSave={handleSaveLesson}
+            onCancel={handleCancel}
+            loading={saving}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

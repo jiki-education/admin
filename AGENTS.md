@@ -22,7 +22,7 @@ The Jiki Admin application is a standalone Next.js application for managing the 
 ### Testing
 
 ```bash
-pnpm test:e2e           # Run E2E tests
+pnpm test:e2e           # Run E2E tests (on port 3064)
 pnpm test:e2e:watch     # Watch mode
 pnpm test:e2e:headful   # Run with visible browser
 ```
@@ -106,6 +106,7 @@ This project follows the same coding standards as `front-end/app`:
 3. **Commit regularly** - Save progress frequently with clear commit messages
 4. **Keep it simple** - This is an admin tool, not a user-facing product. Prioritize functionality over fancy UI
 5. **Document as you go** - Update this file and README.md when adding new features
+6. **Use existing TailAdmin components** - Always check `/components/ui/` for available components (Modal, Button, etc.) before creating custom implementations
 
 ## Common Tasks
 

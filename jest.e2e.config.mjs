@@ -9,7 +9,8 @@ const config = {
         tsconfig: {
           jsx: "react",
           esModuleInterop: true,
-          moduleResolution: "node"
+          moduleResolution: "node",
+          types: ["jest", "node", "puppeteer"]
         }
       }
     ]
@@ -17,7 +18,8 @@ const config = {
   testEnvironment: "jest-environment-puppeteer",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1"
-  }
+  },
+  setupFilesAfterEnv: ["<rootDir>/tests/e2e/setup.ts"]
 };
 
 export default config;
