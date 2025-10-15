@@ -13,8 +13,8 @@ module.exports = {
   },
   ...(process.env.SKIP_SERVER !== "true" && {
     server: {
-      command: "next dev --port 3062",
-      port: 3062,
+      command: "next dev --port 3064",
+      port: 3064,
       launchTimeout: 10000,
       debug: true
     }

@@ -22,7 +22,7 @@ The Jiki Admin application is a standalone Next.js application for managing the 
 ### Testing
 
 ```bash
-pnpm test:e2e           # Run E2E tests
+pnpm test:e2e           # Run E2E tests (on port 3064)
 pnpm test:e2e:watch     # Watch mode
 pnpm test:e2e:headful   # Run with visible browser
 ```
