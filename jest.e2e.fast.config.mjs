@@ -1,8 +1,8 @@
 const config = {
   preset: "jest-puppeteer",
   testMatch: ["<rootDir>/tests/e2e/**/*.test.{js,ts}"],
-  testTimeout: 10000, // Aggressive timeout for speed
-  maxWorkers: 4, // Optimized for single machine (increased from 2)
+  testTimeout: 8000, // Ultra-fast timeout
+  maxWorkers: 6, // Maximum parallel workers for local machine
   transform: {
     "^.+\\.(ts|tsx)$": [
       "ts-jest",
@@ -21,12 +21,14 @@ const config = {
     "^@/(.*)$": "<rootDir>/$1"
   },
   setupFilesAfterEnv: ["<rootDir>/tests/e2e/setup.ts"],
-  // High performance optimizations (now default)
-  maxConcurrency: 6, // Higher concurrency for local development
-  bail: false, // Don't stop on first failure 
+  // Ultra-speed optimizations
+  maxConcurrency: 8, // Very high concurrency for local dev
+  bail: true, // Stop on first failure for speed
   verbose: false,
+  silent: true, // Minimal output for maximum speed
   cache: true, // Enable Jest cache
-  detectOpenHandles: false // Skip expensive cleanup detection
+  detectOpenHandles: false, // Skip expensive cleanup detection
+  forceExit: false // Let Jest exit gracefully
 };
 
 export default config;

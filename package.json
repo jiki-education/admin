@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "test:e2e": "node scripts/run-e2e-tests.js",
+    "test:e2e:turbo": "FAST_MODE=true node scripts/run-e2e-tests.js",
+    "test:e2e:ci": "CI_MODE=true node scripts/run-e2e-tests.js",
     "test:e2e:watch": "node scripts/run-e2e-tests.js --watch",
     "test:e2e:headful": "HEADLESS=false node scripts/run-e2e-tests.js",
     "lint": "eslint",

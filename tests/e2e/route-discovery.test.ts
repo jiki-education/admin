@@ -19,8 +19,8 @@ describe('Route Discovery Validation', () => {
     for (const route of expectedRoutes) {
       await page.goto(`${baseUrl}${route}`);
       
-      // Wait for the page to load
-      await page.waitForSelector('body', { timeout: 10000 });
+      // Wait for the page to load (reduced timeout)
+      await page.waitForSelector('body', { timeout: 5000 });
       
       // Check that we can access the page (no errors)
       const body = await page.$('body');
@@ -38,8 +38,8 @@ describe('Route Discovery Validation', () => {
     
     await page.goto(`${baseUrl}${nonExistentRoute}`);
     
-    // Wait for page load
-    await page.waitForSelector('body', { timeout: 10000 });
+    // Wait for page load (reduced timeout)
+    await page.waitForSelector('body', { timeout: 5000 });
     
     // Check that the page loads without errors (body exists)
     const body = await page.$('body');
