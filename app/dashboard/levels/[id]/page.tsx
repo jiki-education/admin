@@ -4,10 +4,15 @@ import Button from "@/components/ui/button/Button";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter, useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { getLevelLessons } from "@/lib/api/levels";
+import { getLevelLessons, updateLesson } from "@/lib/api/levels";
 import type { AdminLesson } from "../types";
 import LessonTable from "../components/LessonTable";
 import LessonReorderControls from "../components/LessonReorderControls";
+import BulkEditModal from "../components/BulkEditModal";
+import LessonFilters from "../components/LessonFilters";
+import LessonFiltersSkeleton from "../components/LessonFiltersSkeleton";
+import LessonErrorBoundary from "../components/LessonErrorBoundary";
+import ErrorDisplay from "../components/ErrorDisplay";
 
 export default function LevelDetail() {
   const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
@@ -16,8 +21,11 @@ export default function LevelDetail() {
   const levelId = parseInt(params.id as string);
 
   const [lessons, setLessons] = useState<AdminLesson[]>([]);
+  const [filteredLessons, setFilteredLessons] = useState<AdminLesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showBulkEditModal, setShowBulkEditModal] = useState(false);
+  const [selectedLessonIds, setSelectedLessonIds] = useState<number[]>([]);
 
   useEffect(() => {
     if (!hasCheckedAuth) {
@@ -69,6 +77,40 @@ export default function LevelDetail() {
     setError(errorMessage);
   }, []);
 
+  const handleBulkEdit = useCallback((lessonIds: number[]) => {
+    setSelectedLessonIds(lessonIds);
+    setShowBulkEditModal(true);
+  }, []);
+
+  const handleBulkEditSave = useCallback(async (updates: Partial<AdminLesson>) => {
+    try {
+      // Update each selected lesson
+      const updatePromises = selectedLessonIds.map(lessonId => 
+        updateLesson(levelId, lessonId, updates)
+      );
+      
+      await Promise.all(updatePromises);
+      
+      // Reload lessons to reflect changes
+      await loadLessons();
+      
+      setShowBulkEditModal(false);
+      setSelectedLessonIds([]);
+    } catch (error) {
+      console.error("Failed to bulk update lessons:", error);
+      throw error;
+    }
+  }, [selectedLessonIds, levelId, loadLessons]);
+
+  const handleCloseBulkEdit = useCallback(() => {
+    setShowBulkEditModal(false);
+    setSelectedLessonIds([]);
+  }, []);
+
+  const handleFilterChange = useCallback((filtered: AdminLesson[]) => {
+    setFilteredLessons(filtered);
+  }, []);
+
   // Use the lesson reorder controls hook
   const { reorderLesson } = LessonReorderControls({
     lessons,
@@ -91,8 +133,36 @@ export default function LevelDetail() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading level details...</div>
+      <div>
+        <PageBreadcrumb pageTitle="Level Details" />
+        
+        <div className="space-y-6">
+          <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+            <div className="flex items-center justify-between mb-6">
+              <div className="w-48 h-7 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              <div className="w-32 h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-32 h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+                
+                <div className="mb-6">
+                  <LessonFiltersSkeleton />
+                </div>
+                
+                <LessonTable
+                  lessons={[]}
+                  loading={true}
+                  onReorder={async () => {}}
+                  levelId={levelId}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -110,9 +180,12 @@ export default function LevelDetail() {
               Back to Levels
             </Button>
           </div>
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800">
-            <p className="text-red-700 dark:text-red-400">{error}</p>
-          </div>
+          <ErrorDisplay
+            title="Failed to load level details"
+            message={error}
+            onRetry={loadLessons}
+            onGoBack={handleBack}
+          />
         </div>
       </div>
     );
@@ -134,21 +207,44 @@ export default function LevelDetail() {
           </div>
 
           <div className="space-y-6">
-            <div>
-              <h2 className="text-lg font-medium text-gray-800 dark:text-white/90 mb-4">
-                Lessons ({lessons.length})
-              </h2>
-              
-              <LessonTable
-                lessons={lessons}
-                loading={loading}
-                onReorder={reorderLesson}
-                levelId={levelId}
-              />
-            </div>
+            <LessonErrorBoundary>
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-medium text-gray-800 dark:text-white/90">
+                    Lessons ({lessons.length})
+                  </h2>
+                </div>
+                
+                {lessons.length > 0 && (
+                  <div className="mb-6">
+                    <LessonFilters
+                      lessons={lessons}
+                      onFilterChange={handleFilterChange}
+                    />
+                  </div>
+                )}
+                
+                <LessonTable
+                  lessons={filteredLessons.length > 0 || lessons.length === 0 ? filteredLessons : lessons}
+                  loading={loading}
+                  onReorder={reorderLesson}
+                  levelId={levelId}
+                  onBulkEdit={handleBulkEdit}
+                />
+              </div>
+            </LessonErrorBoundary>
           </div>
         </div>
       </div>
+      
+      {/* Bulk Edit Modal */}
+      <BulkEditModal
+        isOpen={showBulkEditModal}
+        onClose={handleCloseBulkEdit}
+        lessons={lessons}
+        selectedLessonIds={selectedLessonIds}
+        onSave={handleBulkEditSave}
+      />
     </div>
   );
 }
