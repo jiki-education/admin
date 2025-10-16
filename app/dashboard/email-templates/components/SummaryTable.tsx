@@ -133,12 +133,20 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
       </div>
       
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <table 
+          className="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+          role="table"
+          aria-label="Email template summary table"
+        >
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
               <th 
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => handleSort("type")}
+                onKeyDown={(e) => e.key === 'Enter' && handleSort("type")}
+                tabIndex={0}
+                role="columnheader"
+                aria-sort={sortField === "type" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
               >
                 <div className="flex items-center space-x-1">
                   <span>Type</span>
@@ -148,6 +156,10 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
               <th 
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => handleSort("slug")}
+                onKeyDown={(e) => e.key === 'Enter' && handleSort("slug")}
+                tabIndex={0}
+                role="columnheader"
+                aria-sort={sortField === "slug" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
               >
                 <div className="flex items-center space-x-1">
                   <span>Slug</span>
@@ -157,6 +169,10 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
               <th 
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => handleSort("implemented")}
+                onKeyDown={(e) => e.key === 'Enter' && handleSort("implemented")}
+                tabIndex={0}
+                role="columnheader"
+                aria-sort={sortField === "implemented" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
               >
                 <div className="flex items-center space-x-1">
                   <span>Implemented Locales</span>
@@ -166,6 +182,10 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
               <th 
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => handleSort("missing")}
+                onKeyDown={(e) => e.key === 'Enter' && handleSort("missing")}
+                tabIndex={0}
+                role="columnheader"
+                aria-sort={sortField === "missing" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
               >
                 <div className="flex items-center space-x-1">
                   <span>Missing Locales</span>
@@ -175,6 +195,10 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
               <th 
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => handleSort("wip")}
+                onKeyDown={(e) => e.key === 'Enter' && handleSort("wip")}
+                tabIndex={0}
+                role="columnheader"
+                aria-sort={sortField === "wip" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
               >
                 <div className="flex items-center space-x-1">
                   <span>WIP Locales</span>

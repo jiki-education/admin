@@ -62,9 +62,9 @@ Add a summary tab to the email templates page that groups templates by type and 
    - [ ] API integration tests
 
 10. **Final polish**
-    - [ ] Responsive design for mobile
-    - [ ] Accessibility improvements
-    - [ ] Code review and cleanup
+    - [x] Responsive design for mobile
+    - [x] Accessibility improvements
+    - [x] Code review and cleanup
 
 ## Implementation Details
 

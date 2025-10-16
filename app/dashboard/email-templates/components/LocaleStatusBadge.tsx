@@ -44,15 +44,20 @@ function LocaleStatusBadge({ locale, status, templateType, templateSlug }: Local
   return (
     <div className="relative inline-block">
       <span 
-        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium cursor-help ${config.bgClass}`}
+        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium cursor-help transition-all duration-200 hover:scale-105 ${config.bgClass}`}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
+        role="tooltip"
+        aria-label={`${locale} locale - ${config.label}`}
       >
         {locale}
       </span>
       
       {showTooltip && (
-        <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg whitespace-nowrap dark:bg-gray-700">
+        <div 
+          className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg whitespace-nowrap dark:bg-gray-700 animate-fade-in"
+          role="tooltip"
+        >
           <div className="font-medium">{locale} - {config.label}</div>
           <div className="text-gray-300 dark:text-gray-400 mt-1">
             {config.description}
@@ -63,7 +68,7 @@ function LocaleStatusBadge({ locale, status, templateType, templateSlug }: Local
             </div>
           )}
           {/* Tooltip arrow */}
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700" />
         </div>
       )}
     </div>
