@@ -10,7 +10,10 @@ import EmailTemplateForm from "./components/EmailTemplateForm";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
 import EmailTemplatePagination from "./components/EmailTemplatePagination";
 import TabNavigation from "./components/TabNavigation";
+import SummaryTable from "./components/SummaryTable";
+import SummaryFilters from "./components/SummaryFilters";
 import type { EmailTemplate, EmailTemplateFilters, EmailTemplateType, EmailTemplateSummaryResponse } from "./types";
+import type { SummaryFilters as SummaryFiltersType } from "./components/SummaryFilters";
 import { getEmailTemplates, getEmailTemplateTypes, createEmailTemplate, deleteEmailTemplate, getEmailTemplatesSummary } from "@/lib/api/email-templates";
 import { useModal } from "@/hooks/useModal";
 
@@ -31,6 +34,7 @@ export default function EmailTemplates() {
   const [summaryData, setSummaryData] = useState<EmailTemplateSummaryResponse | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
+  const [summaryFilters, setSummaryFilters] = useState<SummaryFiltersType>({});
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -175,6 +179,14 @@ export default function EmailTemplates() {
     }
   }, [selectedTemplate, loadTemplates]);
 
+  const handleSummaryFiltersChange = useCallback((newFilters: SummaryFiltersType) => {
+    setSummaryFilters(newFilters);
+  }, []);
+
+  const handleClearSummaryFilters = useCallback(() => {
+    setSummaryFilters({});
+  }, []);
+
   if (!hasCheckedAuth) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -240,7 +252,7 @@ export default function EmailTemplates() {
           )}
 
           {activeTab === "summary" && (
-            <div className="mt-6">
+            <>
               {summaryError && (
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800">
                   <p className="text-red-700 dark:text-red-400">{summaryError}</p>
@@ -254,84 +266,19 @@ export default function EmailTemplates() {
               )}
               
               {!summaryLoading && !summaryError && summaryData && (
-                <div className="space-y-6">
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Found {summaryData.email_templates.length} template groups
-                  </div>
+                <>
+                  <SummaryFilters
+                    filters={summaryFilters}
+                    onFiltersChange={handleSummaryFiltersChange}
+                    templateTypes={templateTypes}
+                    onClearFilters={handleClearSummaryFilters}
+                  />
                   
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                      <thead className="bg-gray-50 dark:bg-gray-800">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Type
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Slug
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Implemented Locales
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Missing Locales
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            WIP Locales
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                        {summaryData.email_templates.map((template, index) => {
-                          const implementedLocales = template.locales;
-                          const missingLocales = summaryData.locales.supported.filter(
-                            locale => !implementedLocales.includes(locale)
-                          );
-                          const wipLocales = summaryData.locales.wip.filter(
-                            locale => implementedLocales.includes(locale)
-                          );
-                          
-                          return (
-                            <tr key={`${template.type}-${template.slug}`} className={index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'}>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {template.type}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {template.slug}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex flex-wrap gap-1">
-                                  {implementedLocales.map(locale => (
-                                    <span key={locale} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                      {locale}
-                                    </span>
-                                  ))}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex flex-wrap gap-1">
-                                  {missingLocales.map(locale => (
-                                    <span key={locale} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                      {locale}
-                                    </span>
-                                  ))}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex flex-wrap gap-1">
-                                  {wipLocales.map(locale => (
-                                    <span key={locale} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                      {locale}
-                                    </span>
-                                  ))}
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                  <SummaryTable
+                    summaryData={summaryData}
+                    filters={summaryFilters}
+                  />
+                </>
               )}
               
               {!summaryLoading && !summaryError && !summaryData && (
@@ -339,7 +286,7 @@ export default function EmailTemplates() {
                   No summary data available
                 </div>
               )}
-            </div>
+            </>
           )}
         </div>
       </div>
