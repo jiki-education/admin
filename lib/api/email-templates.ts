@@ -4,7 +4,12 @@
  */
 
 import { api } from "@/lib/api";
-import type { EmailTemplate, EmailTemplateFilters, EmailTemplateType } from "@/app/dashboard/email-templates/types";
+import type { 
+  EmailTemplate, 
+  EmailTemplateFilters, 
+  EmailTemplateType,
+  EmailTemplateSummaryResponse 
+} from "@/app/dashboard/email-templates/types";
 
 interface EmailTemplatesResponse {
   results: EmailTemplate[];
@@ -87,4 +92,13 @@ export async function updateEmailTemplate(id: number, template: Partial<EmailTem
  */
 export async function deleteEmailTemplate(id: number): Promise<void> {
   await api.delete(`/admin/email_templates/${id}`);
+}
+
+/**
+ * Get email templates summary grouped by type and slug
+ * GET /v1/admin/email_templates/summary
+ */
+export async function getEmailTemplatesSummary(): Promise<EmailTemplateSummaryResponse> {
+  const response = await api.get<EmailTemplateSummaryResponse>("/admin/email_templates/summary");
+  return response.data;
 }

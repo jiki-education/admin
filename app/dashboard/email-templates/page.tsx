@@ -9,8 +9,9 @@ import TemplateFilters from "./components/TemplateFilters";
 import EmailTemplateForm from "./components/EmailTemplateForm";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
 import EmailTemplatePagination from "./components/EmailTemplatePagination";
-import type { EmailTemplate, EmailTemplateFilters, EmailTemplateType } from "./types";
-import { getEmailTemplates, getEmailTemplateTypes, createEmailTemplate, deleteEmailTemplate } from "@/lib/api/email-templates";
+import TabNavigation from "./components/TabNavigation";
+import type { EmailTemplate, EmailTemplateFilters, EmailTemplateType, EmailTemplateSummaryResponse } from "./types";
+import { getEmailTemplates, getEmailTemplateTypes, createEmailTemplate, deleteEmailTemplate, getEmailTemplatesSummary } from "@/lib/api/email-templates";
 import { useModal } from "@/hooks/useModal";
 
 export default function EmailTemplates() {
@@ -22,6 +23,14 @@ export default function EmailTemplates() {
   const [filters, setFilters] = useState<EmailTemplateFilters>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Tab state
+  const [activeTab, setActiveTab] = useState<"templates" | "summary">("templates");
+  
+  // Summary state
+  const [summaryData, setSummaryData] = useState<EmailTemplateSummaryResponse | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -78,6 +87,21 @@ export default function EmailTemplates() {
     }
   }, []);
 
+  const loadSummaryData = useCallback(async () => {
+    try {
+      setSummaryLoading(true);
+      setSummaryError(null);
+      const data = await getEmailTemplatesSummary();
+      setSummaryData(data);
+    } catch (err) {
+      console.error("Failed to load summary data:", err);
+      setSummaryError(err instanceof Error ? err.message : "Failed to load summary data");
+      setSummaryData(null);
+    } finally {
+      setSummaryLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (isAuthenticated) {
       void loadTemplates();
@@ -89,6 +113,12 @@ export default function EmailTemplates() {
       void loadTemplateTypes();
     }
   }, [isAuthenticated, loadTemplateTypes]);
+
+  useEffect(() => {
+    if (isAuthenticated && activeTab === "summary" && !summaryData) {
+      void loadSummaryData();
+    }
+  }, [isAuthenticated, activeTab, summaryData, loadSummaryData]);
 
   const handleFiltersChange = useCallback((newFilters: EmailTemplateFilters) => {
     setFilters(newFilters);
@@ -178,25 +208,139 @@ export default function EmailTemplates() {
             </div>
           )}
 
-          <TemplateFilters
-            filters={filters}
-            onFiltersChange={handleFiltersChange}
-            templateTypes={templateTypes}
-            onClearFilters={handleClearFilters}
-          />
+          <div className="mb-6">
+            <TabNavigation
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
+          </div>
 
-          <EmailTemplateTable
-            templates={templates}
-            onDelete={handleDeleteTemplate}
-            loading={loading}
-          />
+          {activeTab === "templates" && (
+            <>
+              <TemplateFilters
+                filters={filters}
+                onFiltersChange={handleFiltersChange}
+                templateTypes={templateTypes}
+                onClearFilters={handleClearFilters}
+              />
 
-          <EmailTemplatePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalCount={totalCount}
-            onPageChange={handlePageChange}
-          />
+              <EmailTemplateTable
+                templates={templates}
+                onDelete={handleDeleteTemplate}
+                loading={loading}
+              />
+
+              <EmailTemplatePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalCount={totalCount}
+                onPageChange={handlePageChange}
+              />
+            </>
+          )}
+
+          {activeTab === "summary" && (
+            <div className="mt-6">
+              {summaryError && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800">
+                  <p className="text-red-700 dark:text-red-400">{summaryError}</p>
+                </div>
+              )}
+              
+              {summaryLoading && (
+                <div className="text-center py-12">
+                  <div className="text-lg text-gray-500 dark:text-gray-400">Loading summary...</div>
+                </div>
+              )}
+              
+              {!summaryLoading && !summaryError && summaryData && (
+                <div className="space-y-6">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Found {summaryData.email_templates.length} template groups
+                  </div>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                      <thead className="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Type
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Slug
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Implemented Locales
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Missing Locales
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            WIP Locales
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                        {summaryData.email_templates.map((template, index) => {
+                          const implementedLocales = template.locales;
+                          const missingLocales = summaryData.locales.supported.filter(
+                            locale => !implementedLocales.includes(locale)
+                          );
+                          const wipLocales = summaryData.locales.wip.filter(
+                            locale => implementedLocales.includes(locale)
+                          );
+                          
+                          return (
+                            <tr key={`${template.type}-${template.slug}`} className={index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                {template.type}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                {template.slug}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex flex-wrap gap-1">
+                                  {implementedLocales.map(locale => (
+                                    <span key={locale} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                      {locale}
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex flex-wrap gap-1">
+                                  {missingLocales.map(locale => (
+                                    <span key={locale} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                      {locale}
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex flex-wrap gap-1">
+                                  {wipLocales.map(locale => (
+                                    <span key={locale} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                      {locale}
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              
+              {!summaryLoading && !summaryError && !summaryData && (
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  No summary data available
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
