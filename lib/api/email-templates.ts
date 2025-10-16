@@ -28,7 +28,8 @@ export async function getEmailTemplates(filters?: EmailTemplateFilters): Promise
     ...(filters?.type && { type: filters.type }),
     ...(filters?.slug && { slug: filters.slug }),
     ...(filters?.locale && { locale: filters.locale }),
-    ...(filters?.search && { search: filters.search })
+    ...(filters?.search && { search: filters.search }),
+    ...(filters?.page && { page: filters.page.toString() })
   };
 
   const response = await api.get<EmailTemplatesResponse>("/admin/email_templates", { params });

@@ -1,5 +1,6 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import Button from "@/components/ui/button/Button";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -75,6 +76,10 @@ export default function Levels() {
     setFilters(prevFilters => ({ ...prevFilters, page }));
   }, []);
 
+  const handleAddNewLevel = useCallback(() => {
+    router.push("/dashboard/levels/new");
+  }, [router]);
+
   if (!hasCheckedAuth) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -97,6 +102,9 @@ export default function Levels() {
             <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
               Level Management
             </h1>
+            <Button onClick={handleAddNewLevel}>
+              Add New Level
+            </Button>
           </div>
 
           {error && (

@@ -8,6 +8,7 @@ import EmailTemplateTable from "./components/EmailTemplateTable";
 import TemplateFilters from "./components/TemplateFilters";
 import EmailTemplateForm from "./components/EmailTemplateForm";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
+import EmailTemplatePagination from "./components/EmailTemplatePagination";
 import type { EmailTemplate, EmailTemplateFilters, EmailTemplateType } from "./types";
 import { getEmailTemplates, getEmailTemplateTypes, createEmailTemplate, deleteEmailTemplate } from "@/lib/api/email-templates";
 import { useModal } from "@/hooks/useModal";
@@ -21,6 +22,11 @@ export default function EmailTemplates() {
   const [filters, setFilters] = useState<EmailTemplateFilters>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
   // Modal states
   const createModal = useModal();
@@ -46,16 +52,22 @@ export default function EmailTemplates() {
     try {
       setLoading(true);
       setError(null);
-      const response = await getEmailTemplates(filters);
+      const filtersWithPage = { ...filters, page: currentPage };
+      const response = await getEmailTemplates(filtersWithPage);
       setTemplates(response.results);
+      setCurrentPage(response.meta.current_page);
+      setTotalPages(response.meta.total_pages);
+      setTotalCount(response.meta.total_count);
     } catch (err) {
       console.error("Failed to load templates:", err);
       setError(err instanceof Error ? err.message : "Failed to load templates");
       setTemplates([]);
+      setTotalPages(1);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, currentPage]);
 
   const loadTemplateTypes = useCallback(async () => {
     try {
@@ -80,10 +92,16 @@ export default function EmailTemplates() {
 
   const handleFiltersChange = useCallback((newFilters: EmailTemplateFilters) => {
     setFilters(newFilters);
+    setCurrentPage(1); // Reset to first page when filters change
   }, []);
 
   const handleClearFilters = useCallback(() => {
     setFilters({});
+    setCurrentPage(1); // Reset to first page when filters are cleared
+  }, []);
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
   }, []);
 
   const handleDeleteTemplate = useCallback((template: EmailTemplate) => {
@@ -171,6 +189,13 @@ export default function EmailTemplates() {
             templates={templates}
             onDelete={handleDeleteTemplate}
             loading={loading}
+          />
+
+          <EmailTemplatePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalCount={totalCount}
+            onPageChange={handlePageChange}
           />
         </div>
       </div>

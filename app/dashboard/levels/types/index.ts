@@ -32,3 +32,7 @@ export interface AdminLevelsResponse {
     total_count: number;
   };
 }
+
+// Types for creating new levels and lessons
+export type CreateLevelData = Omit<AdminLevel, 'id' | 'position'>;
+export type CreateLessonData = Omit<AdminLesson, 'id' | 'position'>;

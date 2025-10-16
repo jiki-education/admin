@@ -22,6 +22,13 @@ The Jiki Admin application is a standalone Next.js application for managing the 
 ### Testing
 
 ```bash
+# Unit Tests
+pnpm test               # Run unit tests
+pnpm test:watch         # Run unit tests in watch mode
+pnpm test:coverage      # Run unit tests with coverage report
+pnpm test:ci            # Run unit tests for CI (coverage + no watch)
+
+# E2E Tests
 pnpm test:e2e           # Run E2E tests (on port 3064)
 pnpm test:e2e:watch     # Watch mode
 pnpm test:e2e:headful   # Run with visible browser
@@ -41,7 +48,7 @@ pnpm format:check # Check formatting
 - **Framework**: Next.js 15 with App Router, TypeScript
 - **UI Library**: React 19 with React Compiler (automatic optimization)
 - **Styling**: Tailwind CSS v4
-- **Testing**: Jest + Puppeteer for E2E tests
+- **Testing**: Jest + React Testing Library for unit tests, Puppeteer for E2E tests
 - **Package Manager**: pnpm
 
 **Note**: React Compiler is enabled, so manual memoization (`useMemo`, `useCallback`, `memo()`) is generally not needed.
