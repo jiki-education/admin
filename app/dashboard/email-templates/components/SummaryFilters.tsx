@@ -44,10 +44,14 @@ function SummaryFilters({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Template Type Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label 
+            htmlFor="template-type-filter"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
             Template Type
           </label>
           <select
+            id="template-type-filter"
             value={filters.type || ""}
             onChange={(e) => handleFilterChange("type", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
@@ -63,10 +67,14 @@ function SummaryFilters({
 
         {/* Locale Status Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label 
+            htmlFor="locale-status-filter"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
             Locale Status
           </label>
           <select
+            id="locale-status-filter"
             value={filters.localeStatus || "all"}
             onChange={(e) => handleFilterChange("localeStatus", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
@@ -80,11 +88,15 @@ function SummaryFilters({
 
         {/* Search Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label 
+            htmlFor="search-filter"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
             Search Template Slug
           </label>
           <div className="relative">
             <input
+              id="search-filter"
               type="text"
               placeholder="Search by slug..."
               value={filters.search || ""}

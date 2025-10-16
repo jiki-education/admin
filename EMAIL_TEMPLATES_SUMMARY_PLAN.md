@@ -57,7 +57,7 @@ Add a summary tab to the email templates page that groups templates by type and 
    - [x] Ensure proper data refresh
 
 9. **Add tests**
-   - [ ] Unit tests for new components
+   - [x] Unit tests for new components
    - [ ] E2E tests for tab functionality
    - [ ] API integration tests
 
