@@ -107,6 +107,10 @@ export default function LevelDetail() {
     setSelectedLessonIds([]);
   }, []);
 
+  const handleAddNewLesson = useCallback(() => {
+    router.push(`/dashboard/levels/${levelId}/lessons/new`);
+  }, [router, levelId]);
+
   const handleFilterChange = useCallback((filtered: AdminLesson[]) => {
     setFilteredLessons(filtered);
   }, []);
@@ -213,6 +217,9 @@ export default function LevelDetail() {
                   <h2 className="text-lg font-medium text-gray-800 dark:text-white/90">
                     Lessons ({lessons.length})
                   </h2>
+                  <Button onClick={handleAddNewLesson}>
+                    Add New Lesson
+                  </Button>
                 </div>
                 
                 {lessons.length > 0 && (
