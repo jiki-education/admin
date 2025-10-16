@@ -92,26 +92,53 @@ async function runE2ETests() {
     });
     console.log("Server is ready!");
 
-    // Warm up routes to trigger Next.js compilation
+    // Warm up routes to trigger Next.js compilation (optimized)
     console.log("Warming up routes...");
 
     // Auto-discover routes
     const appRoutes = discoverRoutes(path.join(__dirname, "..", "app"));
 
-    const routesToWarm = [...appRoutes];
+    // Only warm up critical routes that are tested
+    const criticalRoutes = appRoutes.filter(route => 
+      ["/", "/signin", "/signup", "/dashboard", "/dashboard/users", "/dashboard/levels", "/dashboard/email-templates"].includes(route)
+    );
 
-    for (const route of routesToWarm) {
+    const routesToWarm = criticalRoutes.length > 0 ? criticalRoutes : appRoutes.slice(0, 5); // Fallback to first 5 routes
+
+    // Warm up routes in parallel for speed
+    const warmupPromises = routesToWarm.map(async (route) => {
       try {
-        await fetch(`${SERVER_URL}${route}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout per route
+        
+        await fetch(`${SERVER_URL}${route}`, { 
+          signal: controller.signal,
+          headers: { 'User-Agent': 'E2E-Test-Warmup' }
+        });
+        
+        clearTimeout(timeoutId);
       } catch (err) {
         // Ignore errors during warmup
       }
-    }
+    });
+
+    await Promise.allSettled(warmupPromises);
     console.log(`Routes warmed up! (${routesToWarm.length} routes)`);
 
     // Run the E2E tests
-    console.log("Running E2E tests...");
-    const testProcess = spawn("pnpm", ["jest", "--config", "jest.e2e.config.mjs", ...process.argv.slice(2)], {
+    let configFile = "jest.e2e.config.mjs";
+    let modeLabel = "";
+    
+    if (process.env.CI_MODE) {
+      configFile = "jest.e2e.ci.config.mjs";
+      modeLabel = " (CI MODE)";
+    } else if (process.env.FAST_MODE) {
+      configFile = "jest.e2e.fast.config.mjs";
+      modeLabel = " (TURBO MODE)";
+    }
+    
+    console.log(`Running E2E tests with config: ${configFile}${modeLabel}...`);
+    const testProcess = spawn("pnpm", ["jest", "--config", configFile, ...process.argv.slice(2)], {
       stdio: "inherit",
       env: {
         ...process.env,

@@ -6,8 +6,8 @@ describe("Basic App Functionality", () => {
   it("should load the home page", async () => {
     await page.goto(`${baseUrl}/`);
     
-    // Wait for the page to load
-    await page.waitForSelector('body', { timeout: 10000 });
+    // Wait for the page to load (reduced timeout)
+    await page.waitForSelector('body', { timeout: 5000 });
     
     // Check that we can access the page (no errors)
     const body = await page.$('body');
