@@ -13,6 +13,7 @@ export interface EmailTemplateFilters {
   slug?: string;
   locale?: string;
   search?: string;
+  page?: number;
 }
 
 export interface EmailTemplateType {
