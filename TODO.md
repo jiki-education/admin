@@ -1,69 +1,85 @@
 # Admin Dashboard TODO
 
-## Missing Backend Endpoints
+## Backend Endpoints
 
 ### User Management
+- [ ] **DELETE /v1/admin/users/:id** (High Priority)
+  - Delete user functionality (frontend complete, backend missing)
+  - Requires: authorization, data cleanup, audit logging
+  - File: `lib/api/users.ts` needs `deleteUser` function
+  - Current placeholder: `app/dashboard/users/page.tsx:99-105`
 
-#### DELETE /v1/admin/users/:id
-**Priority**: High  
-**Status**: Not implemented  
-**Required for**: User deletion functionality  
+### Level and Lesson Management
+- [ ] **POST /v1/admin/levels** (High Priority)
+  - Create new level functionality (frontend complete, backend missing)
+  - Expected request: `{ level: { title, slug, description } }`
+  - Expected response: `{ level: AdminLevel }`
+  - Auto-position assignment handled by Level model
 
-**Description**: 
-Currently, the user management interface includes a delete functionality with email confirmation modal, but the backend endpoint is not yet implemented.
+- [ ] **POST /v1/admin/levels/:levelId/lessons** (High Priority)
+  - Create new lesson functionality (frontend complete, backend missing)
+  - Expected request: `{ lesson: { title, slug, description, type, data } }`
+  - Expected response: `{ lesson: AdminLesson }`
+  - Auto-position assignment handled by Lesson model
 
-**Frontend Implementation Status**: ✅ Complete
-- Delete button in user table rows
-- Email confirmation modal with user verification
-- Loading states and error handling
-- UI state management
+## Testing
 
-**Backend Requirements**:
-- `DELETE /v1/admin/users/:id` endpoint
-- Proper authorization (admin-only access)
-- Soft delete vs hard delete decision
-- Related data cleanup (user_lessons, user_levels, etc.)
-- Audit logging for user deletions
+### E2E Test Coverage Expansion
+- [ ] Authentication flow tests (signin/signup)
+- [ ] Dashboard navigation tests
+- [ ] User management E2E tests
+- [ ] Level management E2E tests
+- [ ] Email template E2E tests
+- [ ] Form interaction tests
 
-**Frontend Integration Points**:
-- File: `lib/api/users.ts` 
-- Function to implement: `deleteUser(id: number): Promise<void>`
-- Current placeholder: Lines 99-105 in `app/dashboard/users/page.tsx`
+### Unit Testing Setup
+- [ ] Setup Vitest + React Testing Library
+- [ ] Component testing utilities
+- [ ] Mock implementations (router, stores, API)
+- [ ] Test coverage reporting
 
-**Security Considerations**:
-- Ensure only admins can delete users
-- Prevent self-deletion (admin deleting themselves)
-- Consider data retention policies
-- Log deletion actions for audit purposes
+## User Management Enhancements
+- [ ] Admin status toggle filter
+- [ ] Items per page selector for pagination
+- [ ] User detail view (`/dashboard/users/[id]/page.tsx`)
+- [ ] User status change modal
+- [ ] Bulk operations (status changes, export)
 
-**Testing Required**:
-- Unit tests for delete API function
-- E2E tests for delete workflow
-- Edge case testing (deleting current user, non-existent users)
+## Level Management Enhancements
+- [ ] Drag & drop lesson reordering
+- [ ] Bulk lesson operations
+- [ ] Advanced search & filtering by lesson type
+- [ ] Performance optimizations for large lesson lists
 
----
+## Email Templates
+- [ ] Syntax highlighting for MJML editor (optional)
+- [ ] Template preview with sample data
+- [ ] Template versioning system
+- [ ] Email template testing (send test emails)
 
-## Implementation Checklist
+## Testing Infrastructure Improvements
+- [ ] Visual regression testing with Playwright
+- [ ] Performance testing with Lighthouse CI
+- [ ] Accessibility testing with axe-core
 
-When implementing the delete endpoint:
+## Documentation
+- [ ] Update CLAUDE.md with new features
+- [ ] API documentation for new endpoints
+- [ ] Testing best practices guide
 
-- [ ] Create backend endpoint `DELETE /v1/admin/users/:id`
-- [ ] Add proper authorization middleware
-- [ ] Implement soft delete or hard delete with data cleanup
-- [ ] Add audit logging
-- [ ] Create `deleteUser` function in `lib/api/users.ts`
-- [ ] Replace placeholder code in `app/dashboard/users/page.tsx` (lines 99-105)
-- [ ] Add error handling for delete failures
-- [ ] Write unit tests for delete functionality
-- [ ] Write E2E tests for user deletion workflow
-- [ ] Test edge cases (self-deletion prevention, etc.)
+## Priority Notes
 
-## Notes
+**Immediate (Required for basic functionality):**
+1. Backend endpoints for level/lesson creation
+2. User deletion endpoint
+3. Basic E2E test coverage
 
-The delete functionality is fully implemented on the frontend with:
-- Proper email confirmation for safety
-- Loading states during deletion
-- Error handling and user feedback
-- Automatic data refresh after successful deletion
+**Short term (Enhance UX):**
+4. Unit testing setup
+5. User management enhancements
+6. Extended E2E coverage
 
-The UI follows the same patterns as the email-templates delete functionality for consistency.
+**Long term (Polish):**
+7. Advanced features and optimizations
+8. Comprehensive testing suite
+9. Performance and accessibility improvements
