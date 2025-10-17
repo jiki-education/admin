@@ -25,7 +25,7 @@ export function generateSlug(title: string): string {
  * @returns True if the slug is valid, false otherwise
  */
 export function isValidSlug(slug: string): boolean {
-  if (!slug || slug.length === 0) return false;
+  if (!slug || slug.length === 0) {return false;}
   
   // Slug should only contain lowercase letters, numbers, and hyphens
   // Should not start or end with hyphen

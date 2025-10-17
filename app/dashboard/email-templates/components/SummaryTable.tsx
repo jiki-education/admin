@@ -97,10 +97,10 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
       if (typeof aValue === "string" && typeof bValue === "string") {
         const result = aValue.localeCompare(bValue);
         return sortDirection === "asc" ? result : -result;
-      } else {
+      } 
         const result = (aValue as number) - (bValue as number);
         return sortDirection === "asc" ? result : -result;
-      }
+      
     });
   };
 
