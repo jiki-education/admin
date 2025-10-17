@@ -20,3 +20,19 @@ export interface EmailTemplateType {
   value: string;
   label: string;
 }
+
+export interface EmailTemplateSummaryItem {
+  type: string;
+  slug: string;
+  locales: string[];
+}
+
+export interface LocaleConfiguration {
+  supported: string[];
+  wip: string[];
+}
+
+export interface EmailTemplateSummaryResponse {
+  email_templates: EmailTemplateSummaryItem[];
+  locales: LocaleConfiguration;
+}

@@ -9,8 +9,12 @@ import TemplateFilters from "./components/TemplateFilters";
 import EmailTemplateForm from "./components/EmailTemplateForm";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
 import EmailTemplatePagination from "./components/EmailTemplatePagination";
-import type { EmailTemplate, EmailTemplateFilters, EmailTemplateType } from "./types";
-import { getEmailTemplates, getEmailTemplateTypes, createEmailTemplate, deleteEmailTemplate } from "@/lib/api/email-templates";
+import TabNavigation from "./components/TabNavigation";
+import SummaryTable from "./components/SummaryTable";
+import SummaryFilters from "./components/SummaryFilters";
+import type { EmailTemplate, EmailTemplateFilters, EmailTemplateType, EmailTemplateSummaryResponse } from "./types";
+import type { SummaryFilters as SummaryFiltersType } from "./components/SummaryFilters";
+import { getEmailTemplates, getEmailTemplateTypes, createEmailTemplate, deleteEmailTemplate, getEmailTemplatesSummary } from "@/lib/api/email-templates";
 import { useModal } from "@/hooks/useModal";
 
 export default function EmailTemplates() {
@@ -22,6 +26,15 @@ export default function EmailTemplates() {
   const [filters, setFilters] = useState<EmailTemplateFilters>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Tab state
+  const [activeTab, setActiveTab] = useState<"templates" | "summary">("templates");
+  
+  // Summary state
+  const [summaryData, setSummaryData] = useState<EmailTemplateSummaryResponse | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+  const [summaryFilters, setSummaryFilters] = useState<SummaryFiltersType>({});
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -78,6 +91,21 @@ export default function EmailTemplates() {
     }
   }, []);
 
+  const loadSummaryData = useCallback(async () => {
+    try {
+      setSummaryLoading(true);
+      setSummaryError(null);
+      const data = await getEmailTemplatesSummary();
+      setSummaryData(data);
+    } catch (err) {
+      console.error("Failed to load summary data:", err);
+      setSummaryError(err instanceof Error ? err.message : "Failed to load summary data");
+      setSummaryData(null);
+    } finally {
+      setSummaryLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (isAuthenticated) {
       void loadTemplates();
@@ -89,6 +117,12 @@ export default function EmailTemplates() {
       void loadTemplateTypes();
     }
   }, [isAuthenticated, loadTemplateTypes]);
+
+  useEffect(() => {
+    if (isAuthenticated && activeTab === "summary" && !summaryData) {
+      void loadSummaryData();
+    }
+  }, [isAuthenticated, activeTab, summaryData, loadSummaryData]);
 
   const handleFiltersChange = useCallback((newFilters: EmailTemplateFilters) => {
     setFilters(newFilters);
@@ -145,6 +179,14 @@ export default function EmailTemplates() {
     }
   }, [selectedTemplate, loadTemplates]);
 
+  const handleSummaryFiltersChange = useCallback((newFilters: SummaryFiltersType) => {
+    setSummaryFilters(newFilters);
+  }, []);
+
+  const handleClearSummaryFilters = useCallback(() => {
+    setSummaryFilters({});
+  }, []);
+
   if (!hasCheckedAuth) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -178,25 +220,74 @@ export default function EmailTemplates() {
             </div>
           )}
 
-          <TemplateFilters
-            filters={filters}
-            onFiltersChange={handleFiltersChange}
-            templateTypes={templateTypes}
-            onClearFilters={handleClearFilters}
-          />
+          <div className="mb-6">
+            <TabNavigation
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
+          </div>
 
-          <EmailTemplateTable
-            templates={templates}
-            onDelete={handleDeleteTemplate}
-            loading={loading}
-          />
+          {activeTab === "templates" && (
+            <>
+              <TemplateFilters
+                filters={filters}
+                onFiltersChange={handleFiltersChange}
+                templateTypes={templateTypes}
+                onClearFilters={handleClearFilters}
+              />
 
-          <EmailTemplatePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalCount={totalCount}
-            onPageChange={handlePageChange}
-          />
+              <EmailTemplateTable
+                templates={templates}
+                onDelete={handleDeleteTemplate}
+                loading={loading}
+              />
+
+              <EmailTemplatePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalCount={totalCount}
+                onPageChange={handlePageChange}
+              />
+            </>
+          )}
+
+          {activeTab === "summary" && (
+            <>
+              {summaryError && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800">
+                  <p className="text-red-700 dark:text-red-400">{summaryError}</p>
+                </div>
+              )}
+              
+              {summaryLoading && (
+                <div className="text-center py-12">
+                  <div className="text-lg text-gray-500 dark:text-gray-400">Loading summary...</div>
+                </div>
+              )}
+              
+              {!summaryLoading && !summaryError && summaryData && (
+                <>
+                  <SummaryFilters
+                    filters={summaryFilters}
+                    onFiltersChange={handleSummaryFiltersChange}
+                    templateTypes={templateTypes}
+                    onClearFilters={handleClearSummaryFilters}
+                  />
+                  
+                  <SummaryTable
+                    summaryData={summaryData}
+                    filters={summaryFilters}
+                  />
+                </>
+              )}
+              
+              {!summaryLoading && !summaryError && !summaryData && (
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  No summary data available
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
 
