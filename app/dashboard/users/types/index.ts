@@ -10,6 +10,7 @@ export interface UserFilters {
   name?: string;
   email?: string;
   locale?: string;
+  admin?: boolean;
   page?: number;
   per?: number; // pagination limit
 }

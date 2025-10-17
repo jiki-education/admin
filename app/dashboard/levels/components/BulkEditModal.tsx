@@ -36,7 +36,7 @@ export default function BulkEditModal({
   });
   const [saving, setSaving] = useState(false);
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   const selectedLessons = lessons.filter(lesson => selectedLessonIds.includes(lesson.id));
 

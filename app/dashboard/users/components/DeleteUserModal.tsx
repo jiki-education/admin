@@ -31,7 +31,9 @@ export default function DeleteUserModal({
   }, [isOpen]);
 
   const handleConfirm = () => {
-    if (!user) return;
+    if (!user) {
+      return;
+    }
 
     if (emailConfirmation !== user.email) {
       setError("Email address does not match. Please type the exact email address.");

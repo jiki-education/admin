@@ -4,7 +4,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import type { User, UserFilters as UserFiltersType } from "./types";
-import { getUsers } from "@/lib/api/users";
+import { getUsers, deleteUser } from "@/lib/api/users";
 import UserFilters from "./components/UserFilters";
 import UserTable from "./components/UserTable";
 import UserPagination from "./components/UserPagination";
@@ -18,6 +18,7 @@ export default function Users() {
   const [filters, setFilters] = useState<UserFiltersType>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const [meta, setMeta] = useState<{
     current_page: number;
     total_count: number;
@@ -49,7 +50,7 @@ export default function Users() {
     try {
       setLoading(true);
       setError(null);
-      const response = await getUsers(filters);
+      const response = await getUsers({ ...filters, per: itemsPerPage });
       setUsers(response.results);
       setMeta(response.meta);
     } catch (err) {
@@ -59,7 +60,7 @@ export default function Users() {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, itemsPerPage]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -80,6 +81,11 @@ export default function Users() {
     setFilters(prevFilters => ({ ...prevFilters, page }));
   }, []);
 
+  const handleItemsPerPageChange = useCallback((newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setFilters(prev => ({ ...prev, page: 1 })); // Reset to page 1 when changing items per page
+  }, []);
+
   const handleDeleteUser = useCallback((user: User) => {
     setSelectedUser(user);
     setIsDeleteModalOpen(true);
@@ -92,17 +98,13 @@ export default function Users() {
   }, []);
 
   const handleConfirmDelete = useCallback(async () => {
-    if (!selectedUser) return;
+    if (!selectedUser) {
+      return;
+    }
 
     setDeleteLoading(true);
     try {
-      // TODO: Implement actual delete API call when endpoint is available
-      // await deleteUser(selectedUser.id);
-      
-      // For now, just simulate a successful delete with a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log(`User ${selectedUser.email} would be deleted (endpoint not implemented yet)`);
+      await deleteUser(selectedUser.id);
       
       // Reload users after successful delete
       await loadUsers();
@@ -160,7 +162,9 @@ export default function Users() {
             currentPage={meta.current_page}
             totalPages={meta.total_pages}
             totalCount={meta.total_count}
+            itemsPerPage={itemsPerPage}
             onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
           />
         </div>
       </div>

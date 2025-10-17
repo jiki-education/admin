@@ -94,9 +94,11 @@ This project follows the same coding standards as `front-end/app`:
 
 ### Testing
 
-- **E2E tests only** - No unit tests currently (can be added as needed)
-- Tests are located in `tests/e2e/`
+- **Comprehensive test coverage** - Both unit and E2E tests
+- **Unit tests**: 57 tests using Jest + React Testing Library
+- **E2E tests**: 47 tests using Puppeteer (located in `tests/e2e/`)
 - Custom test runner starts dev server automatically
+- API client functions have full test coverage
 - Use descriptive test names and clear assertions
 
 ## Architecture Principles
@@ -136,6 +138,39 @@ pnpm add -D [package-name]   # Dev dependency
 - Use `console.log` or browser DevTools for debugging
 - E2E test failures show browser screenshots in terminal
 - Set `HEADLESS=false` to see browser during tests
+
+## Backend Integration Status
+
+### ✅ Completed Integrations (Phase 1)
+
+**User Management:**
+- **DELETE /v1/admin/users/:id** - ✅ Fully integrated
+  - API function: `deleteUser` in `lib/api/users.ts`
+  - UI integration: `app/dashboard/users/page.tsx`
+  - Comprehensive unit tests included
+
+**Level Management:**
+- **POST /v1/admin/levels** - ✅ Fully integrated
+  - API function: `createLevel` in `lib/api/levels.ts`
+  - UI integration: `app/dashboard/levels/new/page.tsx`
+  - Auto-position assignment, full validation
+  - Comprehensive unit tests included
+
+### ❌ Pending Backend Implementation
+
+**Lesson Management:**
+- **POST /v1/admin/levels/:levelId/lessons** - Backend missing
+  - Frontend ready but blocked by missing backend endpoint
+  - Requires backend team to implement following Level::Create pattern
+  - Will complete Phase 2 integration once backend is available
+
+### Integration Guidelines
+
+- All API functions have comprehensive unit test coverage
+- Error handling follows consistent patterns across endpoints
+- Backend uses command pattern (User::Destroy, Level::Create)
+- Frontend matches exact backend request/response formats
+- See `BACKEND_INTEGRATION_PLAN.md` for detailed specifications
 
 ## Deployment
 

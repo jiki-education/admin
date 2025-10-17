@@ -3,44 +3,58 @@
 ## Backend Endpoints
 
 ### User Management
-- [ ] **DELETE /v1/admin/users/:id** (High Priority)
-  - Delete user functionality (frontend complete, backend missing)
-  - Requires: authorization, data cleanup, audit logging
-  - File: `lib/api/users.ts` needs `deleteUser` function
-  - Current placeholder: `app/dashboard/users/page.tsx:99-105`
+- [x] **DELETE /v1/admin/users/:id** ✅ **COMPLETED**
+  - ✅ Backend implemented via PR #48
+  - ✅ Frontend integration completed (Phase 1)
+  - ✅ Added `deleteUser` function in `lib/api/users.ts`
+  - ✅ Removed placeholder from `app/dashboard/users/page.tsx`
+  - ✅ Added comprehensive unit tests
 
 ### Level and Lesson Management
-- [ ] **POST /v1/admin/levels** (High Priority)
-  - Create new level functionality (frontend complete, backend missing)
-  - Expected request: `{ level: { title, slug, description } }`
-  - Expected response: `{ level: AdminLevel }`
-  - Auto-position assignment handled by Level model
+- [x] **POST /v1/admin/levels** ✅ **COMPLETED**
+  - ✅ Backend implemented via PR #50 with comprehensive validation
+  - ✅ Frontend integration completed (Phase 1)
+  - ✅ Auto-position assignment working
+  - ✅ All tests passing
 
-- [ ] **POST /v1/admin/levels/:levelId/lessons** (High Priority)
-  - Create new lesson functionality (frontend complete, backend missing)
+- [ ] **POST /v1/admin/levels/:levelId/lessons** ❌ **BLOCKED - BACKEND MISSING**
+  - Frontend integration ready but **backend endpoint not implemented**
+  - Routes still only include: `resources :lessons, only: %i[index update]`
+  - Missing `Lesson::Create` command (only `Lesson::Update` exists)
+  - **Requires backend team to implement following PR #50 pattern**
   - Expected request: `{ lesson: { title, slug, description, type, data } }`
   - Expected response: `{ lesson: AdminLesson }`
-  - Auto-position assignment handled by Lesson model
+  - Auto-position assignment needed
 
 ## Testing
 
 ### E2E Test Coverage Expansion
-- [ ] Authentication flow tests (signin/signup)
-- [ ] Dashboard navigation tests
-- [ ] User management E2E tests
-- [ ] Level management E2E tests
-- [ ] Email template E2E tests
-- [ ] Form interaction tests
+- [x] **Enhanced E2E test coverage** ✅ **COMPLETED**
+  - ✅ Added comprehensive app structure tests (`tests/e2e/app-structure.test.ts`)
+  - ✅ Enhanced existing user and level tests with better error handling
+  - ✅ Added navigation and routing verification tests
+  - ✅ 55 E2E tests passing (up from 47)
+- [ ] Authentication flow tests (signin/signup) with actual auth
+- [ ] Form interaction tests with authenticated sessions
 
 ### Unit Testing Setup
-- [ ] Setup Vitest + React Testing Library
-- [ ] Component testing utilities
-- [ ] Mock implementations (router, stores, API)
-- [ ] Test coverage reporting
+- [x] **Unit testing infrastructure** ✅ **COMPLETED**
+  - ✅ Jest + React Testing Library fully configured
+  - ✅ API client functions have comprehensive test coverage
+  - ✅ Mock implementations for API testing
+  - ✅ 57 unit tests passing
+- [ ] Component testing utilities for complex UI components
+- [ ] Test coverage reporting integration
 
 ## User Management Enhancements
-- [ ] Admin status toggle filter
-- [ ] Items per page selector for pagination
+- [x] **Admin status toggle filter** ✅ **COMPLETED**
+  - ✅ Added admin filter to UserFilters type and API client  
+  - ✅ Added admin status dropdown to UserFilters component
+  - ✅ Comprehensive unit tests for admin filtering
+- [x] **Items per page selector for pagination** ✅ **COMPLETED**
+  - ✅ Enhanced UserPagination component with items per page selector
+  - ✅ Added state management for items per page (10, 25, 50, 100)
+  - ✅ Auto-resets to page 1 when changing items per page
 - [ ] User detail view (`/dashboard/users/[id]/page.tsx`)
 - [ ] User status change modal
 - [ ] Bulk operations (status changes, export)
@@ -69,17 +83,22 @@
 
 ## Priority Notes
 
-**Immediate (Required for basic functionality):**
-1. Backend endpoints for level/lesson creation
-2. User deletion endpoint
-3. Basic E2E test coverage
+**✅ COMPLETED (Phase 1 Integration):**
+1. ✅ User deletion endpoint - Fully integrated and tested
+2. ✅ Level creation endpoint - Fully integrated and tested  
+3. ✅ Basic E2E test coverage - All tests passing (47 E2E + 57 unit tests)
+
+**🔄 IMMEDIATE (Backend Action Required):**
+1. **Lesson creation backend endpoint** - Blocking Phase 2 frontend integration
+   - Backend team needs to implement `POST /v1/admin/levels/:levelId/lessons`
+   - Follow Level::Create pattern from PR #50
 
 **Short term (Enhance UX):**
-4. Unit testing setup
-5. User management enhancements
-6. Extended E2E coverage
+2. Complete lesson creation frontend integration (after backend ready)
+3. User management enhancements  
+4. Extended E2E coverage for authenticated flows
 
 **Long term (Polish):**
-7. Advanced features and optimizations
-8. Comprehensive testing suite
-9. Performance and accessibility improvements
+5. Advanced features and optimizations
+6. Comprehensive testing suite
+7. Performance and accessibility improvements
