@@ -16,7 +16,7 @@ interface NodeOutputPreviewProps {
 export default function NodeOutputPreview({ node }: NodeOutputPreviewProps) {
   // For asset nodes, check node.asset.source first
   let previewUrl: string | null = null;
-  let dataType = getOutputDataType(node);
+  const dataType = getOutputDataType(node);
 
   if (node.type === "asset" && node.asset != null) {
     previewUrl = node.asset.source;

@@ -8,7 +8,7 @@
 
 import { useState, useMemo } from "react";
 import type { MergeVideosNode, Node } from "@/lib/nodes/types";
-import { reorderNodeInputs } from "@/lib/api-client";
+import { reorderNodeInputs } from "@/lib/api/video-pipelines";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import type { DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
@@ -43,12 +43,16 @@ export default function MergeVideosNodeDetails({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (!over || active.id === over.id) return;
+    if (!over || active.id === over.id) {
+      return;
+    }
 
     const oldIndex = segments.indexOf(active.id as string);
     const newIndex = segments.indexOf(over.id as string);
 
-    if (oldIndex === -1 || newIndex === -1) return;
+    if (oldIndex === -1 || newIndex === -1) {
+      return;
+    }
 
     const newSegments = arrayMove(segments, oldIndex, newIndex);
 

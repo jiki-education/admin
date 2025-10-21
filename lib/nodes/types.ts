@@ -6,12 +6,12 @@
  */
 
 import type {
-  NodeStatus,
-  NodeMetadata,
-  NodeOutput,
-  NodeAsset,
-  NodeInputs,
-  NodeConfig,
+  NodeStatus as _NodeStatus,
+  NodeMetadata as _NodeMetadata,
+  NodeOutput as _NodeOutput,
+  NodeAsset as _NodeAsset,
+  NodeInputs as _NodeInputs,
+  NodeConfig as _NodeConfig,
   VideoProductionNode,
   AssetNode as AdminAssetNode,
   GenerateTalkingHeadNode as AdminGenerateTalkingHeadNode,
@@ -28,17 +28,42 @@ import type {
 // ============================================================================
 
 /**
- * Node types that match the admin's comprehensive video pipeline types
- * These are direct aliases to maintain compatibility with the video production editor
+ * Base interface that adapts admin VideoProductionNode to editor expectations
+ * Maps 'id' -> 'uuid' and 'pipelineId' -> 'pipeline_uuid' for compatibility
  */
-export type AssetNode = AdminAssetNode;
-export type GenerateTalkingHeadNode = AdminGenerateTalkingHeadNode;
-export type GenerateAnimationNode = AdminGenerateAnimationNode;
-export type GenerateVoiceoverNode = AdminGenerateVoiceoverNode;
-export type RenderCodeNode = AdminRenderCodeNode;
-export type MixAudioNode = AdminMixAudioNode;
-export type MergeVideosNode = AdminMergeVideosNode;
-export type ComposeVideoNode = AdminComposeVideoNode;
+interface EditorNodeBase {
+  uuid: string;          // Mapped from VideoProductionNode.id
+  pipeline_uuid: string; // Mapped from VideoProductionNode.pipelineId
+}
+
+/**
+ * Node types that adapt admin's video pipeline types for editor compatibility
+ * These maintain the interface expected by the video production editor components
+ */
+export type AssetNode = Omit<AdminAssetNode, 'id' | 'pipelineId'> & EditorNodeBase;
+export type GenerateTalkingHeadNode = Omit<AdminGenerateTalkingHeadNode, 'id' | 'pipelineId'> & EditorNodeBase;
+export type GenerateAnimationNode = Omit<AdminGenerateAnimationNode, 'id' | 'pipelineId'> & EditorNodeBase;
+export type GenerateVoiceoverNode = Omit<AdminGenerateVoiceoverNode, 'id' | 'pipelineId'> & EditorNodeBase;
+export type RenderCodeNode = Omit<AdminRenderCodeNode, 'id' | 'pipelineId'> & EditorNodeBase;
+export type MixAudioNode = Omit<AdminMixAudioNode, 'id' | 'pipelineId'> & EditorNodeBase;
+export type MergeVideosNode = Omit<AdminMergeVideosNode, 'id' | 'pipelineId'> & EditorNodeBase;
+export type ComposeVideoNode = Omit<AdminComposeVideoNode, 'id' | 'pipelineId'> & EditorNodeBase;
+
+/**
+ * Converts VideoProductionNode to editor-compatible Node
+ */
+export function toEditorNode(adminNode: VideoProductionNode): Node {
+  // Server response already has uuid and pipeline_uuid fields, so just cast
+  return adminNode as unknown as Node;
+}
+
+/**
+ * Converts editor Node back to VideoProductionNode format
+ */
+export function toAdminNode(editorNode: Node): VideoProductionNode {
+  // Fields are already compatible, just cast
+  return editorNode as unknown as VideoProductionNode;
+}
 
 // ============================================================================
 // Discriminated Union

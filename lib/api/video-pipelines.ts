@@ -93,9 +93,10 @@ export interface ValidationErrors {
 // Pipeline structures
 export interface PipelineProgress {
   pending: number;
-  inProgress: number;
+  in_progress: number;  // Matches server response field name
   completed: number;
   failed: number;
+  total: number;        // Add total field from server response
 }
 
 export interface PipelineMetadata {
@@ -113,13 +114,13 @@ export interface PipelineConfig {
 }
 
 export interface VideoProductionPipeline {
-  id: string;           // UUID primary key
+  uuid: string;         // UUID primary key (from server response)
   version: string;      // Pipeline version (default: "1.0")
   title: string;        // Human-readable pipeline title
   config: PipelineConfig; // JSONB - Pipeline configuration
   metadata: PipelineMetadata; // JSONB - Progress and cost tracking
-  createdAt: string;    // ISO8601 timestamp
-  updatedAt: string;    // ISO8601 timestamp
+  createdAt?: string;   // ISO8601 timestamp (optional in server response)
+  updatedAt?: string;   // ISO8601 timestamp (optional in server response)
 }
 
 // Legacy Pipeline interface for backward compatibility
@@ -134,8 +135,8 @@ export interface Pipeline {
 }
 
 export interface VideoProductionNode {
-  id: string;           // UUID primary key
-  pipelineId: string;   // Foreign key to pipeline
+  uuid: string;         // UUID primary key (from server response)
+  pipeline_uuid: string; // Foreign key to pipeline (from server response)  
   title: string;        // Human-readable node title
   
   // Structure (Next.js writes these fields)
@@ -150,11 +151,11 @@ export interface VideoProductionNode {
   output?: NodeOutput;  // JSONB - Execution results
   
   // Validation state (Rails writes these fields)
-  isValid: boolean;     // Whether node passes validation
-  validationErrors: ValidationErrors; // JSONB - Validation error details
+  is_valid: boolean;    // Whether node passes validation (from server response)
+  validation_errors: ValidationErrors; // JSONB - Validation error details (from server response)
   
-  createdAt: string;    // ISO8601 timestamp
-  updatedAt: string;    // ISO8601 timestamp
+  created_at?: string;  // ISO8601 timestamp (optional in server response)
+  updated_at?: string;  // ISO8601 timestamp (optional in server response)
 }
 
 // Legacy Node interface for backward compatibility
@@ -173,6 +174,11 @@ export interface Node {
   updated_at: string;
 }
 
+export interface VideoProductionPipelineWithNodes extends VideoProductionPipeline {
+  nodes: VideoProductionNode[];
+}
+
+// Legacy interface for backward compatibility
 export interface PipelineWithNodes extends Pipeline {
   nodes: Node[];
 }
@@ -222,10 +228,19 @@ export async function getPipelines(filters?: PipelineFilters): Promise<Pipelines
 /**
  * Get single pipeline with nodes
  * GET /v1/admin/video_production/pipelines/:uuid
+ * GET /v1/admin/video_production/pipelines/:uuid/nodes
  */
-export async function getPipeline(uuid: string): Promise<{ pipeline: PipelineWithNodes }> {
-  const response = await api.get<{ pipeline: PipelineWithNodes }>(`/admin/video_production/pipelines/${uuid}`);
-  return response.data;
+export async function getPipeline(uuid: string): Promise<{ pipeline: VideoProductionPipeline; nodes: VideoProductionNode[] }> {
+  // Fetch pipeline and nodes separately (following video-production pattern)
+  const [pipelineResponse, nodesResponse] = await Promise.all([
+    api.get<{ pipeline: VideoProductionPipeline }>(`/admin/video_production/pipelines/${uuid}`),
+    api.get<{ nodes: VideoProductionNode[] }>(`/admin/video_production/pipelines/${uuid}/nodes`)
+  ]);
+
+  return {
+    pipeline: pipelineResponse.data.pipeline,
+    nodes: nodesResponse.data.nodes || []
+  };
 }
 
 /**
@@ -258,13 +273,126 @@ export async function deletePipeline(uuid: string): Promise<void> {
   await api.delete(`/admin/video_production/pipelines/${uuid}`);
 }
 
+/**
+ * Connect two nodes by updating target node's inputs
+ * PATCH /v1/admin/video_production/pipelines/:pipeline_uuid/nodes/:target_uuid
+ */
+export async function connectNodes(
+  pipelineUuid: string,
+  sourceNodeUuid: string,
+  targetNodeUuid: string,
+  inputKey: string
+): Promise<void> {
+  // First fetch the target node to get its current inputs
+  const nodeResponse = await api.get(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${targetNodeUuid}`);
+  const node = nodeResponse.data.node;
+
+  // Update the inputs - check if it's an array or single value
+  const currentValue = node.inputs[inputKey];
+  let newInputs: Record<string, unknown>;
+
+  if (Array.isArray(currentValue)) {
+    // Append to array if not already present
+    if (!currentValue.includes(sourceNodeUuid)) {
+      newInputs = {
+        ...node.inputs,
+        [inputKey]: [...currentValue, sourceNodeUuid]
+      };
+    } else {
+      // Already connected
+      return;
+    }
+  } else {
+    // Set as single value
+    newInputs = {
+      ...node.inputs,
+      [inputKey]: sourceNodeUuid
+    };
+  }
+
+  // PATCH the node with updated inputs
+  await api.patch(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${targetNodeUuid}`, {
+    node: { inputs: newInputs }
+  });
+}
+
+/**
+ * Delete a node from a pipeline
+ * DELETE /v1/admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid
+ */
+export async function deleteNode(pipelineUuid: string, nodeUuid: string): Promise<void> {
+  await api.delete(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`);
+}
+
+/**
+ * Create a new node in a pipeline
+ * POST /v1/admin/video_production/pipelines/:pipeline_uuid/nodes
+ */
+export async function createNode(
+  pipelineUuid: string,
+  nodeData: {
+    id: string;
+    type: string;
+    title: string;
+    inputs: Record<string, unknown>;
+    config: Record<string, unknown>;
+    asset?: Record<string, unknown>;
+  }
+): Promise<VideoProductionNode> {
+  const response = await api.post(`/admin/video_production/pipelines/${pipelineUuid}/nodes`, {
+    node: nodeData
+  });
+  return response.data.node;
+}
+
+/**
+ * Update a node's configuration
+ * PATCH /v1/admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid
+ */
+export async function updateNode(
+  pipelineUuid: string,
+  nodeUuid: string,
+  updates: Partial<VideoProductionNode>
+): Promise<VideoProductionNode> {
+  const response = await api.patch(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`, {
+    node: updates
+  });
+  return response.data.node;
+}
+
+/**
+ * Reorder inputs array for a node
+ * PATCH /v1/admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid
+ */
+export async function reorderNodeInputs(
+  pipelineUuid: string,
+  nodeUuid: string,
+  inputKey: string,
+  newOrder: string[]
+): Promise<void> {
+  // First fetch the target node to get its current inputs
+  const nodeResponse = await api.get(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`);
+  const node = nodeResponse.data.node;
+
+  // Update the inputs with new order
+  const newInputs = {
+    ...node.inputs,
+    [inputKey]: newOrder
+  };
+
+  // PATCH the node with updated inputs
+  await api.patch(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`, {
+    node: { inputs: newInputs }
+  });
+}
+
 // Detailed Node Type Interfaces
 
 // Asset Node
 export interface AssetNode extends VideoProductionNode {
   type: "asset";
-  inputs: {}; // Asset nodes have no inputs
-  config: {};
+  inputs: Record<string, never>; // Asset nodes have no inputs
+  config: Record<string, never>;
   asset: NodeAsset; // Required for asset nodes
 }
 

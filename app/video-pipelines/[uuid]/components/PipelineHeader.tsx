@@ -11,8 +11,8 @@ interface PipelineHeaderProps {
 export default function PipelineHeader({ pipelineUuid, onRefresh, onRelayout }: PipelineHeaderProps) {
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center shrink-0">
-      <Link href="/" className="text-gray-700 hover:text-gray-900">
-        ← Back
+      <Link href="/dashboard/video-pipelines" className="text-gray-700 hover:text-gray-900">
+        ← Back to Pipelines
       </Link>
       <h1 className="flex-1 text-center font-semibold text-gray-900">{pipelineUuid}</h1>
       <div className="flex gap-2">

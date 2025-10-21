@@ -1,24 +1,24 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import type { Node } from "@/lib/nodes/types";
-import type { Pipeline } from "@/lib/types";
+import type { VideoProductionPipeline } from "@/lib/api/video-pipelines";
 import PipelineHeader from "./PipelineHeader";
 import PipelineEditor from "./PipelineEditor";
 
 interface PipelineLayoutProps {
   pipelineUuid: string;
-  pipeline: Pipeline;
+  pipeline: VideoProductionPipeline;
   nodes: Node[];
+  onRefresh?: () => void;
 }
 
-export default function PipelineLayout({ pipelineUuid, pipeline, nodes }: PipelineLayoutProps) {
-  const router = useRouter();
-
+export default function PipelineLayout({ pipelineUuid, pipeline, nodes, onRefresh }: PipelineLayoutProps) {
   const handleRefresh = useCallback(() => {
-    router.refresh();
-  }, [router]);
+    if (onRefresh) {
+      onRefresh();
+    }
+  }, [onRefresh]);
 
   const handleRelayout = useCallback(() => {
     // This is just a pass-through - the actual logic is in PipelineEditor

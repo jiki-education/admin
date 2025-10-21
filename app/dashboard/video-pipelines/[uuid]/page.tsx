@@ -34,16 +34,15 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
 
   useEffect(() => {
     if (isAuthenticated && resolvedParams.uuid) {
-      loadPipeline();
+      void loadPipeline();
     }
-  }, [isAuthenticated, resolvedParams.uuid]);
+  }, [isAuthenticated, resolvedParams.uuid, loadPipeline]);
 
   const loadPipeline = async () => {
     try {
       setLoading(true);
       setError(null);
       const response = await getPipeline(resolvedParams.uuid);
-      console.log("RESPONSE", response)
       setPipeline(response.pipeline);
     } catch (err) {
       console.error("Failed to load pipeline:", err);
@@ -54,7 +53,9 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
   };
 
   const getProgressPercentage = (progress: any) => {
-    if (!progress || progress.total === 0) return 0;
+    if (!progress || progress.total === 0) {
+      return 0;
+    }
     return Math.round((progress.completed / progress.total) * 100);
   };
 
@@ -102,7 +103,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
     );
   }
 
-  const progressPercentage = getProgressPercentage(pipeline.metadata?.progress);
+  const progressPercentage = getProgressPercentage(pipeline.metadata.progress);
 
   return (
     <div>
@@ -131,7 +132,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
             <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg">
               <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Cost</h3>
               <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                ${pipeline.metadata?.totalCost?.toFixed(2) || '0.00'}
+                ${pipeline.metadata.totalCost?.toFixed(2) || '0.00'}
               </p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg">
@@ -156,31 +157,31 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {pipeline.metadata?.progress?.completed || 0}
+                  {pipeline.metadata.progress?.completed || 0}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Completed</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                  {pipeline.metadata?.progress?.in_progress || 0}
+                  {pipeline.metadata.progress?.in_progress || 0}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">In Progress</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">
-                  {pipeline.metadata?.progress?.pending || 0}
+                  {pipeline.metadata.progress?.pending || 0}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Pending</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-                  {pipeline.metadata?.progress?.failed || 0}
+                  {pipeline.metadata.progress?.failed || 0}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Failed</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-800 dark:text-white">
-                  {pipeline.metadata?.progress?.total || 0}
+                  {pipeline.metadata.progress?.total || 0}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Total</div>
               </div>
@@ -194,7 +195,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Bucket:</span>
-                  <span className="ml-2 text-gray-900 dark:text-white">{pipeline.config?.storage?.bucket || 'N/A'}</span>
+                  <span className="ml-2 text-gray-900 dark:text-white">{pipeline.config.storage?.bucket || 'N/A'}</span>
                 </div>
                 {pipeline.config?.storage?.prefix && (
                   <div>
@@ -213,7 +214,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
               Visual pipeline editor with node graph will be implemented here.
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-500">
-              This will show all {pipeline.nodes?.length || 0} nodes in an interactive flow diagram.
+              This will show all {pipeline.nodes.length || 0} nodes in an interactive flow diagram.
             </p>
           </div>
         </div>

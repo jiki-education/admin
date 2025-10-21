@@ -24,10 +24,7 @@ export function getOutputDataType(node: Node): "video" | "image" | "audio" | "te
   // Otherwise infer from node type
   switch (node.type) {
     case "asset":
-      if (node.asset != null) {
-        return node.asset.type as "video" | "image" | "audio" | "text" | "json";
-      }
-      return "unknown";
+      return node.asset?.type || "unknown";
 
     case "generate-talking-head":
     case "generate-animation":
@@ -81,7 +78,7 @@ export function getInputDataType(
     }
   };
 
-  return inputTypeMap[nodeType]?.[inputKey] || "generic";
+  return inputTypeMap[nodeType]?.[inputKey] ?? "generic";
 }
 
 // ============================================================================
@@ -178,7 +175,7 @@ export function getNodeDisplayName(node: Node): string {
     "compose-video": "Video Composition"
   };
 
-  const typeName = typeNames[node.type] ?? node.type;
+  const typeName = typeNames[node.type] || node.type;
   const provider = "provider" in node.config ? node.config.provider : null;
 
   if (provider != null) {
@@ -198,21 +195,23 @@ export function getNodeDisplayName(node: Node): string {
  * Gets the URL for an output preview (thumbnail, audio file, etc.)
  */
 export function getOutputPreviewUrl(output: NodeOutput | null): string | null {
-  if (output == null) return null;
+  if (output == null) {
+    return null;
+  }
 
   // Check for S3 URL first
   if (output.s3Key != null && output.s3Key !== "") {
-    return output.s3Key as string;
+    return output.s3Key;
   }
 
   // Check for local file
   if (output.localFile != null && output.localFile !== "") {
-    return output.localFile as string;
+    return output.localFile;
   }
 
   // Check for url in output
   if (output.url != null && output.url !== "") {
-    return output.url as string;
+    return output.url;
   }
 
   return null;

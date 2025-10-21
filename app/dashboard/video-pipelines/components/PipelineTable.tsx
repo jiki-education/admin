@@ -10,7 +10,9 @@ interface PipelineTableProps {
 
 export default function PipelineTable({ pipelines, loading, onDelete }: PipelineTableProps) {
   const getProgressPercentage = (progress: any) => {
-    if (!progress || progress.total === 0) return 0;
+    if (!progress || progress.total === 0) {
+      return 0;
+    }
     return Math.round((progress.completed / progress.total) * 100);
   };
 
@@ -105,7 +107,7 @@ export default function PipelineTable({ pipelines, loading, onDelete }: Pipeline
               >
                 <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                   <Link
-                    href={`/dashboard/video-pipelines/${pipeline.uuid}`}
+                    href={`/video-pipelines/${pipeline.uuid}`}
                     className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
                   >
                     {pipeline.title}
@@ -139,7 +141,7 @@ export default function PipelineTable({ pipelines, loading, onDelete }: Pipeline
                 <td className="px-6 py-4">
                   <div className="flex items-center space-x-2">
                     <Link
-                      href={`/dashboard/video-pipelines/${pipeline.uuid}`}
+                      href={`/video-pipelines/${pipeline.uuid}`}
                       className="text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300 font-medium text-sm"
                     >
                       View

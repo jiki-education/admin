@@ -10,15 +10,16 @@
 import { useState, useCallback, useMemo, useRef } from "react";
 import type { Node as ReactFlowNode, Edge } from "@xyflow/react";
 import type { Node } from "@/lib/nodes/types";
-import type { Pipeline } from "@/lib/types";
+import type { VideoProductionPipeline } from "@/lib/api/video-pipelines";
 import FlowCanvas from "./FlowCanvas";
 import EditorPanel from "./EditorPanel";
 import { getLayoutedNodes } from "@/lib/layout";
-import { connectNodes, deleteNode } from "@/lib/api-client";
+import { connectNodes, deleteNode } from "@/lib/api/video-pipelines";
 import { getOutputHandleColorValue } from "@/lib/nodes/display-helpers";
+import { hasInputHandle } from "@/lib/nodes/metadata";
 
 interface PipelineEditorProps {
-  pipeline: Pipeline;
+  pipeline: VideoProductionPipeline;
   nodes: Node[];
   onRefresh: () => void;
   onRelayout: () => void;
@@ -58,6 +59,11 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
 
     nodes.forEach((node) => {
       Object.entries(node.inputs).forEach(([inputKey, sources]) => {
+        // Only create edges for input handles that actually exist for this node type
+        if (!hasInputHandle(node.type, inputKey)) {
+          return;
+        }
+
         // All inputs are arrays now
         if (Array.isArray(sources)) {
           sources.forEach((sourceId, index) => {
@@ -141,7 +147,7 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
   }, [reactFlowNodes, edges, nodePositions]);
 
   // Manual re-layout function - call parent's callback when triggered
-  useCallback(() => {
+  const _handleRelayout = useCallback(() => {
     // Force re-layout by clearing positions
     setNodePositions({});
     hasInitialLayout.current = false;
@@ -279,7 +285,7 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
   );
 
   // Manual refresh from database - call parent's callback when triggered
-  useCallback(() => {
+  const _handleRefresh = useCallback(() => {
     onRefresh();
   }, [onRefresh]);
 

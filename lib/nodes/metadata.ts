@@ -113,7 +113,7 @@ export const NODE_INPUT_CONFIG: Record<NodeType, Record<string, InputConfig>> = 
  * Get input configuration for a specific node type
  */
 export function getNodeInputConfig(nodeType: NodeType): Record<string, InputConfig> {
-  return NODE_INPUT_CONFIG[nodeType] ?? {};
+  return NODE_INPUT_CONFIG[nodeType] || {};
 }
 
 /**
@@ -129,7 +129,19 @@ export function hasInputs(nodeType: NodeType): boolean {
  */
 export function getMaxConnections(nodeType: NodeType, inputKey: string): number {
   const config = getNodeInputConfig(nodeType);
-  return config[inputKey]?.maxConnections ?? 1; // Default to 1 if not specified
+  const inputConfig = config[inputKey];
+  if (!inputConfig) {
+    return 0; // Input doesn't exist for this node type
+  }
+  return inputConfig.maxConnections || 1; // Default to 1 if not specified
+}
+
+/**
+ * Check if an input handle exists for a node type
+ */
+export function hasInputHandle(nodeType: NodeType, inputKey: string): boolean {
+  const config = getNodeInputConfig(nodeType);
+  return inputKey in config;
 }
 
 /**
@@ -144,5 +156,5 @@ export function isUnlimitedInput(nodeType: NodeType, inputKey: string): boolean 
  */
 export function isOrderedInput(nodeType: NodeType, inputKey: string): boolean {
   const config = getNodeInputConfig(nodeType);
-  return config[inputKey]?.ordered ?? false;
+  return config[inputKey]?.ordered || false;
 }

@@ -18,14 +18,13 @@ import {
   type OnConnect,
   type OnNodesDelete,
   type NodeTypes,
-  type IsValidConnection,
   type NodeMouseHandler
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
 import type { Node } from "@/lib/nodes/types";
 import type { NodeType } from "@/lib/nodes/types";
-import { getMaxConnections } from "@/lib/nodes/metadata";
+import { getMaxConnections, hasInputHandle } from "@/lib/nodes/metadata";
 
 // Import custom node components
 import AssetNode from "./nodes/AssetNode";
@@ -66,49 +65,48 @@ export default function FlowCanvas({
   onConnect,
   onNodesDelete
 }: FlowCanvasProps) {
-  // Validate new connections based on metadata
-  const isValidConnection: IsValidConnection = useCallback(
+
+  // Handle new connections with validation
+  const handleConnect: OnConnect = useCallback(
     (connection) => {
-      if (connection.target == null || connection.targetHandle == null || connection.targetHandle === "") return false;
+      // Validate connection before processing
+      if (!connection.source || !connection.target || !connection.targetHandle || connection.targetHandle === "") {
+        return;
+      }
 
       // Find target node
       const targetNode = nodes.find((n) => n.id === connection.target);
-      if (!targetNode) return false;
+      if (!targetNode?.data?.node) {
+        return;
+      }
 
       // Get node data
       const nodeData = targetNode.data as { node: Node };
-      if (nodeData?.node == null) return false;
+      const node = nodeData.node;
+      
+      // Check if the input handle exists for this node type
+      if (!hasInputHandle(node.type as NodeType, connection.targetHandle)) {
+        return;
+      }
 
       // Get max allowed connections for this input
-      const maxConnections = getMaxConnections(nodeData.node.type as NodeType, connection.targetHandle);
+      const maxConnections = getMaxConnections(node.type as NodeType, connection.targetHandle);
+      
+      // Check connection limits (unless unlimited)
+      if (maxConnections !== -1) {
+        const existingConnections = edges.filter(
+          (e) => e.target === connection.target && e.targetHandle === connection.targetHandle
+        );
 
-      // -1 = unlimited, always valid
-      if (maxConnections === -1) return true;
-
-      // Count existing connections to this input
-      const existingConnections = edges.filter(
-        (e) => e.target === connection.target && e.targetHandle === connection.targetHandle
-      );
-
-      // Check limit
-      return existingConnections.length < maxConnections;
-    },
-    [nodes, edges]
-  );
-
-  // Handle new connections
-  const handleConnect: OnConnect = useCallback(
-    (connection) => {
-      if (
-        connection.source != null &&
-        connection.target != null &&
-        connection.targetHandle != null &&
-        connection.targetHandle !== ""
-      ) {
-        void onConnect(connection.source, connection.target, connection.targetHandle);
+        if (existingConnections.length >= maxConnections) {
+          return;
+        }
       }
+
+      // Connection is valid, proceed
+      void onConnect(connection.source, connection.target, connection.targetHandle);
     },
-    [onConnect]
+    [onConnect, nodes, edges]
   );
 
   // Handle node deletion
@@ -143,7 +141,6 @@ export default function FlowCanvas({
         onNodesDelete={handleNodesDelete}
         onNodeClick={handleNodeClick}
         onPaneClick={handlePaneClick}
-        isValidConnection={isValidConnection}
         fitView
         fitViewOptions={{
           padding: 0.2,
@@ -156,6 +153,9 @@ export default function FlowCanvas({
           type: "default",
           animated: false
         }}
+        deleteKeyCode={["Backspace", "Delete"]}
+        selectNodesOnDrag={false}
+        connectOnClick={false}
         proOptions={{ hideAttribution: true }}
       >
         <Background color="#aaa" gap={16} />

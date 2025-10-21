@@ -1,38 +1,94 @@
+"use client";
+
 import Link from "next/link";
-import { getPipeline, toDomainNode } from "@/lib/api-client";
-import type { Pipeline as APIPipeline } from "@/lib/api-client";
-import type { Pipeline } from "@/lib/types";
+import { useEffect, useState, use } from "react";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "next/navigation";
+import { getPipeline } from "@/lib/api/video-pipelines";
+import type { VideoProductionPipeline } from "@/lib/api/video-pipelines";
 import type { Node } from "@/lib/nodes/types";
+import { toEditorNode } from "@/lib/nodes/types";
 import PipelineLayout from "./components/PipelineLayout";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ uuid: string }>;
 }
 
-export default async function PipelinePage({ params }: PageProps) {
-  const { id: uuid } = await params;
+export default function PipelinePage({ params }: PageProps) {
+  const { uuid } = use(params);
+  const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
+  const router = useRouter();
 
-  let pipeline: APIPipeline | null = null;
-  let nodes: Node[] = [];
-  let error: string | null = null;
+  const [pipeline, setPipeline] = useState<VideoProductionPipeline | null>(null);
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  try {
-    // Get pipeline from Rails API
-    const data = await getPipeline(uuid);
-    console.log('data', data)
-    pipeline = data.pipeline;
-    nodes = data.nodes.map(toDomainNode);
-  } catch (err) {
-    console.error("Error loading pipeline from API:", err);
-    error = err instanceof Error ? err.message : "Unknown API error";
+  // Check authentication on mount
+  useEffect(() => {
+    if (!hasCheckedAuth) {
+      void checkAuth();
+    }
+  }, [hasCheckedAuth, checkAuth]);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (hasCheckedAuth && !isAuthenticated) {
+      router.push("/auth/signin");
+    }
+  }, [hasCheckedAuth, isAuthenticated, router]);
+
+  // Load pipeline data
+  useEffect(() => {
+    if (!isAuthenticated || !hasCheckedAuth) {
+      return;
+    }
+
+    const loadPipeline = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Get pipeline from admin API
+        const data = await getPipeline(uuid);
+        setPipeline(data.pipeline);
+        // Convert admin VideoProductionNode types to editor Node types
+        setNodes(data.nodes.map(toEditorNode));
+      } catch (err) {
+        console.error("Error loading pipeline from API:", err);
+        setError(err instanceof Error ? err.message : "Unknown API error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadPipeline();
+  }, [uuid, isAuthenticated, hasCheckedAuth]);
+
+  // Show loading while checking auth
+  if (!hasCheckedAuth) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-gray-500">Checking authentication...</div>
+      </div>
+    );
+  }
+
+  // Show loading while fetching data
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-gray-500">Loading pipeline...</div>
+      </div>
+    );
   }
 
   if (error !== null || pipeline === null) {
     return (
       <div className="h-screen flex flex-col">
         <header className="bg-gray-800 text-white px-6 py-4 flex items-center">
-          <Link href="/" className="text-white hover:text-gray-300">
-            ← Back
+          <Link href="/dashboard/video-pipelines" className="text-white hover:text-gray-300">
+            ← Back to Pipelines
           </Link>
           <h1 className="flex-1 text-center font-semibold">Pipeline: {uuid}</h1>
           <div className="w-16"></div>
@@ -50,10 +106,31 @@ export default async function PipelinePage({ params }: PageProps) {
     );
   }
 
+  // Refresh handler for pipeline data
+  const handleRefresh = async () => {
+    if (!isAuthenticated) {
+      return;
+    }
+    
+    try {
+      setError(null);
+      const data = await getPipeline(uuid);
+      setPipeline(data.pipeline);
+      setNodes(data.nodes.map(toEditorNode));
+    } catch (err) {
+      console.error("Error refreshing pipeline:", err);
+      setError(err instanceof Error ? err.message : "Failed to refresh pipeline");
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col">
-      {/* Cast pipeline to lib/types Pipeline (API returns strings, DB expects Dates) */}
-      <PipelineLayout pipelineUuid={uuid} pipeline={pipeline as unknown as Pipeline} nodes={nodes} />
+      <PipelineLayout 
+        pipelineUuid={uuid} 
+        pipeline={pipeline} 
+        nodes={nodes} 
+        onRefresh={handleRefresh}
+      />
     </div>
   );
 }
