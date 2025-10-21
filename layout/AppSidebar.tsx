@@ -39,7 +39,8 @@ const navItems: NavItem[] = [
     icon: <PageIcon />,
     name: "Content",
     subItems: [
-      { name: "Levels", path: "/dashboard/levels", pro: false }
+      { name: "Levels", path: "/dashboard/levels", pro: false },
+      { name: "Video Pipelines", path: "/dashboard/video-pipelines", pro: false }
     ]
   }
 ];
