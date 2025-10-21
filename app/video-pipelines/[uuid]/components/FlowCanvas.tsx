@@ -83,7 +83,7 @@ export default function FlowCanvas({
       // Get node data
       const nodeData = targetNode.data as { node: Node };
       const node = nodeData.node;
-      
+
       // Check if the input handle exists for this node type
       if (!hasInputHandle(node.type as NodeType, connection.targetHandle)) {
         return;
@@ -91,7 +91,7 @@ export default function FlowCanvas({
 
       // Get max allowed connections for this input
       const maxConnections = getMaxConnections(node.type as NodeType, connection.targetHandle);
-      
+
       // Check connection limits (unless unlimited)
       if (maxConnections !== -1) {
         const existingConnections = edges.filter(

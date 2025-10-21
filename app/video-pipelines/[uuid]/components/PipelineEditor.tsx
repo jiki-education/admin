@@ -64,31 +64,31 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
           return;
         }
 
-        // All inputs are arrays now
-        if (Array.isArray(sources)) {
-          sources.forEach((sourceId, index) => {
-            // Find the source node to get its output color
-            const sourceNode = nodes.find((n) => n.uuid === sourceId);
-            const edgeColor = sourceNode != null ? getOutputHandleColorValue(sourceNode) : "#9ca3af";
+        // Normalize inputs: handle both string (single input) and string[] (multi input)
+        const sourceArray = Array.isArray(sources) ? sources : [sources];
 
-            // Determine if line should be dashed (pending/in_progress/failed) or solid (completed)
-            // Check the SOURCE node's status since the edge represents its output
-            const isDashed = sourceNode != null ? sourceNode.status !== "completed" : true;
+        sourceArray.forEach((sourceId, index) => {
+          // Find the source node to get its output color
+          const sourceNode = nodes.find((n) => n.uuid === sourceId);
+          const edgeColor = sourceNode != null ? getOutputHandleColorValue(sourceNode) : "#9ca3af";
 
-            edgesList.push({
-              id: `${sourceId}-${node.uuid}-${inputKey}-${index}`,
-              source: sourceId,
-              target: node.uuid,
-              targetHandle: inputKey,
-              animated: node.status === "in_progress",
-              style: {
-                stroke: edgeColor,
-                strokeWidth: 2,
-                strokeDasharray: isDashed ? "5,5" : "0"
-              }
-            });
+          // Determine if line should be dashed (pending/in_progress/failed) or solid (completed)
+          // Check the SOURCE node's status since the edge represents its output
+          const isDashed = sourceNode != null ? sourceNode.status !== "completed" : true;
+
+          edgesList.push({
+            id: `${sourceId}-${node.uuid}-${inputKey}-${index}`,
+            source: sourceId,
+            target: node.uuid,
+            targetHandle: inputKey,
+            animated: node.status === "in_progress",
+            style: {
+              stroke: edgeColor,
+              strokeWidth: 2,
+              strokeDasharray: isDashed ? "5,5" : "0"
+            }
           });
-        }
+        });
       });
     });
 
@@ -147,7 +147,7 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
   }, [reactFlowNodes, edges, nodePositions]);
 
   // Manual re-layout function - call parent's callback when triggered
-  const _handleRelayout = useCallback(() => {
+  useCallback(() => {
     // Force re-layout by clearing positions
     setNodePositions({});
     hasInitialLayout.current = false;
@@ -285,7 +285,7 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
   );
 
   // Manual refresh from database - call parent's callback when triggered
-  const _handleRefresh = useCallback(() => {
+  useCallback(() => {
     onRefresh();
   }, [onRefresh]);
 
