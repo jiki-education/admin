@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useCallback } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
 import { getPipeline } from "@/lib/api/video-pipelines";
@@ -39,31 +39,31 @@ export default function PipelinePage({ params }: PageProps) {
   }, [hasCheckedAuth, isAuthenticated, router]);
 
   // Load pipeline data
+  const loadPipeline = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Get pipeline from admin API
+      const data = await getPipeline(uuid);
+      setPipeline(data.pipeline);
+      // Convert admin VideoProductionNode types to editor Node types
+      setNodes(data.nodes.map(toEditorNode));
+    } catch (err) {
+      console.error("Error loading pipeline from API:", err);
+      setError(err instanceof Error ? err.message : "Unknown API error");
+    } finally {
+      setLoading(false);
+    }
+  }, [uuid]);
+
   useEffect(() => {
     if (!isAuthenticated || !hasCheckedAuth) {
       return;
     }
 
-    const loadPipeline = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Get pipeline from admin API
-        const data = await getPipeline(uuid);
-        setPipeline(data.pipeline);
-        // Convert admin VideoProductionNode types to editor Node types
-        setNodes(data.nodes.map(toEditorNode));
-      } catch (err) {
-        console.error("Error loading pipeline from API:", err);
-        setError(err instanceof Error ? err.message : "Unknown API error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     void loadPipeline();
-  }, [uuid, isAuthenticated, hasCheckedAuth]);
+  }, [uuid, isAuthenticated, hasCheckedAuth, loadPipeline]);
 
   // Show loading while checking auth
   if (!hasCheckedAuth) {
