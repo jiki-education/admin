@@ -129,11 +129,11 @@ export default function PipelineTable({ pipelines, loading, onDelete }: Pipeline
                     </span>
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {pipeline.metadata.progress.completed}/{pipeline.metadata.progress.total} nodes
+                    {pipeline.metadata.progress?.completed || 0}/{pipeline.metadata.progress?.total || 0} nodes
                   </div>
                 </td>
                 <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                  ${pipeline.metadata.totalCost.toFixed(2)}
+                  ${pipeline.metadata.totalCost?.toFixed(2) || '0.00'}
                 </td>
                 <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
                   {formatDate(pipeline.updated_at)}

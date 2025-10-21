@@ -2,9 +2,9 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useCallback } from "react";
 import Link from "next/link";
-import type { PipelineWithNodes } from "../types";
+import type { VideoProductionPipeline, VideoProductionNode } from "@/lib/api/video-pipelines";
 import { getPipeline } from "@/lib/api/video-pipelines";
 
 interface PipelineDetailProps {
@@ -16,7 +16,8 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
   const router = useRouter();
   const resolvedParams = use(params);
 
-  const [pipeline, setPipeline] = useState<PipelineWithNodes | null>(null);
+  const [pipeline, setPipeline] = useState<VideoProductionPipeline | null>(null);
+  const [nodes, setNodes] = useState<VideoProductionNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,25 +33,26 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
     }
   }, [isAuthenticated, hasCheckedAuth, router]);
 
-  useEffect(() => {
-    if (isAuthenticated && resolvedParams.uuid) {
-      void loadPipeline();
-    }
-  }, [isAuthenticated, resolvedParams.uuid, loadPipeline]);
-
-  const loadPipeline = async () => {
+  const loadPipeline = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const response = await getPipeline(resolvedParams.uuid);
       setPipeline(response.pipeline);
+      setNodes(response.nodes);
     } catch (err) {
       console.error("Failed to load pipeline:", err);
       setError(err instanceof Error ? err.message : "Failed to load pipeline");
     } finally {
       setLoading(false);
     }
-  };
+  }, [resolvedParams.uuid]);
+
+  useEffect(() => {
+    if (isAuthenticated && resolvedParams.uuid) {
+      void loadPipeline();
+    }
+  }, [isAuthenticated, resolvedParams.uuid, loadPipeline]);
 
   const getProgressPercentage = (progress: any) => {
     if (!progress || progress.total === 0) {
@@ -214,7 +216,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
               Visual pipeline editor with node graph will be implemented here.
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-500">
-              This will show all {pipeline.nodes.length || 0} nodes in an interactive flow diagram.
+              This will show all {nodes.length || 0} nodes in an interactive flow diagram.
             </p>
           </div>
         </div>

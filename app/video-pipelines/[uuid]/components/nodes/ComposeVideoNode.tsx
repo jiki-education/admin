@@ -40,14 +40,22 @@ export default function ComposeVideoNode({ data, selected }: ComposeVideoNodePro
       <NodeOutputPreview node={node} />
 
       <div className="px-4 py-3 text-xs text-gray-600 space-y-1">
-        {node.config.rounded != null && (
+        <div>
+          <span className="font-semibold">Position:</span> {node.config.position}
+        </div>
+        {node.config.opacity != null && (
           <div>
-            <span className="font-semibold">Rounded:</span> {String(node.config.rounded)}
+            <span className="font-semibold">Opacity:</span> {node.config.opacity}
           </div>
         )}
-        {node.config.crop_width != null && node.config.crop_height != null && (
+        {node.config.scale != null && (
           <div>
-            <span className="font-semibold">Crop:</span> {node.config.crop_width}x{node.config.crop_height}
+            <span className="font-semibold">Scale:</span> {node.config.scale}
+          </div>
+        )}
+        {(node.config.offsetX != null || node.config.offsetY != null) && (
+          <div>
+            <span className="font-semibold">Offset:</span> {node.config.offsetX || 0}px, {node.config.offsetY || 0}px
           </div>
         )}
       </div>
