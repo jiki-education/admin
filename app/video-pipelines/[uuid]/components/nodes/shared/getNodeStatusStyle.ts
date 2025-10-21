@@ -12,5 +12,6 @@ export function getNodeStatusStyle(status: string) {
     failed: { border: "border-red-400", bg: "bg-red-50", shadow: "" }
   };
 
-  return styles[status as keyof typeof styles] ?? styles.pending;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  return styles[status as keyof typeof styles] || styles.pending;
 }

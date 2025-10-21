@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus, prism } from "react-syntax-highlighter/dist/esm/styles/prism";
-import type { SceneConfig, TypeAction } from "@/lib/remotion/types";
+import type { SceneConfig } from "@/lib/remotion/types";
 
 interface CodePreviewProps {
   config: SceneConfig;
@@ -11,11 +11,11 @@ interface CodePreviewProps {
 
 export default function CodePreview({ config }: CodePreviewProps) {
   const finalCode = useMemo(() => {
-    const typeActions = config.actions.filter((action) => action.type === "type") as TypeAction[];
+    const typeActions = config.actions.filter((action) => action.type === "type");
     return typeActions.map((action) => action.code).join("\n");
   }, [config.actions]);
 
-  const firstTypeAction = config.actions.find((action) => action.type === "type") as TypeAction | undefined;
+  const firstTypeAction = config.actions.find((action) => action.type === "type");
   const language = firstTypeAction?.language || "javascript";
   const theme = config.theme || "dark";
 

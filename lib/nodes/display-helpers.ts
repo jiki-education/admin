@@ -24,7 +24,8 @@ export function getOutputDataType(node: Node): "video" | "image" | "audio" | "te
   // Otherwise infer from node type
   switch (node.type) {
     case "asset":
-      return node.asset?.type || "unknown";
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      return node.asset.type || "unknown";
 
     case "generate-talking-head":
     case "generate-animation":
@@ -78,7 +79,8 @@ export function getInputDataType(
     }
   };
 
-  return inputTypeMap[nodeType]?.[inputKey] ?? "generic";
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  return inputTypeMap[nodeType]?.[inputKey] || "generic";
 }
 
 // ============================================================================

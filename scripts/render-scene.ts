@@ -20,7 +20,7 @@ async function renderScene() {
 
   const composition = comps[0];
 
-  console.log(`Rendering composition "${compositionId}"...`);
+  console.debug(`Rendering composition "${compositionId}"...`);
 
   await renderMedia({
     composition,
@@ -29,7 +29,7 @@ async function renderScene() {
     outputLocation: `out/${compositionId}.mp4`,
   });
 
-  console.log(`Rendered video saved to out/${compositionId}.mp4`);
+  console.debug(`Rendered video saved to out/${compositionId}.mp4`);
 }
 
 renderScene().catch((err) => {

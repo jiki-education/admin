@@ -239,7 +239,7 @@ export async function getPipeline(uuid: string): Promise<{ pipeline: VideoProduc
 
   return {
     pipeline: pipelineResponse.data.pipeline,
-    nodes: nodesResponse.data.nodes || []
+    nodes: nodesResponse.data.nodes
   };
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { SceneConfig, Action, TypeAction, PauseAction } from "@/lib/remotion/types";
+import type { SceneConfig, Action } from "@/lib/remotion/types";
 import Button from "@/components/ui/button/Button";
 import ActionEditor from "./ActionEditor";
 import CodePreview from "./CodePreview";
@@ -127,8 +127,8 @@ export default function SceneEditor({ config, onChange }: SceneEditorProps) {
                       </span>
                       <span className="text-sm text-gray-700">
                         {action.type === "type" 
-                          ? (action as TypeAction).code.slice(0, 50) + (action.code.length > 50 ? "..." : "")
-                          : `${(action as PauseAction).duration}s pause`
+                          ? (action).code.slice(0, 50) + (action.code.length > 50 ? "..." : "")
+                          : `${(action).duration}s pause`
                         }
                       </span>
                     </div>

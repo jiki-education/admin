@@ -10,8 +10,6 @@ import {
   GridIcon,
   HorizontaLDots,
   PageIcon,
-  PieChartIcon,
-  PlugInIcon,
   UserCircleIcon
 } from "../icons/index";
 

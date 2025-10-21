@@ -98,6 +98,7 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
   // Apply positions to nodes (auto-layout only on first render)
   const layoutedNodes = useMemo(() => {
     // If we already have positions for all nodes, use them
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const allNodesHavePositions = reactFlowNodes.every((node) => nodePositions[node.id] != null);
 
     if (allNodesHavePositions && hasInitialLayout.current) {
@@ -235,6 +236,7 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
             }
           });
 
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           return modified ? ({ ...node, inputs: cleanedInputs } as Node) : node;
         });
 

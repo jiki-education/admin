@@ -4,9 +4,9 @@ import type { SceneConfig } from "@/lib/remotion/types";
 import { calculateActionTimings } from "@/lib/remotion/timing";
 import { AnimatedCode } from "./AnimatedCode";
 
-export type CodeSceneProps = {
+export interface CodeSceneProps {
   config: SceneConfig;
-};
+}
 
 export const CodeScene: React.FC<CodeSceneProps> = (props) => {
   const { config } = props;
@@ -30,6 +30,7 @@ export const CodeScene: React.FC<CodeSceneProps> = (props) => {
           return null;
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (timing.action.type === "type") {
           return (
             <Sequence key={index} from={timing.startFrame} durationInFrames={timing.endFrame - timing.startFrame}>

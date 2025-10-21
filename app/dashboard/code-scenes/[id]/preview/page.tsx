@@ -55,10 +55,12 @@ export default function PreviewCodeScenePage({ params }: PageProps) {
     if (isAuthenticated && hasCheckedAuth) {
       void loadScene();
     }
-  }, [id, isAuthenticated, hasCheckedAuth]);
+  }, [id, isAuthenticated, hasCheckedAuth, loadScene]);
 
   const handleRender = async () => {
-    if (!scene) return;
+    if (!scene) {
+      return;
+    }
 
     try {
       setRendering(true);
@@ -217,7 +219,7 @@ export default function PreviewCodeScenePage({ params }: PageProps) {
               <div className="text-center">
                 <div className="text-white mb-4">
                   <div className="text-xl font-bold">Code Scene Preview</div>
-                  <div className="text-sm opacity-75">"{scene.title}"</div>
+                  <div className="text-sm opacity-75">&quot;{scene.title}&quot;</div>
                 </div>
                 <div className="text-white text-sm opacity-75">
                   Remotion Player integration coming in Phase 3

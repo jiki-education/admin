@@ -1,5 +1,4 @@
 import type {
-  CodeScene,
   CreateCodeSceneData,
   UpdateCodeSceneData,
   CodeScenesResponse,

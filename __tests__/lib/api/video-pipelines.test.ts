@@ -322,9 +322,9 @@ describe('Video Pipelines API Client', () => {
 
       mockApi.delete.mockResolvedValue({ data: null, status: 204, headers: {} });
 
-      const result = await deletePipeline(uuid);
-
-      expect(result).toBeUndefined();
+      await deletePipeline(uuid);
+      
+      expect(mockApi.delete).toHaveBeenCalledWith(`/v1/admin/video-pipelines/${uuid}`);
     });
   });
 });

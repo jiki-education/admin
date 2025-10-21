@@ -9,9 +9,10 @@ export function calculateActionDuration(action: Action, fps: number): number {
     return action.duration * fps;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (action.type === "type") {
     const lines = action.code.split("\n");
-    let totalChars = action.code.length;
+    const totalChars = action.code.length;
 
     if (Array.isArray(action.speed)) {
       // Different speed per line

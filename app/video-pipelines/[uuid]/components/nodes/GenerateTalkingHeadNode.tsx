@@ -44,6 +44,7 @@ export default function GenerateTalkingHeadNode({ data, selected }: GenerateTalk
 
       {/* Node Info */}
       <div className="px-4 py-3 text-xs text-gray-600 space-y-1">
+        {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
         {node.config.provider === "heygen" && node.config.avatar_id != null && node.config.avatar_id !== "" && (
           <div>
             <span className="font-semibold">Avatar:</span> {node.config.avatar_id}

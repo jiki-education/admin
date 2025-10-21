@@ -65,7 +65,7 @@ describe('Navigation Buttons', () => {
   });
 
   test('Add New Level button navigates to correct route', async () => {
-    const { getAdminLevels } = require('@/lib/api/levels');
+    const { getAdminLevels } = await import('@/lib/api/levels');
     getAdminLevels.mockResolvedValue({
       results: [],
       meta: { current_page: 1, total_pages: 1, total_count: 0 }
@@ -82,8 +82,8 @@ describe('Navigation Buttons', () => {
   });
 
   test('Add New Lesson button navigates to correct route with level ID', async () => {
-    const { useParams } = require('next/navigation');
-    const { getLevelLessons } = require('@/lib/api/levels');
+    const { useParams } = await import('next/navigation');
+    const { getLevelLessons } = await import('@/lib/api/levels');
     
     useParams.mockReturnValue({ id: '123' });
     getLevelLessons.mockResolvedValue([]);
@@ -99,7 +99,7 @@ describe('Navigation Buttons', () => {
   });
 
   test('navigation buttons are properly positioned in UI layout', async () => {
-    const { getAdminLevels } = require('@/lib/api/levels');
+    const { getAdminLevels } = await import('@/lib/api/levels');
     getAdminLevels.mockResolvedValue({
       results: [],
       meta: { current_page: 1, total_pages: 1, total_count: 0 }
@@ -118,7 +118,7 @@ describe('Navigation Buttons', () => {
   });
 
   test('buttons are accessible with proper ARIA labels', async () => {
-    const { getAdminLevels } = require('@/lib/api/levels');
+    const { getAdminLevels } = await import('@/lib/api/levels');
     getAdminLevels.mockResolvedValue({
       results: [],
       meta: { current_page: 1, total_pages: 1, total_count: 0 }

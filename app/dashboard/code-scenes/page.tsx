@@ -60,7 +60,9 @@ export default function CodeScenesPage() {
   };
 
   const handleDeleteConfirm = async () => {
-    if (!sceneToDelete) return;
+    if (!sceneToDelete) {
+      return;
+    }
 
     try {
       setDeleting(true);
@@ -210,7 +212,7 @@ export default function CodeScenesPage() {
       >
         <div className="p-6">
           <p className="text-gray-700 mb-4">
-            Are you sure you want to delete "{sceneToDelete?.title}"? This action cannot be undone.
+            Are you sure you want to delete &quot;{sceneToDelete?.title}&quot;? This action cannot be undone.
           </p>
           <div className="flex justify-end space-x-3">
             <Button

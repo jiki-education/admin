@@ -30,7 +30,7 @@ export default function LessonForm({
   onCancel,
   loading = false,
   mode,
-  levelId
+  levelId: _levelId
 }: LessonFormProps) {
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
@@ -99,7 +99,7 @@ export default function LessonForm({
       setErrors(prev => ({ ...prev, data: error }));
     } else {
       setErrors(prev => {
-        const { data, ...rest } = prev;
+        const { data: _data, ...rest } = prev;
         return rest;
       });
     }
@@ -148,7 +148,7 @@ export default function LessonForm({
       if (formData.data.trim()) {
         try {
           parsedData = JSON.parse(formData.data);
-        } catch (err) {
+        } catch {
           setErrors({ data: "Invalid JSON format. Please check your JSON data." });
           return;
         }

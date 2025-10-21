@@ -57,7 +57,7 @@ describe('Users - Basic', () => {
     
     // If redirected to signin, skip this test (expected behavior)
     if (currentUrl.includes('/signin')) {
-      console.log('Redirected to signin - skipping filter structure test');
+      console.debug('Redirected to signin - skipping filter structure test');
       return;
     }
     
@@ -71,8 +71,8 @@ describe('Users - Basic', () => {
       
       // These elements should exist if we're on the actual users page
       expect(emailInput || nameInput).toBeTruthy();
-    } catch (error) {
-      console.log('Could not test filter structure - page not accessible');
+    } catch {
+      console.debug('Could not test filter structure - page not accessible');
     }
   });
 
@@ -84,21 +84,21 @@ describe('Users - Basic', () => {
     
     // If redirected to signin, skip this test
     if (currentUrl.includes('/signin')) {
-      console.log('Redirected to signin - skipping pagination test');
+      console.debug('Redirected to signin - skipping pagination test');
       return;
     }
     
     try {
       // Look for pagination-related elements
       const pageElements = await page.$$('[class*="pagination"], [class*="page"]');
-      const itemsPerPageText = await page.$('text=/Items per page/');
+      const _itemsPerPageText = await page.$('text=/Items per page/');
       
-      console.log(`Found ${pageElements.length} pagination elements`);
+      console.debug(`Found ${pageElements.length} pagination elements`);
       
       // If we can access the page, there should be some pagination structure
       expect(pageElements.length >= 0).toBeTruthy();
-    } catch (error) {
-      console.log('Could not test pagination - page not accessible');
+    } catch {
+      console.debug('Could not test pagination - page not accessible');
     }
   });
 });

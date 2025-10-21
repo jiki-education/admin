@@ -69,7 +69,7 @@ export default function NewLesson() {
   const handleSaveLesson = useCallback(async (lessonData: CreateLessonData) => {
     try {
       setError(null);
-      const newLesson = await createLesson(levelId, lessonData);
+      await createLesson(levelId, lessonData);
       
       // Redirect back to the level detail page
       router.push(`/dashboard/levels/${levelId}`);

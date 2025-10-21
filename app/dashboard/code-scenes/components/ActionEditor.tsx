@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import type { Action, TypeAction, PauseAction, TypingSpeed } from "@/lib/remotion/types";
+import type { Action, TypingSpeed } from "@/lib/remotion/types";
 import Button from "@/components/ui/button/Button";
 
 interface ActionEditorProps {
@@ -41,7 +40,7 @@ const TYPING_SPEEDS: { value: TypingSpeed; label: string; description: string }[
 
 export default function ActionEditor({ action, onChange, onClose }: ActionEditorProps) {
   if (action.type === "type") {
-    const typeAction = action as TypeAction;
+    const typeAction = action;
 
     const handleCodeChange = (code: string) => {
       onChange({ ...typeAction, code });
@@ -121,8 +120,9 @@ export default function ActionEditor({ action, onChange, onClose }: ActionEditor
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (action.type === "pause") {
-    const pauseAction = action as PauseAction;
+    const pauseAction = action;
 
     const handleDurationChange = (duration: number) => {
       onChange({ ...pauseAction, duration });

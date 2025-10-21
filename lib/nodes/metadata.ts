@@ -113,7 +113,7 @@ export const NODE_INPUT_CONFIG: Record<NodeType, Record<string, InputConfig>> = 
  * Get input configuration for a specific node type
  */
 export function getNodeInputConfig(nodeType: NodeType): Record<string, InputConfig> {
-  return NODE_INPUT_CONFIG[nodeType] || {};
+  return NODE_INPUT_CONFIG[nodeType];
 }
 
 /**
@@ -130,6 +130,7 @@ export function hasInputs(nodeType: NodeType): boolean {
 export function getMaxConnections(nodeType: NodeType, inputKey: string): number {
   const config = getNodeInputConfig(nodeType);
   const inputConfig = config[inputKey];
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!inputConfig) {
     return 0; // Input doesn't exist for this node type
   }
@@ -156,5 +157,5 @@ export function isUnlimitedInput(nodeType: NodeType, inputKey: string): boolean 
  */
 export function isOrderedInput(nodeType: NodeType, inputKey: string): boolean {
   const config = getNodeInputConfig(nodeType);
-  return config[inputKey]?.ordered || false;
+  return config[inputKey].ordered || false;
 }

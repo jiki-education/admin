@@ -67,7 +67,7 @@ export default function EditCodeScenePage({ params }: PageProps) {
     if (isAuthenticated && hasCheckedAuth) {
       void loadScene();
     }
-  }, [id, isAuthenticated, hasCheckedAuth]);
+  }, [id, isAuthenticated, hasCheckedAuth, loadScene]);
 
   // Update config title when title changes
   useEffect(() => {
@@ -76,7 +76,9 @@ export default function EditCodeScenePage({ params }: PageProps) {
 
   // Track changes
   useEffect(() => {
-    if (!scene) return;
+    if (!scene) {
+      return;
+    }
     
     const changed = 
       title !== scene.title ||
@@ -87,7 +89,9 @@ export default function EditCodeScenePage({ params }: PageProps) {
   }, [scene, title, description, config]);
 
   const handleSave = async () => {
-    if (!scene) return;
+    if (!scene) {
+      return;
+    }
 
     if (!title.trim()) {
       setError("Title is required");

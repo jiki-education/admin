@@ -112,6 +112,7 @@ export default function EditorPanel({ selectedNode, pipelineUuid, allNodes, onDe
             </Section>
 
             {/* Asset (for asset nodes) */}
+            {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
             {selectedNode.type === "asset" && selectedNode.asset != null && (
               <Section title="Asset">
                 <div className="space-y-2">
