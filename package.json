@@ -30,6 +30,7 @@
     "@remotion/bundler": "^4.0.364",
     "@remotion/cli": "^4.0.364",
     "@remotion/media-utils": "^4.0.364",
+    "@remotion/player": "^4.0.364",
     "@remotion/renderer": "^4.0.364",
     "@xyflow/react": "^12.9.0",
     "dagre": "^0.8.5",

@@ -4,6 +4,8 @@ export interface CodeScene {
   id: string;
   title: string;
   description?: string;
+  category?: string;
+  tags?: string[];
   config: SceneConfig;
   createdAt: string;
   updatedAt: string;
@@ -12,12 +14,16 @@ export interface CodeScene {
 export interface CreateCodeSceneData {
   title: string;
   description?: string;
+  category?: string;
+  tags?: string[];
   config: SceneConfig;
 }
 
 export interface UpdateCodeSceneData {
   title?: string;
   description?: string;
+  category?: string;
+  tags?: string[];
   config?: SceneConfig;
 }
 

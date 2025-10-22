@@ -40,9 +40,23 @@ export default function RenderCodeNode({ data, selected }: RenderCodeNodeProps) 
       <NodeOutputPreview node={node} />
 
       <div className="px-4 py-3 text-xs text-gray-600 space-y-1">
+        {node.config.sceneId ? (
+          <div>
+            <span className="font-semibold">Scene:</span> {String(node.config.sceneId)}
+          </div>
+        ) : (
+          <div className="text-yellow-600">
+            <span className="font-semibold">⚠️ No scene configured</span>
+          </div>
+        )}
         {node.metadata?.duration != null && (
           <div>
             <span className="font-semibold">Duration:</span> {String(node.metadata.duration)}s
+          </div>
+        )}
+        {node.metadata?.resolution && (
+          <div>
+            <span className="font-semibold">Resolution:</span> {String(node.metadata.resolution)}
           </div>
         )}
       </div>

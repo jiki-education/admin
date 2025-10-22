@@ -9,9 +9,10 @@
 
 import { useTransition } from "react";
 import type { Node } from "@/lib/nodes/types";
-import { isMergeVideosNode } from "@/lib/nodes/types";
+import { isMergeVideosNode, isRenderCodeNode } from "@/lib/nodes/types";
 import NodeDetailsHeader from "./editor-panel/NodeDetailsHeader";
 import MergeVideosNodeDetails from "./editor-panel/MergeVideosNodeDetails";
+import RenderCodeNodeDetails from "./editor-panel/RenderCodeNodeDetails";
 
 interface EditorPanelProps {
   selectedNode: Node | null;
@@ -64,6 +65,12 @@ export default function EditorPanel({ selectedNode, pipelineUuid, allNodes, onDe
             node={selectedNode}
             pipelineUuid={pipelineUuid}
             allNodes={allNodes}
+            onRefresh={onRefresh}
+          />
+        ) : isRenderCodeNode(selectedNode) ? (
+          <RenderCodeNodeDetails
+            node={selectedNode}
+            pipelineUuid={pipelineUuid}
             onRefresh={onRefresh}
           />
         ) : (
