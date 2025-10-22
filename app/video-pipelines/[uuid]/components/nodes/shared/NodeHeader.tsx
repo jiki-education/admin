@@ -12,6 +12,7 @@ interface NodeHeaderProps {
   title: string;
   displayName: string;
   status: string;
+  onExecute?: () => void;
 }
 
 const NODE_ICONS: Record<NodeType, string> = {
@@ -25,7 +26,7 @@ const NODE_ICONS: Record<NodeType, string> = {
   "compose-video": "🎨"
 };
 
-export default function NodeHeader({ type, title, displayName, status }: NodeHeaderProps) {
+export default function NodeHeader({ type, title, displayName, status, onExecute }: NodeHeaderProps) {
   const icon = NODE_ICONS[type] || "📦";
 
   return (
@@ -38,7 +39,7 @@ export default function NodeHeader({ type, title, displayName, status }: NodeHea
           </div>
           <div className="text-xs text-gray-600 truncate">{displayName}</div>
         </div>
-        <StatusBadge status={status} />
+        <StatusBadge status={status} onExecute={onExecute} />
       </div>
     </div>
   );

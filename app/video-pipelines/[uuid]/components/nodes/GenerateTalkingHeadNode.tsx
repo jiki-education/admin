@@ -16,6 +16,7 @@ interface GenerateTalkingHeadNodeProps {
   data: {
     node: GenerateTalkingHeadNodeType;
     onSelect: () => void;
+    onExecute: () => void;
   };
   selected: boolean;
 }
@@ -37,7 +38,7 @@ export default function GenerateTalkingHeadNode({ data, selected }: GenerateTalk
       `}
     >
       {/* Header */}
-      <NodeHeader type={node.type} title={node.title} displayName={displayName} status={node.status} />
+      <NodeHeader type={node.type} title={node.title} displayName={displayName} status={node.status} onExecute={data.onExecute} />
 
       {/* Output Preview */}
       <NodeOutputPreview node={node} />
@@ -45,9 +46,9 @@ export default function GenerateTalkingHeadNode({ data, selected }: GenerateTalk
       {/* Node Info */}
       <div className="px-4 py-3 text-xs text-gray-600 space-y-1">
         {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-        {node.config.provider === "heygen" && node.config.avatar_id != null && node.config.avatar_id !== "" && (
+        {node.config.provider === "heygen" && node.config.avatarId != null && node.config.avatarId !== "" && (
           <div>
-            <span className="font-semibold">Avatar:</span> {node.config.avatar_id}
+            <span className="font-semibold">Avatar:</span> {node.config.avatarId}
           </div>
         )}
         {node.metadata?.duration != null && (

@@ -16,6 +16,7 @@ interface MixAudioNodeProps {
   data: {
     node: MixAudioNodeType;
     onSelect: () => void;
+    onExecute: () => void;
   };
   selected: boolean;
 }
@@ -36,7 +37,7 @@ export default function MixAudioNode({ data, selected }: MixAudioNodeProps) {
         ${statusStyle.shadow}
       `}
     >
-      <NodeHeader type={node.type} title={node.title} displayName={displayName} status={node.status} />
+      <NodeHeader type={node.type} title={node.title} displayName={displayName} status={node.status} onExecute={data.onExecute} />
       <NodeOutputPreview node={node} />
 
       <div className="px-4 py-3 text-xs text-gray-600 space-y-1">

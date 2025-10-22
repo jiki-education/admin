@@ -67,6 +67,10 @@ export interface NodeMetadata {
   // Cost and performance
   cost?: number;            // Estimated cost for this node
   retries?: number;         // Number of retry attempts
+  
+  // Output properties
+  duration?: number;        // Duration in seconds (for audio/video)
+  resolution?: string;      // Video resolution (e.g., "1920x1080")
 }
 
 // Output Structure
@@ -141,7 +145,7 @@ export interface VideoProductionNode {
   
   // Structure (Next.js writes these fields)
   type: NodeType;       // Node type
-  inputs: NodeInputs;   // JSONB - Input slot definitions
+  inputs: NodeInputValues; // JSONB - Input values (node UUIDs)
   config: NodeConfig;   // JSONB - Node configuration
   asset?: NodeAsset;    // JSONB - Asset data for asset nodes
   
@@ -284,7 +288,7 @@ export async function connectNodes(
   inputKey: string
 ): Promise<void> {
   // First fetch the target node to get its current inputs
-  const nodeResponse = await api.get(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${targetNodeUuid}`);
+  const nodeResponse = await api.get<{ node: VideoProductionNode }>(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${targetNodeUuid}`);
   const node = nodeResponse.data.node;
 
   // Update the inputs - check if it's an array or single value
@@ -339,7 +343,7 @@ export async function createNode(
     asset?: Record<string, unknown>;
   }
 ): Promise<VideoProductionNode> {
-  const response = await api.post(`/admin/video_production/pipelines/${pipelineUuid}/nodes`, {
+  const response = await api.post<{ node: VideoProductionNode }>(`/admin/video_production/pipelines/${pipelineUuid}/nodes`, {
     node: nodeData
   });
   return response.data.node;
@@ -354,7 +358,7 @@ export async function updateNode(
   nodeUuid: string,
   updates: Partial<VideoProductionNode>
 ): Promise<VideoProductionNode> {
-  const response = await api.patch(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`, {
+  const response = await api.patch<{ node: VideoProductionNode }>(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`, {
     node: updates
   });
   return response.data.node;
@@ -371,7 +375,7 @@ export async function reorderNodeInputs(
   newOrder: string[]
 ): Promise<void> {
   // First fetch the target node to get its current inputs
-  const nodeResponse = await api.get(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`);
+  const nodeResponse = await api.get<{ node: VideoProductionNode }>(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`);
   const node = nodeResponse.data.node;
 
   // Update the inputs with new order
@@ -384,6 +388,28 @@ export async function reorderNodeInputs(
   await api.patch(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`, {
     node: { inputs: newInputs }
   });
+}
+
+/**
+ * Execute a node in a pipeline
+ * POST /v1/admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid/execute
+ */
+export async function executeNode(
+  pipelineUuid: string,
+  nodeUuid: string
+): Promise<VideoProductionNode> {
+  console.log(`Executing node ${nodeUuid} in pipeline ${pipelineUuid}`);
+  
+  try {
+    const response = await api.post<{ node: VideoProductionNode }>(
+      `/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}/execute`
+    );
+    
+    return response.data.node;
+  } catch (error) {
+    console.error(`Failed to execute node ${nodeUuid}:`, error);
+    throw error;
+  }
 }
 
 // Detailed Node Type Interfaces
@@ -463,6 +489,7 @@ export interface RenderCodeNode extends VideoProductionNode {
   };
   config: {
     provider: "remotion";
+    sceneId?: string;   // Remotion scene/composition ID
     duration?: number;  // Animation duration in seconds
     width?: number;     // Video width in pixels
     height?: number;    // Video height in pixels
