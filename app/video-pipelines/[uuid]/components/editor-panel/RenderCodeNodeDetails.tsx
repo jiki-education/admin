@@ -10,7 +10,7 @@ import { useState, useEffect } from "react";
 import type { RenderCodeNode } from "@/lib/nodes/types";
 import type { CodeScene } from "@/lib/types/code-scenes";
 import Button from "@/components/ui/button/Button";
-import { RemotionPreview } from "@/components/remotion/RemotionPreview";
+import { StaticCodePreview } from "@/components/remotion/StaticCodePreview";
 import { SCENE_CATEGORIES } from "@/lib/scene-templates";
 import { 
   analyzeSceneComplexity, 
@@ -166,7 +166,7 @@ export default function RenderCodeNodeDetails({
 
             {/* Preview */}
             <div className="mt-4">
-              <RemotionPreview 
+              <StaticCodePreview 
                 config={selectedScene.config}
                 width={320}
                 height={180}
