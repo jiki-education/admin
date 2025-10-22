@@ -172,6 +172,25 @@ pnpm add -D [package-name]   # Dev dependency
 - Frontend matches exact backend request/response formats
 - See `BACKEND_INTEGRATION_PLAN.md` for detailed specifications
 
+### Video Proxy Authentication
+
+**Problem**: HTML video/audio elements cannot send custom Authorization headers, but video endpoints require authentication.
+
+**Solution**: The `/api/videos/[pipelineId]/[nodeId]` proxy route supports both header and query parameter authentication:
+
+1. **Server-side Route** (`app/api/videos/[pipelineId]/[nodeId]/route.ts`):
+   - Accepts JWT token from `Authorization: Bearer <token>` header OR `?token=<token>` query parameter
+   - Removes hardcoded `user_id=2` and uses proper Rails API authentication
+   - Forwards authenticated requests to Rails backend: `/v1/admin/video_production/pipelines/${pipelineId}/nodes/${nodeId}/output`
+   - Returns 401 if no valid token provided
+
+2. **Frontend Component** (`NodeOutputPreview.tsx`):
+   - Constructs video URLs with auth token: `/api/videos/${pipelineUuid}/${nodeUuid}?token=${jwt}`
+   - Uses `getToken()` from auth storage to include current user's JWT
+   - Only renders video/audio elements when user is authenticated
+
+**Usage**: This pattern should be used for any media endpoints that need to be consumed by HTML elements (video, audio, img) while maintaining authentication.
+
 ## Deployment
 
 Deployment configuration is not yet set up. When adding deployment:

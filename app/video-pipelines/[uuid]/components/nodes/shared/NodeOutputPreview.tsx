@@ -9,6 +9,7 @@
 import type { Node } from "@/lib/nodes/types";
 import Image from "next/image";
 import { getOutputPreviewUrl, getOutputDataType } from "@/lib/nodes/display-helpers";
+import { getToken } from "@/lib/auth/storage";
 
 interface NodeOutputPreviewProps {
   node: Node;
@@ -21,11 +22,11 @@ export default function NodeOutputPreview({ node }: NodeOutputPreviewProps) {
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (node.type === "asset" && node.asset != null) {
-    previewUrl = node.asset.source;
+    previewUrl = node.asset.source ?? null;
     // Asset type is already reflected in dataType via getOutputDataType
   } else {
     // For other nodes, check output
-    previewUrl = getOutputPreviewUrl(node.output);
+    previewUrl = getOutputPreviewUrl(node.output ?? null);
   }
 
   const hasPreview = previewUrl !== null && previewUrl !== "";
@@ -33,10 +34,13 @@ export default function NodeOutputPreview({ node }: NodeOutputPreviewProps) {
   // Determine if video/audio is ready to play
   const isCompleted = node.status === "completed";
 
-  // For videos/audio, construct API URL
+  // For videos/audio, construct API URL with auth token
   const pipelineUuid = node.pipeline_uuid;
+  const token = getToken();
   const apiVideoUrl =
-    isCompleted && (dataType === "video" || dataType === "audio") ? `/api/videos/${pipelineUuid}/${node.uuid}` : null;
+    isCompleted && (dataType === "video" || dataType === "audio") && token
+      ? `/api/videos/${pipelineUuid}/${node.uuid}?token=${encodeURIComponent(token)}`
+      : null;
 
   if (!hasPreview) {
     return (

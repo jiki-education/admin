@@ -9,45 +9,65 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { pipelineId: string; nodeId: string } }
+  { params }: { params: Promise<{ pipelineId: string; nodeId: string }> }
 ) {
   try {
-    const { pipelineId, nodeId } = params;
+    const { pipelineId, nodeId } = await params;
     
-    // Build Rails API URL for video output
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/v1/admin/video_production/pipelines/${pipelineId}/nodes/${nodeId}/output?user_id=1`;
-    
-    // Forward request headers to Rails API
-    const headers = new Headers();
-    
-    // Copy relevant headers from the original request
+    // Get auth token from request headers or query parameter
     const authHeader = request.headers.get("authorization");
-    if (authHeader) {
-      headers.set("authorization", authHeader);
+    const { searchParams } = new URL(request.url);
+    const tokenParam = searchParams.get("token");
+    
+    let authToken: string | null = null;
+    
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      authToken = authHeader;
+    } else if (tokenParam) {
+      authToken = `Bearer ${tokenParam}`;
     }
     
-    const contentType = request.headers.get("content-type");
-    if (contentType) {
-      headers.set("content-type", contentType);
+    if (!authToken) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
     }
     
-    const userAgent = request.headers.get("user-agent");
-    if (userAgent) {
-      headers.set("user-agent", userAgent);
-    }
+    // Build Rails API URL for video output (no user_id needed with auth)
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/v1/admin/video_production/pipelines/${pipelineId}/nodes/${nodeId}/output`;
+    
+    console.log("Fetching from API:", apiUrl);
 
-    // Fetch from Rails API with redirect following enabled
+    // Forward request to Rails API with auth headers
     const response = await fetch(apiUrl, {
-      method: "GET",
-      headers,
-      redirect: "follow" // Follow S3 presigned URL redirects
+      headers: {
+        "Authorization": authToken,
+        "Content-Type": "application/json"
+      },
+      redirect: "follow" // Follow the redirect to S3
     });
 
-    // Return proxied response
+    console.log("API response status:", response.status);
+    console.log("API response headers:", Object.fromEntries(response.headers.entries()));
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.log("API error response:", errorText);
+      
+      return NextResponse.json(
+        { error: "Video not found or unavailable" },
+        { status: response.status }
+      );
+    }
+
     return new NextResponse(response.body, {
       status: response.status,
-      statusText: response.statusText,
-      headers: response.headers
+      headers: {
+        'Content-Type': response.headers.get('Content-Type') || 'video/mp4',
+        'Content-Length': response.headers.get('Content-Length') || '',
+        'Cache-Control': response.headers.get('Cache-Control') || 'public, max-age=3600'
+      }
     });
     
   } catch (error) {
