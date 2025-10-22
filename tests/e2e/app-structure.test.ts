@@ -75,8 +75,8 @@ describe('App Structure and Integration Tests', () => {
           });
           
           expect(headingText.toLowerCase()).toMatch(new RegExp(testCase.expectedText.toLowerCase()));
-        } catch (error) {
-          console.log(`Could not verify page title for ${testCase.route}`);
+        } catch {
+          console.debug(`Could not verify page title for ${testCase.route}`);
         }
       }
     });

@@ -28,10 +28,10 @@ export default function LessonEditForm({
   loading = false
 }: LessonEditFormProps) {
   const [formData, setFormData] = useState({
-    title: lesson.title || "",
-    description: lesson.description || "",
-    type: lesson.type || "exercise",
-    data: JSON.stringify(lesson.data || {}, null, 2)
+    title: lesson.title,
+    description: lesson.description,
+    type: lesson.type,
+    data: JSON.stringify(lesson.data, null, 2)
   });
   
   const [jsonError, setJsonError] = useState<string | null>(null);
@@ -39,10 +39,10 @@ export default function LessonEditForm({
 
   useEffect(() => {
     setFormData({
-      title: lesson.title || "",
-      description: lesson.description || "",
-      type: lesson.type || "exercise",
-      data: JSON.stringify(lesson.data || {}, null, 2)
+      title: lesson.title,
+      description: lesson.description,
+      type: lesson.type,
+      data: JSON.stringify(lesson.data, null, 2)
     });
   }, [lesson]);
 
@@ -79,7 +79,7 @@ export default function LessonEditForm({
       if (formData.data.trim()) {
         try {
           parsedData = JSON.parse(formData.data);
-        } catch (err) {
+        } catch {
           alert("Invalid JSON format. Please check your JSON data.");
           return;
         }

@@ -14,7 +14,7 @@ import type { VideoProductionPipeline } from "@/lib/api/video-pipelines";
 import FlowCanvas from "./FlowCanvas";
 import EditorPanel from "./EditorPanel";
 import { getLayoutedNodes } from "@/lib/layout";
-import { connectNodes, deleteNode } from "@/lib/api/video-pipelines";
+import { connectNodes, deleteNode, executeNode } from "@/lib/api/video-pipelines";
 import { getOutputHandleColorValue } from "@/lib/nodes/display-helpers";
 import { hasInputHandle } from "@/lib/nodes/metadata";
 
@@ -39,6 +39,28 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
   const selectedNode =
     selectedNodeId != null && selectedNodeId !== "" ? (nodes.find((n) => n.uuid === selectedNodeId) ?? null) : null;
 
+  // Handle node execution
+  const handleExecute = useCallback(
+    async (nodeUuid: string) => {
+      setIsSaving(true);
+      
+      try {
+        // Execute the node
+        await executeNode(pipeline.uuid, nodeUuid);
+        
+        // Refresh the pipeline to get updated node status
+        onRefresh();
+      } catch (error) {
+        // Show user-friendly error message
+        const errorMessage = error instanceof Error ? error.message : "Failed to execute node";
+        alert(`Failed to execute node: ${errorMessage}`);
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [pipeline.uuid, onRefresh]
+  );
+
   // Convert domain nodes to React Flow nodes
   const reactFlowNodes: ReactFlowNode[] = useMemo(() => {
     return nodes.map((node) => ({
@@ -47,11 +69,12 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
       position: { x: 0, y: 0 }, // Will be set by layout or preserved position
       data: {
         node,
-        onSelect: () => setSelectedNodeId(node.uuid)
+        onSelect: () => setSelectedNodeId(node.uuid),
+        onExecute: () => handleExecute(node.uuid)
       },
       selected: node.uuid === selectedNodeId
     }));
-  }, [nodes, selectedNodeId]);
+  }, [nodes, selectedNodeId, handleExecute]);
 
   // Convert node inputs to React Flow edges
   const edges: Edge[] = useMemo(() => {
@@ -65,7 +88,7 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
         }
 
         // Normalize inputs: handle both string (single input) and string[] (multi input)
-        const sourceArray = Array.isArray(sources) ? sources : [sources];
+        const sourceArray = Array.isArray(sources) ? sources : sources != null ? [sources] : [];
 
         sourceArray.forEach((sourceId, index) => {
           // Find the source node to get its output color
@@ -98,6 +121,7 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
   // Apply positions to nodes (auto-layout only on first render)
   const layoutedNodes = useMemo(() => {
     // If we already have positions for all nodes, use them
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const allNodesHavePositions = reactFlowNodes.every((node) => nodePositions[node.id] != null);
 
     if (allNodesHavePositions && hasInitialLayout.current) {
@@ -235,6 +259,7 @@ export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefres
             }
           });
 
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           return modified ? ({ ...node, inputs: cleanedInputs } as Node) : node;
         });
 

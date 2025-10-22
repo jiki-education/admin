@@ -16,6 +16,7 @@ interface AssetNodeProps {
   data: {
     node: AssetNodeType;
     onSelect: () => void;
+    onExecute: () => void;
   };
   selected: boolean;
 }
@@ -37,7 +38,7 @@ export default function AssetNode({ data, selected }: AssetNodeProps) {
       `}
     >
       {/* Header */}
-      <NodeHeader type={node.type} title={node.title} displayName={displayName} status={node.status} />
+      <NodeHeader type={node.type} title={node.title} displayName={displayName} status={node.status} onExecute={data.onExecute} />
 
       {/* Output Preview */}
       <NodeOutputPreview node={node} />

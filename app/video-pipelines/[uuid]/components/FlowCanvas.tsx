@@ -23,7 +23,6 @@ import {
 import "@xyflow/react/dist/style.css";
 
 import type { Node } from "@/lib/nodes/types";
-import type { NodeType } from "@/lib/nodes/types";
 import { getMaxConnections, hasInputHandle } from "@/lib/nodes/metadata";
 
 // Import custom node components
@@ -76,7 +75,7 @@ export default function FlowCanvas({
 
       // Find target node
       const targetNode = nodes.find((n) => n.id === connection.target);
-      if (!targetNode?.data?.node) {
+      if (!targetNode || !targetNode.data.node) {
         return;
       }
 
@@ -85,12 +84,12 @@ export default function FlowCanvas({
       const node = nodeData.node;
 
       // Check if the input handle exists for this node type
-      if (!hasInputHandle(node.type as NodeType, connection.targetHandle)) {
+      if (!hasInputHandle(node.type, connection.targetHandle)) {
         return;
       }
 
       // Get max allowed connections for this input
-      const maxConnections = getMaxConnections(node.type as NodeType, connection.targetHandle);
+      const maxConnections = getMaxConnections(node.type, connection.targetHandle);
 
       // Check connection limits (unless unlimited)
       if (maxConnections !== -1) {

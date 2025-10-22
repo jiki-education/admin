@@ -11,7 +11,7 @@ describe('LevelForm Component', () => {
     jest.clearAllMocks();
   });
 
-  test('validates required fields and shows errors for empty submission', async () => {
+  test('validates required fields and shows errors for empty submission', () => {
     render(
       <LevelForm
         mode="create"

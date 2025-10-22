@@ -18,7 +18,7 @@ jest.mock('@/app/dashboard/levels/components/JSONEditor', () => {
       try {
         JSON.parse(newValue);
         onValidation(null); // Valid JSON
-      } catch (error) {
+      } catch {
         onValidation('Invalid JSON format'); // Invalid JSON
       }
     };

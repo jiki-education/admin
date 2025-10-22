@@ -43,7 +43,7 @@ describe('Lessons Management E2E Tests', () => {
       
       // If redirected to signin, skip form validation (not authenticated)
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping form validation test');
+        console.debug('Redirected to signin - skipping form validation test');
         return;
       }
       
@@ -62,8 +62,8 @@ describe('Lessons Management E2E Tests', () => {
         // Check for form buttons
         const saveButton = await page.$('button[type="submit"]');
         expect(saveButton).toBeTruthy();
-      } catch (error) {
-        console.log('Form elements not found - likely redirected or not loaded');
+      } catch {
+        console.debug('Form elements not found - likely redirected or not loaded');
       }
     });
 
@@ -73,13 +73,13 @@ describe('Lessons Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping context test');
+        console.debug('Redirected to signin - skipping context test');
         return;
       }
       
       // Look for level context display (could be in various formats)
       const contextElements = await page.$$('.bg-blue-50, [class*="level"], [class*="context"]');
-      console.log(`Found ${contextElements.length} potential context elements`);
+      console.debug(`Found ${contextElements.length} potential context elements`);
     });
 
     it('should auto-generate slug from lesson title when authenticated', async () => {
@@ -88,7 +88,7 @@ describe('Lessons Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping slug generation test');
+        console.debug('Redirected to signin - skipping slug generation test');
         return;
       }
       
@@ -109,8 +109,8 @@ describe('Lessons Management E2E Tests', () => {
         // Check that slug was generated
         const slugValue = await slugInput.evaluate((el: HTMLInputElement) => el.value);
         expect(slugValue).toBe('variables-and-data-types');
-      } catch (error) {
-        console.log('Could not test slug generation - form not accessible');
+      } catch {
+        console.debug('Could not test slug generation - form not accessible');
       }
     });
 
@@ -120,7 +120,7 @@ describe('Lessons Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping dropdown test');
+        console.debug('Redirected to signin - skipping dropdown test');
         return;
       }
       
@@ -139,8 +139,8 @@ describe('Lessons Management E2E Tests', () => {
         expectedTypes.forEach(type => {
           expect(options).toContain(type);
         });
-      } catch (error) {
-        console.log('Could not test dropdown - form not accessible');
+      } catch {
+        console.debug('Could not test dropdown - form not accessible');
       }
     });
 
@@ -150,7 +150,7 @@ describe('Lessons Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping validation test');
+        console.debug('Redirected to signin - skipping validation test');
         return;
       }
       
@@ -166,9 +166,9 @@ describe('Lessons Management E2E Tests', () => {
         // Check for error messages
         const errorElements = await page.$$('.text-red-600, .text-red-400, [class*="text-red"]');
         
-        console.log(`Found ${errorElements.length} error elements`);
-      } catch (error) {
-        console.log('Could not test validation - form not accessible');
+        console.debug(`Found ${errorElements.length} error elements`);
+      } catch {
+        console.debug('Could not test validation - form not accessible');
       }
     });
 
@@ -178,7 +178,7 @@ describe('Lessons Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping JSON editor test');
+        console.debug('Redirected to signin - skipping JSON editor test');
         return;
       }
       
@@ -196,10 +196,10 @@ describe('Lessons Management E2E Tests', () => {
           expect(content).toContain('key');
           expect(content).toContain('value');
         } else {
-          console.log('JSON editor not found - may not be present on this page');
+          console.debug('JSON editor not found - may not be present on this page');
         }
-      } catch (error) {
-        console.log('Could not test JSON editor - form not accessible');
+      } catch {
+        console.debug('Could not test JSON editor - form not accessible');
       }
     });
 
@@ -209,7 +209,7 @@ describe('Lessons Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping cancel test');
+        console.debug('Redirected to signin - skipping cancel test');
         return;
       }
       
@@ -217,9 +217,10 @@ describe('Lessons Management E2E Tests', () => {
         // Look for cancel button by text content
         const cancelButton = await page.waitForFunction(() => {
           const buttons = Array.from(document.querySelectorAll('button'));
-          return buttons.find(btn => btn.textContent?.toLowerCase().includes('cancel'));
+          return buttons.find(btn => btn.textContent && btn.textContent.toLowerCase().includes('cancel'));
         }, { timeout: 2000 });
         
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (cancelButton) {
           await cancelButton.click();
           
@@ -227,10 +228,10 @@ describe('Lessons Management E2E Tests', () => {
           await page.waitForTimeout(1000);
           
           const newUrl = page.url();
-          console.log(`Navigated from new lesson page to: ${newUrl}`);
+          console.debug(`Navigated from new lesson page to: ${newUrl}`);
         }
-      } catch (error) {
-        console.log('Could not test cancel action - form not accessible');
+      } catch {
+        console.debug('Could not test cancel action - form not accessible');
       }
     });
   });
@@ -242,7 +243,7 @@ describe('Lessons Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping slug validation test');
+        console.debug('Redirected to signin - skipping slug validation test');
         return;
       }
       
@@ -269,9 +270,9 @@ describe('Lessons Management E2E Tests', () => {
         
         // Check for slug validation error
         const slugError = await page.$('.text-red-600, .text-red-400, [class*="text-red"]');
-        console.log(`Found slug error element: ${slugError ? 'yes' : 'no'}`);
-      } catch (error) {
-        console.log('Could not test slug validation - form not accessible');
+        console.debug(`Found slug error element: ${slugError ? 'yes' : 'no'}`);
+      } catch {
+        console.debug('Could not test slug validation - form not accessible');
       }
     });
 
@@ -281,7 +282,7 @@ describe('Lessons Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping type selection test');
+        console.debug('Redirected to signin - skipping type selection test');
         return;
       }
       
@@ -293,8 +294,8 @@ describe('Lessons Management E2E Tests', () => {
         
         const selectedValue = await typeSelect.evaluate((el: HTMLSelectElement) => el.value);
         expect(selectedValue).toBe('tutorial');
-      } catch (error) {
-        console.log('Could not test type selection - form not accessible');
+      } catch {
+        console.debug('Could not test type selection - form not accessible');
       }
     });
   });
@@ -306,13 +307,13 @@ describe('Lessons Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping navigation test');
+        console.debug('Redirected to signin - skipping navigation test');
         return;
       }
       
       // Look for navigation elements
       const navElements = await page.$$('nav, [data-testid="breadcrumb"], .breadcrumb');
-      console.log(`Found ${navElements.length} navigation elements`);
+      console.debug(`Found ${navElements.length} navigation elements`);
     });
 
     it('should display page heading when accessible', async () => {
@@ -321,26 +322,26 @@ describe('Lessons Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping heading test');
+        console.debug('Redirected to signin - skipping heading test');
         return;
       }
       
       try {
         // Look for headings
         const headings = await page.$$('h1, h2, [role="heading"]');
-        console.log(`Found ${headings.length} heading elements`);
+        console.debug(`Found ${headings.length} heading elements`);
         
         // Check if any heading contains relevant text
         for (const heading of headings) {
-          const text = await heading.evaluate(el => el.textContent?.toLowerCase() || '');
+          const text = await heading.evaluate(el => (el.textContent || '').toLowerCase());
           if (text.includes('add') || text.includes('new') || text.includes('lesson')) {
-            console.log(`Found relevant heading: ${text}`);
+            console.debug(`Found relevant heading: ${text}`);
             expect(heading).toBeTruthy();
             return;
           }
         }
-      } catch (error) {
-        console.log('Could not find headings - form not accessible');
+      } catch {
+        console.debug('Could not find headings - form not accessible');
       }
     });
   });

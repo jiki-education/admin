@@ -199,7 +199,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
                   <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Bucket:</span>
                   <span className="ml-2 text-gray-900 dark:text-white">{pipeline.config.storage?.bucket || 'N/A'}</span>
                 </div>
-                {pipeline.config?.storage?.prefix && (
+                {pipeline.config.storage?.prefix && (
                   <div>
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Prefix:</span>
                     <span className="ml-2 text-gray-900 dark:text-white">{pipeline.config.storage.prefix}</span>

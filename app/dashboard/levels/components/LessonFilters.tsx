@@ -155,7 +155,7 @@ export default function LessonFilters({
           <span className="text-gray-600 dark:text-gray-400">Active filters:</span>
           {searchTerm.trim() && (
             <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-              Search: "{searchTerm.trim()}"
+              Search: &quot;{searchTerm.trim()}&quot;
             </span>
           )}
           {selectedType && (

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { EmailTemplateSummaryResponse, EmailTemplateSummaryItem } from "../types";
+import type { EmailTemplateSummaryResponse } from "../types";
 import LocaleStatusBadge from "./LocaleStatusBadge";
 import type { SummaryFilters } from "./SummaryFilters";
 
@@ -57,6 +57,8 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
             return missingLocales.length > 0;
           case "wip":
             return wipLocales.length > 0;
+          case "all":
+          case undefined:
           default:
             return true;
         }

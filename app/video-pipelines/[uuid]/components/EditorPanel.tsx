@@ -9,9 +9,10 @@
 
 import { useTransition } from "react";
 import type { Node } from "@/lib/nodes/types";
-import { isMergeVideosNode } from "@/lib/nodes/types";
+import { isMergeVideosNode, isRenderCodeNode } from "@/lib/nodes/types";
 import NodeDetailsHeader from "./editor-panel/NodeDetailsHeader";
 import MergeVideosNodeDetails from "./editor-panel/MergeVideosNodeDetails";
+import RenderCodeNodeDetails from "./editor-panel/RenderCodeNodeDetails";
 
 interface EditorPanelProps {
   selectedNode: Node | null;
@@ -66,6 +67,12 @@ export default function EditorPanel({ selectedNode, pipelineUuid, allNodes, onDe
             allNodes={allNodes}
             onRefresh={onRefresh}
           />
+        ) : isRenderCodeNode(selectedNode) ? (
+          <RenderCodeNodeDetails
+            node={selectedNode}
+            pipelineUuid={pipelineUuid}
+            onRefresh={onRefresh}
+          />
         ) : (
           /* Generic Detail View */
           <>
@@ -112,6 +119,7 @@ export default function EditorPanel({ selectedNode, pipelineUuid, allNodes, onDe
             </Section>
 
             {/* Asset (for asset nodes) */}
+            {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
             {selectedNode.type === "asset" && selectedNode.asset != null && (
               <Section title="Asset">
                 <div className="space-y-2">

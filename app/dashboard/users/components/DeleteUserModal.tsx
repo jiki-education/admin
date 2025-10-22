@@ -93,7 +93,7 @@ export default function DeleteUserModal({
             
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                To confirm deletion, please type the user's email address:
+                To confirm deletion, please type the user&apos;s email address:
               </label>
               <input
                 type="email"

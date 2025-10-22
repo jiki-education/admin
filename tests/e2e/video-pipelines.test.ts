@@ -29,7 +29,7 @@ describe('Video Pipelines Management E2E Tests', () => {
       
       // If redirected to signin, skip this test
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping title test');
+        console.debug('Redirected to signin - skipping title test');
         return;
       }
       
@@ -40,8 +40,8 @@ describe('Video Pipelines Management E2E Tests', () => {
           return h1 ? h1.textContent : '';
         });
         expect(titleText).toContain('Video Production Pipelines');
-      } catch (error) {
-        console.log('Could not find title - page not accessible');
+      } catch {
+        console.debug('Could not find title - page not accessible');
       }
     });
 
@@ -51,14 +51,14 @@ describe('Video Pipelines Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping create button test');
+        console.debug('Redirected to signin - skipping create button test');
         return;
       }
       
       try {
         const createButton = await page.waitForFunction(() => {
           const buttons = Array.from(document.querySelectorAll('a, button'));
-          return buttons.find(btn => btn.textContent?.includes('Create New Pipeline'));
+          return buttons.find(btn => btn.textContent && btn.textContent.includes('Create New Pipeline'));
         }, { timeout: 3000 });
         
         expect(createButton).toBeTruthy();
@@ -66,8 +66,8 @@ describe('Video Pipelines Management E2E Tests', () => {
         // Verify the button links to the correct page
         const href = await createButton.evaluate(el => el.getAttribute('href'));
         expect(href).toBe('/dashboard/video-pipelines/new');
-      } catch (error) {
-        console.log('Could not find create button - page not accessible');
+      } catch {
+        console.debug('Could not find create button - page not accessible');
       }
     });
 
@@ -77,18 +77,18 @@ describe('Video Pipelines Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping table test');
+        console.debug('Redirected to signin - skipping table test');
         return;
       }
       
       try {
         // Look for table headers that should exist
         const tableHeaders = await page.$$('th');
-        console.log(`Found ${tableHeaders.length} table headers`);
+        console.debug(`Found ${tableHeaders.length} table headers`);
         
         if (tableHeaders.length > 0) {
           const headerTexts = await Promise.all(
-            tableHeaders.map(header => header.evaluate(el => el.textContent?.trim() || ''))
+            tableHeaders.map(header => header.evaluate(el => (el.textContent || '').trim()))
           );
           
           // Check for expected column headers
@@ -96,8 +96,8 @@ describe('Video Pipelines Management E2E Tests', () => {
           expect(headerTexts.some(text => text.includes('Progress'))).toBeTruthy();
           expect(headerTexts.some(text => text.includes('Actions'))).toBeTruthy();
         }
-      } catch (error) {
-        console.log('Could not test table structure - page not accessible');
+      } catch {
+        console.debug('Could not test table structure - page not accessible');
       }
     });
 
@@ -107,14 +107,14 @@ describe('Video Pipelines Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping pagination test');
+        console.debug('Redirected to signin - skipping pagination test');
         return;
       }
       
       try {
         // Look for pagination-related elements
         const paginationElements = await page.$$('[class*="pagination"], [class*="page"], select');
-        console.log(`Found ${paginationElements.length} pagination elements`);
+        console.debug(`Found ${paginationElements.length} pagination elements`);
         
         // Look for items per page selector
         const itemsPerPageSelect = await page.$('select');
@@ -122,8 +122,8 @@ describe('Video Pipelines Management E2E Tests', () => {
           const options = await itemsPerPageSelect.$$('option');
           expect(options.length).toBeGreaterThan(0);
         }
-      } catch (error) {
-        console.log('Could not test pagination - page not accessible');
+      } catch {
+        console.debug('Could not test pagination - page not accessible');
       }
     });
   });
@@ -149,7 +149,7 @@ describe('Video Pipelines Management E2E Tests', () => {
       
       // If redirected to signin, skip form validation (not authenticated)
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping form validation test');
+        console.debug('Redirected to signin - skipping form validation test');
         return;
       }
       
@@ -165,13 +165,14 @@ describe('Video Pipelines Management E2E Tests', () => {
         const submitButton = await page.$('button[type="submit"]');
         const cancelButton = await page.waitForFunction(() => {
           const buttons = Array.from(document.querySelectorAll('a, button'));
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           return buttons.find(btn => btn.textContent?.includes('Cancel'));
         }, { timeout: 2000 });
         
         expect(submitButton).toBeTruthy();
         expect(cancelButton).toBeTruthy();
-      } catch (error) {
-        console.log('Form elements not found - likely redirected or not loaded');
+      } catch {
+        console.debug('Form elements not found - likely redirected or not loaded');
       }
     });
 
@@ -181,7 +182,7 @@ describe('Video Pipelines Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping form sections test');
+        console.debug('Redirected to signin - skipping form sections test');
         return;
       }
       
@@ -192,13 +193,13 @@ describe('Video Pipelines Management E2E Tests', () => {
           headings.map(heading => heading.evaluate(el => el.textContent?.trim() || ''))
         );
         
-        console.log('Found headings:', headingTexts);
+        console.debug('Found headings:', headingTexts);
         
         // Check for expected form sections
         expect(headingTexts.some(text => text.includes('Basic Information') || text.includes('Create'))).toBeTruthy();
         expect(headingTexts.some(text => text.includes('Storage Configuration') || text.includes('Storage'))).toBeTruthy();
-      } catch (error) {
-        console.log('Could not test form sections - form not accessible');
+      } catch {
+        console.debug('Could not test form sections - form not accessible');
       }
     });
 
@@ -208,7 +209,7 @@ describe('Video Pipelines Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping validation test');
+        console.debug('Redirected to signin - skipping validation test');
         return;
       }
       
@@ -223,9 +224,9 @@ describe('Video Pipelines Management E2E Tests', () => {
         
         // Check if form prevents submission or shows validation
         const errorElements = await page.$$('.text-red-600, .text-red-400, [class*="text-red"]');
-        console.log(`Found ${errorElements.length} error elements after empty submission`);
-      } catch (error) {
-        console.log('Could not test validation - form not accessible');
+        console.debug(`Found ${errorElements.length} error elements after empty submission`);
+      } catch {
+        console.debug('Could not test validation - form not accessible');
       }
     });
 
@@ -235,7 +236,7 @@ describe('Video Pipelines Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping cancel test');
+        console.debug('Redirected to signin - skipping cancel test');
         return;
       }
       
@@ -256,10 +257,10 @@ describe('Video Pipelines Management E2E Tests', () => {
           await page.waitForTimeout(1000);
           
           const newUrl = page.url();
-          console.log(`Navigated from new page to: ${newUrl}`);
+          console.debug(`Navigated from new page to: ${newUrl}`);
         }
-      } catch (error) {
-        console.log('Could not test cancel action - form not accessible');
+      } catch {
+        console.debug('Could not test cancel action - form not accessible');
       }
     });
   });
@@ -286,7 +287,7 @@ describe('Video Pipelines Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping editor placeholder test');
+        console.debug('Redirected to signin - skipping editor placeholder test');
         return;
       }
       
@@ -301,8 +302,8 @@ describe('Video Pipelines Management E2E Tests', () => {
         }, { timeout: 3000 });
         
         expect(editorPlaceholder).toBeTruthy();
-      } catch (error) {
-        console.log('Could not find editor placeholder - page may show error or not accessible');
+      } catch {
+        console.debug('Could not find editor placeholder - page may show error or not accessible');
       }
     });
 
@@ -313,7 +314,7 @@ describe('Video Pipelines Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping back link test');
+        console.debug('Redirected to signin - skipping back link test');
         return;
       }
       
@@ -327,8 +328,8 @@ describe('Video Pipelines Management E2E Tests', () => {
         }, { timeout: 3000 });
         
         expect(backLink).toBeTruthy();
-      } catch (error) {
-        console.log('Could not find back link - page may show error or not accessible');
+      } catch {
+        console.debug('Could not find back link - page may show error or not accessible');
       }
     });
   });
@@ -340,7 +341,7 @@ describe('Video Pipelines Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping navigation test');
+        console.debug('Redirected to signin - skipping navigation test');
         return;
       }
       
@@ -355,8 +356,8 @@ describe('Video Pipelines Management E2E Tests', () => {
         }, { timeout: 3000 });
         
         expect(navLink).toBeTruthy();
-      } catch (error) {
-        console.log('Could not find navigation link - sidebar may not be accessible');
+      } catch {
+        console.debug('Could not find navigation link - sidebar may not be accessible');
       }
     });
 
@@ -366,22 +367,22 @@ describe('Video Pipelines Management E2E Tests', () => {
       
       const currentUrl = page.url();
       if (currentUrl.includes('/signin')) {
-        console.log('Redirected to signin - skipping breadcrumb test');
+        console.debug('Redirected to signin - skipping breadcrumb test');
         return;
       }
       
       try {
         // Look for breadcrumb elements
         const breadcrumbElements = await page.$$('[data-testid="breadcrumb"], .breadcrumb, nav');
-        console.log(`Found ${breadcrumbElements.length} potential breadcrumb elements`);
+        console.debug(`Found ${breadcrumbElements.length} potential breadcrumb elements`);
         
         // Check for page title that might serve as breadcrumb
         const pageTitle = await page.evaluate(() => document.title);
-        console.log(`Page title: ${pageTitle}`);
+        console.debug(`Page title: ${pageTitle}`);
         
         expect(breadcrumbElements.length >= 0).toBeTruthy();
-      } catch (error) {
-        console.log('Could not test breadcrumbs - page not accessible');
+      } catch {
+        console.debug('Could not test breadcrumbs - page not accessible');
       }
     });
   });

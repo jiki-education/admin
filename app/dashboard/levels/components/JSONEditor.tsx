@@ -102,7 +102,7 @@ export default function JSONEditor({
       )}
       
       <p className="text-xs text-gray-500 dark:text-gray-400">
-        Enter valid JSON data. Use the "Format JSON" button to auto-format your input.
+        Enter valid JSON data. Use the &quot;Format JSON&quot; button to auto-format your input.
       </p>
     </div>
   );

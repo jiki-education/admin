@@ -68,7 +68,7 @@ export default function MergeVideosNodeDetails({
       })
       .catch((error: unknown) => {
         setIsReordering(false);
-        setSegments(node.inputs.segments ?? []);
+        setSegments(node.inputs.segments);
         const errorMessage = error instanceof Error ? error.message : "Failed to reorder segments";
         alert(`Failed to reorder segments: ${errorMessage}`);
       });

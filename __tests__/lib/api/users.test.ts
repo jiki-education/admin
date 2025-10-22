@@ -152,9 +152,9 @@ describe('Users API Client', () => {
 
       mockApi.delete.mockResolvedValue({ data: null, status: 204, headers: {} });
 
-      const result = await deleteUser(userId);
-
-      expect(result).toBeUndefined();
+      await deleteUser(userId);
+      
+      expect(mockApi.delete).toHaveBeenCalledWith(`/v1/admin/users/${userId}`);
     });
   });
 });

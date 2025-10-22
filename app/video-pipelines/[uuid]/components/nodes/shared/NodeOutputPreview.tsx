@@ -7,6 +7,7 @@
 "use client";
 
 import type { Node } from "@/lib/nodes/types";
+import Image from "next/image";
 import { getOutputPreviewUrl, getOutputDataType } from "@/lib/nodes/display-helpers";
 
 interface NodeOutputPreviewProps {
@@ -18,6 +19,7 @@ export default function NodeOutputPreview({ node }: NodeOutputPreviewProps) {
   let previewUrl: string | null = null;
   const dataType = getOutputDataType(node);
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (node.type === "asset" && node.asset != null) {
     previewUrl = node.asset.source;
     // Asset type is already reflected in dataType via getOutputDataType
@@ -61,8 +63,8 @@ export default function NodeOutputPreview({ node }: NodeOutputPreviewProps) {
   return (
     <div className="border-t border-gray-200">
       {dataType === "image" && previewUrl != null ? (
-        <img src={previewUrl} alt="Output preview" className="w-full object-cover" />
-      ) : dataType === "video" && apiVideoUrl !== null && apiVideoUrl !== undefined && isCompleted ? (
+        <Image src={previewUrl} alt="Output preview" className="w-full object-cover" width={400} height={200} />
+      ) : dataType === "video" && apiVideoUrl && isCompleted ? (
         <video src={apiVideoUrl} controls muted className="w-full bg-black" style={{ maxHeight: "200px" }}>
           Your browser does not support video playback.
         </video>
@@ -75,7 +77,7 @@ export default function NodeOutputPreview({ node }: NodeOutputPreviewProps) {
             {node.status === "failed" && "Failed"}
           </span>
         </div>
-      ) : dataType === "audio" && apiVideoUrl !== null && apiVideoUrl !== undefined && isCompleted ? (
+      ) : dataType === "audio" && apiVideoUrl && isCompleted ? (
         <div className="w-full bg-gray-100 p-4">
           <audio src={apiVideoUrl} controls className="w-full">
             Your browser does not support audio playback.
@@ -93,6 +95,7 @@ export default function NodeOutputPreview({ node }: NodeOutputPreviewProps) {
       ) : (
         <div className="w-full h-16 bg-gray-100 flex flex-col items-center justify-center gap-1">
           <span className="text-2xl">📄</span>
+          {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
           {node.type === "asset" && node.asset != null && (
             <span className="text-xs text-gray-600">{getFileTypeLabel(node.asset.type)}</span>
           )}
