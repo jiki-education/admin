@@ -22,11 +22,11 @@ export default function NodeOutputPreview({ node }: NodeOutputPreviewProps) {
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (node.type === "asset" && node.asset != null) {
-    previewUrl = node.asset.source;
+    previewUrl = node.asset.source ?? null;
     // Asset type is already reflected in dataType via getOutputDataType
   } else {
     // For other nodes, check output
-    previewUrl = getOutputPreviewUrl(node.output);
+    previewUrl = getOutputPreviewUrl(node.output ?? null);
   }
 
   const hasPreview = previewUrl !== null && previewUrl !== "";
