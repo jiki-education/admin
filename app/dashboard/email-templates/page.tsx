@@ -15,9 +15,10 @@ import type { EmailTemplate, EmailTemplateFilters, EmailTemplateType, EmailTempl
 import type { SummaryFilters as SummaryFiltersType } from "./components/SummaryFilters";
 import { getEmailTemplates, getEmailTemplateTypes, createEmailTemplate, deleteEmailTemplate, getEmailTemplatesSummary } from "@/lib/api/email-templates";
 import { useModal } from "@/hooks/useModal";
+import { useRequireAuth } from "@/lib/auth/hooks";
 
 export default function EmailTemplates() {
-  
+  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const router = useRouter();
 
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
@@ -48,17 +49,6 @@ export default function EmailTemplates() {
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
   const [operationLoading, setOperationLoading] = useState(false);
 
-  useEffect(() => {
-    if (!hasCheckedAuth) {
-      void checkAuth();
-    }
-  }, [hasCheckedAuth, checkAuth]);
-
-  useEffect(() => {
-    if (hasCheckedAuth && !isAuthenticated) {
-      router.push("/signin");
-    }
-  }, [isAuthenticated, hasCheckedAuth, router]);
 
   const loadTemplates = useCallback(async () => {
     try {
@@ -186,16 +176,12 @@ export default function EmailTemplates() {
     setSummaryFilters({});
   }, []);
 
-  if (!hasCheckedAuth) {
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg">Loading...</div>
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return null; // Will redirect to signin
   }
 
   return (

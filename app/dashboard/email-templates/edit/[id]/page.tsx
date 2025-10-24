@@ -6,9 +6,10 @@ import { useCallback, useEffect, useState } from "react";
 import { getEmailTemplate, updateEmailTemplate, getEmailTemplateTypes } from "@/lib/api/email-templates";
 import EmailTemplateForm from "../../components/EmailTemplateForm";
 import type { EmailTemplate, EmailTemplateType } from "../../types";
+import { useRequireAuth } from "@/lib/auth/hooks";
 
 export default function EditEmailTemplate() {
-  
+  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const router = useRouter();
   const params = useParams();
   const templateId = parseInt(params.id as string);
@@ -19,17 +20,6 @@ export default function EditEmailTemplate() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!hasCheckedAuth) {
-      void checkAuth();
-    }
-  }, [hasCheckedAuth, checkAuth]);
-
-  useEffect(() => {
-    if (hasCheckedAuth && !isAuthenticated) {
-      router.push("/signin");
-    }
-  }, [isAuthenticated, hasCheckedAuth, router]);
 
   const loadTemplate = useCallback(async () => {
     if (!templateId || isNaN(templateId)) {
@@ -82,16 +72,12 @@ export default function EditEmailTemplate() {
     router.push("/dashboard/email-templates");
   }, [router]);
 
-  if (!hasCheckedAuth) {
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg">Loading...</div>
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return null;
   }
 
   if (loading) {

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import JSONEditor from "./JSONEditor";
 import { useFormValidation } from "../hooks/useFormValidation";
 import { useFormSubmission } from "../hooks/useFormSubmission";
@@ -9,7 +9,6 @@ import RequiredFieldsNotice from "./shared/RequiredFieldsNotice";
 import FormErrorSummary from "./shared/FormErrorSummary";
 import FormField from "./shared/FormField";
 import FormActions from "./shared/FormActions";
-import { isValidSlug } from "@/lib/utils/slug";
 import type { AdminLesson, CreateLessonData } from "../types";
 
 interface LessonFormProps {
@@ -21,14 +20,7 @@ interface LessonFormProps {
   levelId: number;
 }
 
-export default function LessonForm({
-  initialData,
-  onSave,
-  onCancel,
-  loading = false,
-  mode,
-  levelId: _levelId
-}: LessonFormProps) {
+export default function LessonForm({ initialData, onSave, onCancel, loading = false, mode }: LessonFormProps) {
   const { formData, errors, handleInputChange, handleSlugChange, validateForm, setFieldErrors } = useFormValidation({
     initialData,
     fields: ['title', 'slug', 'description', 'type', 'data'],
@@ -37,102 +29,37 @@ export default function LessonForm({
 
   const [jsonError, setJsonError] = useState<string | null>(null);
 
-  // Initialize JSON validation on mount and ensure type has a default value
-  useEffect(() => {
-    try {
-      JSON.parse(formData.data || '{}');
-      setJsonError(null);
-    } catch {
-      setJsonError("Invalid JSON format");
-    }
-    
-    // Ensure type field has a default value
-    if (!formData.type) {
-      handleInputChange('type', 'exercise');
-    }
-  }, [formData.data, formData.type, handleInputChange]);
-
   const { saving, handleSubmit } = useFormSubmission({
     onSave,
     formData,
     validateForm,
     setFieldErrors,
     errorParser: parseValidationErrors,
-    dataTransform: (data) => {
-      let parsedData = {};
-      if (data.data.trim()) {
-        try {
-          parsedData = JSON.parse(data.data);
-        } catch {
-          throw new Error("Invalid JSON format. Please check your JSON data.");
-        }
-      }
-      
-      return {
-        title: data.title.trim(),
-        slug: data.slug.trim(),
-        description: data.description.trim(),
-        type: data.type,
-        data: parsedData
-      };
-    }
+    dataTransform: (data) => ({
+      title: data.title.trim(),
+      slug: data.slug.trim(),
+      description: data.description.trim(),
+      type: data.type,
+      data: data.data.trim() ? JSON.parse(data.data) : {}
+    })
   });
 
-  const handleJSONChange = (value: string) => {
-    handleInputChange("data", value);
-  };
-
+  const handleJSONChange = (value: string) => handleInputChange("data", value);
+  
   const handleJSONValidation = (error: string | null) => {
     setJsonError(error);
-    // Also update the form validation errors
-    if (error) {
-      setFieldErrors({ ...errors, data: error });
-    } else {
-      const { data: _data, ...restErrors } = errors;
-      setFieldErrors(restErrors);
-    }
-  };
-
-  const handleSlugInputChange = (_field: string, value: string) => {
-    handleSlugChange(value);
   };
 
   const isFormValid = () => {
-    const titleOk = formData.title.trim().length > 0;
-    const slugOk = formData.slug.trim().length > 0;
-    const descriptionOk = formData.description.trim().length > 0;
-    const typeOk = formData.type.length > 0;
-    const dataOk = formData.data.trim().length > 0;
-    const slugValidOk = isValidSlug(formData.slug);
-    
     const hasRequiredFields = (
-      titleOk &&
-      slugOk &&
-      descriptionOk &&
-      typeOk &&
-      dataOk &&
-      slugValidOk
+      formData.title.trim().length > 0 &&
+      formData.slug.trim().length > 0 &&
+      formData.description.trim().length > 0 &&
+      formData.type.length > 0 &&
+      formData.data.trim().length > 0
     );
     
-    const hasClientErrors = jsonError !== null;
-    
-    // Debug logging
-    console.log('LessonForm validation debug:', {
-      formData,
-      titleOk,
-      slugOk,
-      descriptionOk,
-      typeOk,
-      dataOk,
-      slugValidOk,
-      jsonError,
-      hasRequiredFields,
-      hasClientErrors,
-      errors,
-      finalValid: hasRequiredFields && !hasClientErrors
-    });
-    
-    return hasRequiredFields && !hasClientErrors;
+    return hasRequiredFields && !jsonError && Object.keys(errors).length === 0;
   };
 
   return (
@@ -140,52 +67,10 @@ export default function LessonForm({
       <RequiredFieldsNotice />
       <FormErrorSummary errors={errors} />
       
-      <FormField
-        type="text"
-        name="title"
-        label="Title"
-        value={formData.title}
-        onChange={handleInputChange}
-        error={errors.title}
-        placeholder="Enter lesson title"
-        required
-      />
-      
-      <FormField
-        type="text"
-        name="slug"
-        label="Slug"
-        value={formData.slug}
-        onChange={handleSlugInputChange}
-        error={errors.slug}
-        placeholder="lesson-slug"
-        className="font-mono text-sm"
-        helpText="URL-friendly identifier. Auto-generated from title, but you can customize it."
-        required
-      />
-      
-      <FormField
-        type="textarea"
-        name="description"
-        label="Description"
-        value={formData.description}
-        onChange={handleInputChange}
-        error={errors.description}
-        placeholder="Enter lesson description"
-        rows={3}
-        required
-      />
-      
-      <FormField
-        type="select"
-        name="type"
-        label="Type"
-        value={formData.type}
-        onChange={handleInputChange}
-        error={errors.type}
-        options={LESSON_TYPES}
-        required
-      />
+      <FormField type="text" name="title" label="Title" value={formData.title} onChange={handleInputChange} error={errors.title} placeholder="Enter lesson title" required />
+      <FormField type="text" name="slug" label="Slug" value={formData.slug} onChange={(_, value) => handleSlugChange(value)} error={errors.slug} placeholder="lesson-slug" className="font-mono text-sm" helpText="URL-friendly identifier. Auto-generated from title." required />
+      <FormField type="textarea" name="description" label="Description" value={formData.description} onChange={handleInputChange} error={errors.description} placeholder="Enter lesson description" rows={3} required />
+      <FormField type="select" name="type" label="Type" value={formData.type} onChange={handleInputChange} error={errors.type} options={LESSON_TYPES} required />
       
       <FormField
         type="custom"

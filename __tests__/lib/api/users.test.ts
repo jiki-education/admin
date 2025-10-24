@@ -154,7 +154,7 @@ describe('Users API Client', () => {
 
       await deleteUser(userId);
       
-      expect(mockApi.delete).toHaveBeenCalledWith(`/v1/admin/users/${userId}`);
+      expect(mockApi.delete).toHaveBeenCalledWith(`/admin/users/${userId}`);
     });
   });
 });

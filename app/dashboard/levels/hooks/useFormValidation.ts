@@ -37,7 +37,6 @@ export function useFormValidation({
         initial[field] = (initialData && initialData[field]) || defaultValue;
       }
     });
-    console.log('useFormValidation initialization:', { initialData, fields, initial });
     return initial;
   });
 
