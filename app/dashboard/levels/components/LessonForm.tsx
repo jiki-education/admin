@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Button from "@/components/ui/button/Button";
 import JSONEditor from "./JSONEditor";
 import { generateSlug, isValidSlug } from "@/lib/utils/slug";
+import { ApiError } from "@/lib/api/client";
 import type { AdminLesson, CreateLessonData } from "../types";
 
 interface LessonFormProps {
@@ -23,6 +24,41 @@ const LESSON_TYPES = [
   { value: "project", label: "Project" },
   { value: "assessment", label: "Assessment" }
 ];
+
+/**
+ * Parse Rails validation error messages into field-specific errors
+ * Example: "Validation failed: Title can't be blank, Slug has already been taken"
+ */
+function parseValidationErrors(message: string): Record<string, string> {
+  const errors: Record<string, string> = {};
+  
+  // Remove "Validation failed: " prefix if present
+  const cleanMessage = message.replace(/^Validation failed:\s*/, "");
+  
+  // Split by comma and process each error
+  const errorParts = cleanMessage.split(", ");
+  
+  for (const part of errorParts) {
+    // Match patterns like "Title can't be blank" or "Slug has already been taken"
+    const match = part.match(/^([A-Za-z_]+)\s+(.+)$/);
+    
+    if (match) {
+      const [, field, error] = match;
+      const fieldKey = field.toLowerCase();
+      errors[fieldKey] = `${field} ${error}`;
+    } else {
+      // If we can't parse the field, add to general errors
+      errors.general = part;
+    }
+  }
+  
+  // If no field-specific errors were found, treat the whole message as general
+  if (Object.keys(errors).length === 0) {
+    errors.general = message;
+  }
+  
+  return errors;
+}
 
 export default function LessonForm({
   initialData,
@@ -126,7 +162,9 @@ export default function LessonForm({
       newErrors.type = "Lesson type is required";
     }
 
-    if (jsonError) {
+    if (!formData.data.trim()) {
+      newErrors.data = "Lesson data is required";
+    } else if (jsonError) {
       newErrors.data = jsonError;
     }
 
@@ -165,8 +203,23 @@ export default function LessonForm({
       await onSave(lessonData);
     } catch (error) {
       console.error("Failed to save lesson:", error);
-      // Handle API errors - could be duplicate slug, etc.
-      if (error instanceof Error) {
+      
+      // Handle API validation errors
+      if (error instanceof ApiError && error.status === 422) {
+        // Parse backend validation errors
+        const errorData = error.data as { error?: { message?: string } };
+        const errorMessage = errorData?.error?.message;
+        
+        if (errorMessage) {
+          // Parse Rails validation error messages
+          const fieldErrors = parseValidationErrors(errorMessage);
+          setErrors(fieldErrors);
+        } else {
+          setErrors({ general: "Validation failed. Please check your input." });
+        }
+      } else if (error instanceof ApiError) {
+        setErrors({ general: `API Error: ${error.status} ${error.statusText}` });
+      } else if (error instanceof Error) {
         setErrors({ general: error.message });
       } else {
         setErrors({ general: "Failed to save lesson. Please try again." });
@@ -177,30 +230,91 @@ export default function LessonForm({
   };
 
   const isFormValid = () => {
-    return (
+    // Check basic form requirements
+    const hasRequiredFields = (
       formData.title.trim().length > 0 &&
       formData.slug.trim().length > 0 &&
       formData.description.trim().length > 0 &&
       formData.type.length > 0 &&
-      isValidSlug(formData.slug) &&
-      !jsonError &&
-      Object.keys(errors).length === 0
+      formData.data.trim().length > 0 &&
+      isValidSlug(formData.slug)
     );
+    
+    // Check for client-side validation errors (but not server-side errors)
+    const hasClientErrors = jsonError !== null;
+    
+    return hasRequiredFields && !hasClientErrors;
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* General Error */}
-      {errors.general && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800">
-          <p className="text-red-700 dark:text-red-400">{errors.general}</p>
+      {/* Required Fields Notice */}
+      <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 pb-2">
+        <span>Fields marked with</span>
+        <span className="text-red-500 font-bold">*</span>
+        <span>are required</span>
+      </div>
+
+      {/* Error Summary Box */}
+      {Object.keys(errors).length > 0 && (
+        <div className="p-4 bg-red-50 border-2 border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-700">
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0">
+              <svg className="w-5 h-5 text-red-400 dark:text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-red-800 dark:text-red-200 mb-2">
+                Please fix the following {Object.keys(errors).length === 1 ? 'error' : 'errors'}:
+              </h3>
+              <ul className="space-y-1 text-sm text-red-700 dark:text-red-300">
+                {errors.general && (
+                  <li className="flex items-start space-x-2">
+                    <span className="font-medium">•</span>
+                    <span>{errors.general}</span>
+                  </li>
+                )}
+                {errors.title && (
+                  <li className="flex items-start space-x-2">
+                    <span className="font-medium">•</span>
+                    <span><strong>Title <span className="text-red-600">*</span>:</strong> {errors.title.replace(/^Title\s+/i, '')}</span>
+                  </li>
+                )}
+                {errors.slug && (
+                  <li className="flex items-start space-x-2">
+                    <span className="font-medium">•</span>
+                    <span><strong>Slug <span className="text-red-600">*</span>:</strong> {errors.slug.replace(/^Slug\s+/i, '')}</span>
+                  </li>
+                )}
+                {errors.description && (
+                  <li className="flex items-start space-x-2">
+                    <span className="font-medium">•</span>
+                    <span><strong>Description <span className="text-red-600">*</span>:</strong> {errors.description.replace(/^Description\s+/i, '')}</span>
+                  </li>
+                )}
+                {errors.type && (
+                  <li className="flex items-start space-x-2">
+                    <span className="font-medium">•</span>
+                    <span><strong>Type <span className="text-red-600">*</span>:</strong> {errors.type.replace(/^Type\s+/i, '')}</span>
+                  </li>
+                )}
+                {errors.data && (
+                  <li className="flex items-start space-x-2">
+                    <span className="font-medium">•</span>
+                    <span><strong>Lesson Data (JSON) <span className="text-red-600">*</span>:</strong> {errors.data.replace(/^Data\s+/i, '')}</span>
+                  </li>
+                )}
+              </ul>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Title Field */}
       <div>
         <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Title *
+          Title <span className="text-red-500 font-bold">*</span>
         </label>
         <input
           type="text"
@@ -216,14 +330,16 @@ export default function LessonForm({
           required
         />
         {errors.title && (
-          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.title}</p>
+          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-700">
+            <p className="text-sm text-red-700 dark:text-red-300">{errors.title}</p>
+          </div>
         )}
       </div>
 
       {/* Slug Field */}
       <div>
         <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Slug *
+          Slug <span className="text-red-500 font-bold">*</span>
         </label>
         <input
           type="text"
@@ -239,7 +355,9 @@ export default function LessonForm({
           required
         />
         {errors.slug && (
-          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.slug}</p>
+          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-700">
+            <p className="text-sm text-red-700 dark:text-red-300">{errors.slug}</p>
+          </div>
         )}
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
           URL-friendly identifier. Auto-generated from title, but you can customize it.
@@ -249,7 +367,7 @@ export default function LessonForm({
       {/* Description Field */}
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Description *
+          Description <span className="text-red-500 font-bold">*</span>
         </label>
         <textarea
           id="description"
@@ -265,14 +383,16 @@ export default function LessonForm({
           required
         />
         {errors.description && (
-          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.description}</p>
+          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-700">
+            <p className="text-sm text-red-700 dark:text-red-300">{errors.description}</p>
+          </div>
         )}
       </div>
 
       {/* Type Dropdown */}
       <div>
         <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Type *
+          Type <span className="text-red-500 font-bold">*</span>
         </label>
         <select
           id="type"
@@ -292,14 +412,16 @@ export default function LessonForm({
           ))}
         </select>
         {errors.type && (
-          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.type}</p>
+          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-700">
+            <p className="text-sm text-red-700 dark:text-red-300">{errors.type}</p>
+          </div>
         )}
       </div>
 
       {/* JSON Data Editor */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Lesson Data (JSON)
+          Lesson Data (JSON) <span className="text-red-500 font-bold">*</span>
         </label>
         <JSONEditor
           value={formData.data}
@@ -308,10 +430,12 @@ export default function LessonForm({
           placeholder="Enter lesson data as valid JSON..."
         />
         {errors.data && (
-          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.data}</p>
+          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-700">
+            <p className="text-sm text-red-700 dark:text-red-300">{errors.data}</p>
+          </div>
         )}
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          Optional JSON data for lesson-specific configuration and content.
+          Required JSON data for lesson-specific configuration and content.
         </p>
       </div>
 
