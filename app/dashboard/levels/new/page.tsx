@@ -1,28 +1,14 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { createLevel } from "@/lib/api/levels";
 import LevelForm from "../components/LevelForm";
 import type { CreateLevelData } from "../types";
 
 export default function NewLevel() {
-  const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!hasCheckedAuth) {
-      void checkAuth();
-    }
-  }, [hasCheckedAuth, checkAuth]);
-
-  useEffect(() => {
-    if (hasCheckedAuth && !isAuthenticated) {
-      router.push("/signin");
-    }
-  }, [isAuthenticated, hasCheckedAuth, router]);
 
   const handleSaveLevel = useCallback(async (levelData: CreateLevelData) => {
     try {
@@ -42,18 +28,6 @@ export default function NewLevel() {
   const handleCancel = useCallback(() => {
     router.push("/dashboard/levels");
   }, [router]);
-
-  if (!hasCheckedAuth) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null; // Will redirect to signin
-  }
 
   return (
     <div>

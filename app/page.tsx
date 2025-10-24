@@ -1,25 +1,16 @@
 "use client";
 
-import { useAuthStore } from "@/stores/authStore";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRedirectIfAuthenticated } from "@/lib/auth/hooks";
+import { useState } from "react";
 import SignInForm from "@/components/auth/SignInForm";
 import SignUpForm from "@/components/auth/SignupForm";
 
 export default function HomePage() {
-  const { isAuthenticated, hasCheckedAuth, isLoading } = useAuthStore();
-  const router = useRouter();
+  const { isLoading } = useRedirectIfAuthenticated();
   const [showSignUp, setShowSignUp] = useState(false);
 
-  useEffect(() => {
-    // If authenticated and auth check is complete, redirect to dashboard
-    if (isAuthenticated && hasCheckedAuth) {
-      router.push("/dashboard");
-    }
-  }, [isAuthenticated, hasCheckedAuth, router]);
-
   // Show loading while checking authentication
-  if (isLoading || !hasCheckedAuth) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
@@ -28,11 +19,6 @@ export default function HomePage() {
         </div>
       </div>
     );
-  }
-
-  // If authenticated, this shouldn't render due to redirect above, but just in case
-  if (isAuthenticated) {
-    return null;
   }
 
   // Show authentication forms for non-authenticated users

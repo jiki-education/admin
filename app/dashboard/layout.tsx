@@ -1,4 +1,5 @@
 "use client";
+import { useRequireAuth } from "@/lib/auth/hooks";
 import AppSidebar from "@/layout/AppSidebar";
 import AppHeader from "@/layout/AppHeader";
 import Backdrop from "@/layout/Backdrop";
@@ -9,8 +10,26 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { isAuthenticated, isLoading, isReady } = useRequireAuth({
+    redirectTo: "/signin",  // Consistent redirect to signin page
+  });
   const { getSidebarWidth } = useSidebar();
   const sidebarWidth = getSidebarWidth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !isReady) {
+    return null; // Will redirect via useRequireAuth
+  }
 
   return (
     <div className="h-screen overflow-hidden">

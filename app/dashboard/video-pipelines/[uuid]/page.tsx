@@ -1,6 +1,5 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, use, useCallback } from "react";
 import Link from "next/link";
@@ -12,7 +11,6 @@ interface PipelineDetailProps {
 }
 
 export default function PipelineDetail({ params }: PipelineDetailProps) {
-  const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
   const router = useRouter();
   const resolvedParams = use(params);
 
@@ -21,17 +19,6 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!hasCheckedAuth) {
-      void checkAuth();
-    }
-  }, [hasCheckedAuth, checkAuth]);
-
-  useEffect(() => {
-    if (hasCheckedAuth && !isAuthenticated) {
-      router.push("/signin");
-    }
-  }, [isAuthenticated, hasCheckedAuth, router]);
 
   const loadPipeline = useCallback(async () => {
     try {
@@ -49,10 +36,10 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
   }, [resolvedParams.uuid]);
 
   useEffect(() => {
-    if (isAuthenticated && resolvedParams.uuid) {
+    if (resolvedParams.uuid) {
       void loadPipeline();
     }
-  }, [isAuthenticated, resolvedParams.uuid, loadPipeline]);
+  }, [resolvedParams.uuid, loadPipeline]);
 
   const getProgressPercentage = (progress: any) => {
     if (!progress || progress.total === 0) {
@@ -60,18 +47,6 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
     }
     return Math.round((progress.completed / progress.total) * 100);
   };
-
-  if (!hasCheckedAuth) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
 
   if (loading) {
     return (

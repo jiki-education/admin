@@ -1,7 +1,6 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
-import { useAuthStore } from "@/stores/authStore";
 import { useRouter, useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { getLevelLessons, updateLesson } from "@/lib/api/levels";
@@ -15,7 +14,6 @@ import LessonErrorBoundary from "../components/LessonErrorBoundary";
 import ErrorDisplay from "../components/ErrorDisplay";
 
 export default function LevelDetail() {
-  const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
   const router = useRouter();
   const params = useParams();
   const levelId = parseInt(params.id as string);
@@ -26,18 +24,6 @@ export default function LevelDetail() {
   const [error, setError] = useState<string | null>(null);
   const [showBulkEditModal, setShowBulkEditModal] = useState(false);
   const [selectedLessonIds, setSelectedLessonIds] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (!hasCheckedAuth) {
-      void checkAuth();
-    }
-  }, [hasCheckedAuth, checkAuth]);
-
-  useEffect(() => {
-    if (hasCheckedAuth && !isAuthenticated) {
-      router.push("/signin");
-    }
-  }, [isAuthenticated, hasCheckedAuth, router]);
 
   const loadLessons = useCallback(async () => {
     if (!levelId || isNaN(levelId)) {
@@ -60,10 +46,8 @@ export default function LevelDetail() {
   }, [levelId]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      void loadLessons();
-    }
-  }, [isAuthenticated, loadLessons]);
+    void loadLessons();
+  }, [loadLessons]);
 
   const handleBack = useCallback(() => {
     router.push("/dashboard/levels");
@@ -122,18 +106,6 @@ export default function LevelDetail() {
     onLessonsUpdate: handleLessonsUpdate,
     onError: handleError
   });
-
-  if (!hasCheckedAuth) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
 
   if (loading) {
     return (

@@ -1,6 +1,5 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
@@ -11,7 +10,6 @@ import PipelinePagination from "./components/PipelinePagination";
 import DeletePipelineModal from "./components/DeletePipelineModal";
 
 export default function VideoPipelines() {
-  const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
   const router = useRouter();
 
   const [pipelines, setPipelines] = useState<Pipeline[]>([]);
@@ -34,18 +32,6 @@ export default function VideoPipelines() {
   const [selectedPipeline, setSelectedPipeline] = useState<Pipeline | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  useEffect(() => {
-    if (!hasCheckedAuth) {
-      void checkAuth();
-    }
-  }, [hasCheckedAuth, checkAuth]);
-
-  useEffect(() => {
-    if (hasCheckedAuth && !isAuthenticated) {
-      router.push("/signin");
-    }
-  }, [isAuthenticated, hasCheckedAuth, router]);
-
   const loadPipelines = useCallback(async () => {
     try {
       setLoading(true);
@@ -63,10 +49,8 @@ export default function VideoPipelines() {
   }, [filters, itemsPerPage]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      void loadPipelines();
-    }
-  }, [isAuthenticated, loadPipelines]);
+    void loadPipelines();
+  }, [loadPipelines]);
 
   const handlePageChange = useCallback((page: number) => {
     setFilters(prevFilters => ({ ...prevFilters, page }));
@@ -105,18 +89,6 @@ export default function VideoPipelines() {
       setDeleteLoading(false);
     }
   }, [selectedPipeline, loadPipelines, handleCloseDeleteModal]);
-
-  if (!hasCheckedAuth) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
 
   return (
     <div>
