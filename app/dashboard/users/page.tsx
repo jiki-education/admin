@@ -1,7 +1,5 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { useAuthStore } from "@/stores/authStore";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import type { User, UserFilters as UserFiltersType } from "./types";
 import { getUsers, deleteUser } from "@/lib/api/users";
@@ -11,8 +9,6 @@ import UserPagination from "./components/UserPagination";
 import DeleteUserModal from "./components/DeleteUserModal";
 
 export default function Users() {
-  const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
-  const router = useRouter();
 
   const [users, setUsers] = useState<User[]>([]);
   const [filters, setFilters] = useState<UserFiltersType>({});
@@ -34,18 +30,6 @@ export default function Users() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  useEffect(() => {
-    if (!hasCheckedAuth) {
-      void checkAuth();
-    }
-  }, [hasCheckedAuth, checkAuth]);
-
-  useEffect(() => {
-    if (hasCheckedAuth && !isAuthenticated) {
-      router.push("/signin");
-    }
-  }, [isAuthenticated, hasCheckedAuth, router]);
-
   const loadUsers = useCallback(async () => {
     try {
       setLoading(true);
@@ -63,10 +47,8 @@ export default function Users() {
   }, [filters, itemsPerPage]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      void loadUsers();
-    }
-  }, [isAuthenticated, loadUsers]);
+    void loadUsers();
+  }, [loadUsers]);
 
   const handleFiltersChange = useCallback((newFilters: UserFiltersType) => {
     // Reset to page 1 when filters change
@@ -115,18 +97,6 @@ export default function Users() {
       setDeleteLoading(false);
     }
   }, [selectedUser, loadUsers, handleCloseDeleteModal]);
-
-  if (!hasCheckedAuth) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null; // Will redirect to signin
-  }
 
   return (
     <div>

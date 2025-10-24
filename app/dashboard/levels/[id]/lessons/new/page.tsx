@@ -1,6 +1,5 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { useAuthStore } from "@/stores/authStore";
 import { useRouter, useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { createLesson, getAdminLevels } from "@/lib/api/levels";
@@ -8,7 +7,6 @@ import LessonForm from "../../../components/LessonForm";
 import type { CreateLessonData, AdminLevel } from "../../../types";
 
 export default function NewLesson() {
-  const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
   const router = useRouter();
   const params = useParams();
   const levelId = parseInt(params.id as string);
@@ -16,18 +14,6 @@ export default function NewLesson() {
   const [level, setLevel] = useState<AdminLevel | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!hasCheckedAuth) {
-      void checkAuth();
-    }
-  }, [hasCheckedAuth, checkAuth]);
-
-  useEffect(() => {
-    if (hasCheckedAuth && !isAuthenticated) {
-      router.push("/signin");
-    }
-  }, [isAuthenticated, hasCheckedAuth, router]);
 
   // Load level details to show context
   const loadLevel = useCallback(async () => {
@@ -61,10 +47,8 @@ export default function NewLesson() {
   }, [levelId]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      void loadLevel();
-    }
-  }, [isAuthenticated, loadLevel]);
+    void loadLevel();
+  }, [loadLevel]);
 
   const handleSaveLesson = useCallback(async (lessonData: CreateLessonData) => {
     try {
@@ -84,18 +68,6 @@ export default function NewLesson() {
   const handleCancel = useCallback(() => {
     router.push(`/dashboard/levels/${levelId}`);
   }, [router, levelId]);
-
-  if (!hasCheckedAuth) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null; // Will redirect to signin
-  }
 
   if (loading) {
     return (

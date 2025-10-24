@@ -1,37 +1,6 @@
-"use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { useAuthStore } from "@/stores/authStore";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 export default function Dashboard() {
-  const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!hasCheckedAuth) {
-      void checkAuth();
-    }
-  }, [hasCheckedAuth, checkAuth]);
-
-  useEffect(() => {
-    if (hasCheckedAuth && !isAuthenticated) {
-      router.push("/signin");
-    }
-  }, [isAuthenticated, hasCheckedAuth, router]);
-
-  if (!hasCheckedAuth) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null; // Will redirect to signin
-  }
-
   return (
     <div>
       <PageBreadcrumb pageTitle="Dashboard" />

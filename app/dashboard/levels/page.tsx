@@ -1,7 +1,6 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
-import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import type { AdminLevel, AdminLevelFilters } from "./types";
@@ -11,7 +10,6 @@ import LevelTable from "./components/LevelTable";
 import LevelPagination from "./components/LevelPagination";
 
 export default function Levels() {
-  const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
   const router = useRouter();
 
   const [levels, setLevels] = useState<AdminLevel[]>([]);
@@ -27,18 +25,6 @@ export default function Levels() {
     total_count: 0,
     total_pages: 0
   });
-
-  useEffect(() => {
-    if (!hasCheckedAuth) {
-      void checkAuth();
-    }
-  }, [hasCheckedAuth, checkAuth]);
-
-  useEffect(() => {
-    if (hasCheckedAuth && !isAuthenticated) {
-      router.push("/signin");
-    }
-  }, [isAuthenticated, hasCheckedAuth, router]);
 
   const loadLevels = useCallback(async () => {
     try {
@@ -58,10 +44,8 @@ export default function Levels() {
   }, [filters]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      void loadLevels();
-    }
-  }, [isAuthenticated, loadLevels]);
+    void loadLevels();
+  }, [loadLevels]);
 
   const handleFiltersChange = useCallback((newFilters: AdminLevelFilters) => {
     // Reset to page 1 when filters change
@@ -79,18 +63,6 @@ export default function Levels() {
   const handleAddNewLevel = useCallback(() => {
     router.push("/dashboard/levels/new");
   }, [router]);
-
-  if (!hasCheckedAuth) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null; // Will redirect to signin
-  }
 
   return (
     <div>
