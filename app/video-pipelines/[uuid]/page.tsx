@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, use, useCallback } from "react";
-import { useAuthStore } from "@/stores/authStore";
+import { useRequireAuth } from "@/lib/auth/hooks";
 import { useRouter } from "next/navigation";
 import { getPipeline } from "@/lib/api/video-pipelines";
 import type { VideoProductionPipeline } from "@/lib/api/video-pipelines";
@@ -16,7 +16,7 @@ interface PageProps {
 
 export default function PipelinePage({ params }: PageProps) {
   const { uuid } = use(params);
-  const { isAuthenticated, hasCheckedAuth, checkAuth } = useAuthStore();
+  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const router = useRouter();
 
   const [pipeline, setPipeline] = useState<VideoProductionPipeline | null>(null);
@@ -24,19 +24,6 @@ export default function PipelinePage({ params }: PageProps) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Check authentication on mount
-  useEffect(() => {
-    if (!hasCheckedAuth) {
-      void checkAuth();
-    }
-  }, [hasCheckedAuth, checkAuth]);
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (hasCheckedAuth && !isAuthenticated) {
-      router.push("/auth/signin");
-    }
-  }, [hasCheckedAuth, isAuthenticated, router]);
 
   // Load pipeline data
   const loadPipeline = useCallback(async () => {
@@ -58,15 +45,15 @@ export default function PipelinePage({ params }: PageProps) {
   }, [uuid]);
 
   useEffect(() => {
-    if (!isAuthenticated || !hasCheckedAuth) {
+    if (!isAuthenticated || authLoading) {
       return;
     }
 
     void loadPipeline();
-  }, [uuid, isAuthenticated, hasCheckedAuth, loadPipeline]);
+  }, [uuid, isAuthenticated, authLoading, loadPipeline]);
 
   // Show loading while checking auth
-  if (!hasCheckedAuth) {
+  if (authLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="text-gray-500">Checking authentication...</div>

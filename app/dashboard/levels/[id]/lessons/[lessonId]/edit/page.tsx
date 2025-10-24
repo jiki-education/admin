@@ -6,9 +6,10 @@ import { useCallback, useEffect, useState } from "react";
 import { getLevelLessons, updateLesson } from "@/lib/api/levels";
 import LessonEditForm from "../../../../components/LessonEditForm";
 import type { AdminLesson } from "../../../../types";
+import { useRequireAuth } from "@/lib/auth/hooks";
 
 export default function EditLesson() {
-  
+  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const router = useRouter();
   const params = useParams();
   const levelId = parseInt(params.id as string);
@@ -19,17 +20,6 @@ export default function EditLesson() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!hasCheckedAuth) {
-      void checkAuth();
-    }
-  }, [hasCheckedAuth, checkAuth]);
-
-  useEffect(() => {
-    if (hasCheckedAuth && !isAuthenticated) {
-      router.push("/signin");
-    }
-  }, [isAuthenticated, hasCheckedAuth, router]);
 
   const loadLesson = useCallback(async () => {
     if (!levelId || isNaN(levelId) || !lessonId || isNaN(lessonId)) {
@@ -85,16 +75,12 @@ export default function EditLesson() {
     router.push(`/dashboard/levels/${levelId}`);
   }, [router, levelId]);
 
-  if (!hasCheckedAuth) {
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg">Loading...</div>
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return null;
   }
 
   if (loading) {

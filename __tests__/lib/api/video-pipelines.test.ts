@@ -324,7 +324,7 @@ describe('Video Pipelines API Client', () => {
 
       await deletePipeline(uuid);
       
-      expect(mockApi.delete).toHaveBeenCalledWith(`/v1/admin/video-pipelines/${uuid}`);
+      expect(mockApi.delete).toHaveBeenCalledWith(`/admin/video_production/pipelines/${uuid}`);
     });
   });
 });
