@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import type { PipelineState, LayoutConfig, LayoutAlgorithm, LayoutDirection } from './types';
-import { getPipeline, executeNode as apiExecuteNode } from '@/lib/api/video-pipelines';
+import { getPipeline, executeNode as apiExecuteNode, updateNode as apiUpdateNode } from '@/lib/api/video-pipelines';
 import type { Node } from "@/lib/nodes/types";
 
 /**
@@ -27,6 +27,54 @@ export const createActions = (set: (partial: Partial<PipelineState> | ((state: P
     }
   },
   
+  updateNode: async (pipelineUuid: string, nodeUuid: string, updates: Partial<Node>): Promise<void> => {
+    const { nodes } = get();
+    const node = nodes.find(n => n.uuid === nodeUuid);
+    const nodeTitle = node?.title || nodeUuid;
+    
+    // Save to history before update
+    get().saveToHistory('execute', `Update node: ${nodeTitle}`);
+    
+    // OPTIMISTIC UPDATE: Update UI immediately
+    const previousNodes = nodes;
+    
+    set((state) => ({
+      nodes: state.nodes.map((n) => 
+        n.uuid === nodeUuid ? { ...n, ...updates } : n
+      ),
+      isSaving: true
+    }));
+    
+    toast.loading(`Updating node: ${nodeTitle}...`, { id: `update-${nodeUuid}` });
+    
+    try {
+      // Call API to persist changes
+      await apiUpdateNode(pipelineUuid, nodeUuid, updates);
+      
+      // Refresh the pipeline to get updated data
+      const response = await getPipeline(pipelineUuid);
+      set({ 
+        pipeline: response.pipeline, 
+        nodes: response.nodes as Node[]
+      });
+      
+      toast.success(`Successfully updated: ${nodeTitle}`, { 
+        id: `update-${nodeUuid}`,
+        duration: 3000 
+      });
+    } catch (error) {
+      // ROLLBACK: Restore previous state on error
+      const errorMessage = error instanceof Error ? error.message : "Failed to update node";
+      toast.error(`Failed to update node: ${errorMessage}`, { 
+        id: `update-${nodeUuid}`,
+        duration: 5000 
+      });
+      set({ nodes: previousNodes });
+    } finally {
+      set({ isSaving: false });
+    }
+  },
+
   executeNode: async (pipelineUuid: string, nodeUuid: string): Promise<void> => {
     const { nodes } = get();
     const node = nodes.find(n => n.uuid === nodeUuid);

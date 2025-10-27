@@ -122,6 +122,7 @@ export default function FlowCanvas() {
   // Handle node click (select)
   const handleNodeClick: NodeMouseHandler = useCallback(
     (_event, node) => {
+      console.log("node", node)
       setSelectedNode(node.id);
     },
     [setSelectedNode]

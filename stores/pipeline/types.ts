@@ -15,7 +15,7 @@ export interface HistoryEntry {
 }
 
 // Layout configuration types
-export type LayoutDirection = 'LR' | 'RL' | 'TB' | 'BT';
+export type LayoutDirection = 'LR' | 'TB'; // Only LR and TB are supported by dagre
 export type LayoutAlgorithm = 'dagre' | 'force' | 'circular' | 'grid';
 
 export interface LayoutConfig {
@@ -62,6 +62,7 @@ export interface PipelineState {
   loadPipeline: (uuid: string) => Promise<void>;
   setSelectedNode: (nodeId: string | null) => void;
   executeNode: (pipelineUuid: string, nodeUuid: string) => Promise<void>;
+  updateNode: (pipelineUuid: string, nodeUuid: string, updates: Partial<Node>) => Promise<void>;
   connectNodes: (pipelineUuid: string, sourceId: string, targetId: string, targetHandle: string) => Promise<void>;
   deleteNodes: (pipelineUuid: string, nodeIds: string[]) => Promise<void>;
   updateNodePositions: (positions: Record<string, { x: number; y: number }>) => void;
