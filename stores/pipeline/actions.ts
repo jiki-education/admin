@@ -55,7 +55,7 @@ export const createActions = (set: (partial: Partial<PipelineState> | ((state: P
     
     set((state) => ({
       nodes: state.nodes.map((n) => 
-        n.uuid === nodeUuid ? { ...n, ...updates } : n
+        n.uuid === nodeUuid ? { ...n, ...updates } as Node : n
       ),
       isSaving: true
     }));
@@ -178,8 +178,8 @@ export const createActions = (set: (partial: Partial<PipelineState> | ((state: P
     toast.success(`Applied ${algorithm} layout${directionText}`, { duration: 2000 });
   },
   
-  resetStore: (): void => {
-    const { initialState } = require('./types');
+  resetStore: async (): Promise<void> => {
+    const { initialState } = await import('./types');
     set(initialState);
   },
   

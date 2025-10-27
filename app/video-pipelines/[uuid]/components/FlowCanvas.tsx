@@ -69,7 +69,7 @@ export default function FlowCanvas() {
   
   // Use React Flow's built-in state management for proper drag functionality
   const [nodes, setNodes, onNodesChange] = useNodesState(storeNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(storeEdges);
+  const [edges, setEdges] = useEdgesState(storeEdges);
   
   // Sync store state with React Flow state
   useEffect(() => {
@@ -139,7 +139,6 @@ export default function FlowCanvas() {
   // Handle node click (select)
   const handleNodeClick: NodeMouseHandler = useCallback(
     (_event, node) => {
-      console.log("node", node)
       setSelectedNode(node.id);
     },
     [setSelectedNode]
@@ -153,8 +152,6 @@ export default function FlowCanvas() {
   // Enhanced node change handler that combines React Flow's built-in handling with our custom logic
   const handleNodesChange: OnNodesChange = useCallback(
     (changes) => {
-      console.log('Node changes:', changes);
-      
       // Always apply React Flow's internal changes first (essential for drag functionality)
       onNodesChange(changes);
       
@@ -164,8 +161,6 @@ export default function FlowCanvas() {
       );
       
       if (positionChanges.length > 0) {
-        console.log('Position changes detected:', positionChanges);
-        
         // Create new positions object
         const newPositions: Record<string, { x: number; y: number }> = {};
         positionChanges.forEach((change) => {
@@ -174,7 +169,6 @@ export default function FlowCanvas() {
           }
         });
         
-        console.log('Updating node positions:', newPositions);
         updateNodePositions(newPositions);
       }
     },
