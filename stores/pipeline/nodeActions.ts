@@ -1,7 +1,8 @@
 import toast from 'react-hot-toast';
 import type { PipelineState } from './types';
-import { connectNodes as apiConnectNodes, deleteNode as apiDeleteNode } from '@/lib/api/video-pipelines';
+import { connectNodes as apiConnectNodes, deleteNode as apiDeleteNode, createNode as apiCreateNode } from '@/lib/api/video-pipelines';
 import type { Node } from "@/lib/nodes/types";
+import { toEditorNode } from "@/lib/nodes/types";
 
 /**
  * Node-specific actions
@@ -143,6 +144,94 @@ export const createNodeActions = (set: (partial: Partial<PipelineState> | ((stat
         nodes: previousNodes,
         nodePositions: previousPositions,
         selectedNodeId: nodeIds.includes(selectedNodeId || "") ? selectedNodeId : selectedNodeId
+      });
+    } finally {
+      set({ isSaving: false });
+    }
+  },
+
+  createNode: async (pipelineUuid: string, nodeData: {
+    uuid: string;
+    type: string;
+    title: string;
+    inputs: Record<string, unknown>;
+    config: Record<string, unknown>;
+    asset?: Record<string, unknown>;
+    position?: { x: number; y: number };
+  }): Promise<void> => {
+    const { nodes } = get();
+    const createDesc = `Create node: ${nodeData.title}`;
+    
+    // Save to history before creation
+    get().saveToHistory('connect', createDesc);
+    
+    // OPTIMISTIC UPDATE: Add node to UI immediately
+    const previousNodes = nodes;
+    const previousPositions = get().nodePositions;
+
+    // Create the new node with default values for server-provided fields
+    const newNode: Node = {
+      uuid: nodeData.uuid,
+      pipeline_uuid: pipelineUuid,
+      title: nodeData.title,
+      type: nodeData.type,
+      inputs: nodeData.inputs,
+      config: nodeData.config,
+      asset: nodeData.asset,
+      status: 'pending',
+      metadata: {},
+      output: {},
+      is_valid: true,
+      validation_errors: {},
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as Node;
+
+    set((state) => ({
+      nodes: [...state.nodes, newNode],
+      nodePositions: nodeData.position ? {
+        ...state.nodePositions,
+        [nodeData.uuid]: nodeData.position
+      } : state.nodePositions,
+      selectedNodeId: nodeData.uuid,
+      isSaving: true
+    }));
+
+    toast.loading('Creating node...', { id: `create-${nodeData.uuid}` });
+
+    // Call Rails API to persist creation
+    try {
+      const createdNode = await apiCreateNode(pipelineUuid, {
+        id: nodeData.uuid,
+        type: nodeData.type,
+        title: nodeData.title,
+        inputs: nodeData.inputs,
+        config: nodeData.config,
+        asset: nodeData.asset,
+      });
+      
+      // Update the optimistically created node with server response
+      set((state) => ({
+        nodes: state.nodes.map((node) => 
+          node.uuid === nodeData.uuid ? toEditorNode(createdNode) : node
+        )
+      }));
+
+      toast.success(createDesc, { 
+        id: `create-${nodeData.uuid}`,
+        duration: 2000 
+      });
+    } catch (error) {
+      // ROLLBACK: Remove the optimistically created node on error
+      const errorMessage = error instanceof Error ? error.message : "Failed to create node";
+      toast.error(`Failed to create node: ${errorMessage}`, { 
+        id: `create-${nodeData.uuid}`,
+        duration: 4000 
+      });
+      set({ 
+        nodes: previousNodes,
+        nodePositions: previousPositions,
+        selectedNodeId: null
       });
     } finally {
       set({ isSaving: false });

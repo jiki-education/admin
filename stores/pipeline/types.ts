@@ -65,6 +65,15 @@ export interface PipelineState {
   updateNode: (pipelineUuid: string, nodeUuid: string, updates: Partial<Node>) => Promise<void>;
   connectNodes: (pipelineUuid: string, sourceId: string, targetId: string, targetHandle: string) => Promise<void>;
   deleteNodes: (pipelineUuid: string, nodeIds: string[]) => Promise<void>;
+  createNode: (pipelineUuid: string, nodeData: {
+    uuid: string;
+    type: string;
+    title: string;
+    inputs: Record<string, unknown>;
+    config: Record<string, unknown>;
+    asset?: Record<string, unknown>;
+    position?: { x: number; y: number };
+  }) => Promise<void>;
   updateNodePositions: (positions: Record<string, { x: number; y: number }>) => void;
   forceRelayout: () => void;
   setLayoutConfig: (config: Partial<LayoutConfig>) => void;
