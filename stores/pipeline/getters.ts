@@ -36,7 +36,8 @@ export const createGetters = (get: () => PipelineState) => ({
         node,
         onExecute: () => executeNode(node.pipeline_uuid, node.uuid)
       },
-      selected: node.uuid === selectedNodeId
+      selected: node.uuid === selectedNodeId,
+      dragHandle: '.drag-handle__custom'
     }));
   },
   
@@ -87,17 +88,30 @@ export const createGetters = (get: () => PipelineState) => ({
     const reactFlowNodes = get().getReactFlowNodes();
     const edges = get().getEdges();
     
-    // If we already have positions for all nodes, use them
-    const allNodesHavePositions = reactFlowNodes.every((node) => nodePositions[node.id] != null);
+    // Check if we have any saved positions at all
+    const hasSavedPositions = Object.keys(nodePositions).length > 0;
 
-    if (allNodesHavePositions && hasInitialLayout) {
-      // Preserve existing positions
-      return reactFlowNodes.map((node) => ({
+    // If we have saved positions, use a hybrid approach
+    if (hasSavedPositions) {
+      // Use layout for nodes without saved positions, saved positions for nodes that have them
+      const layoutedNodes = hasInitialLayout 
+        ? reactFlowNodes.map((node) => ({ ...node, position: { x: 0, y: 0 } }))
+        : getLayoutedNodes(reactFlowNodes, edges, {
+            direction: layoutConfig.direction,
+            nodeWidth: layoutConfig.nodeWidth,
+            nodeHeight: layoutConfig.nodeHeight,
+            rankSep: layoutConfig.rankSep,
+            nodeSep: layoutConfig.nodeSep
+          });
+
+      // Override with saved positions where available
+      return layoutedNodes.map((node) => ({
         ...node,
-        position: nodePositions[node.id] ?? { x: 0, y: 0 }
+        position: nodePositions[node.id] ?? node.position
       }));
     }
 
+    // No saved positions - use full layout
     // Calculate node dimensions from measured heights (if available) or use config
     const haveMeasuredDimensions = reactFlowNodes.some((n) => n.measured?.height != null && n.measured.height !== 0);
     const maxHeight = haveMeasuredDimensions
@@ -125,7 +139,6 @@ export const createGetters = (get: () => PipelineState) => ({
       nodeSep: layoutConfig.nodeSep
     });
 
-    // This will be handled by the store to save positions
     return layouted;
   }
 });

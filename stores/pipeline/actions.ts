@@ -12,9 +12,24 @@ export const createActions = (set: (partial: Partial<PipelineState> | ((state: P
     try {
       set({ loading: true, error: null });
       const response = await getPipeline(uuid);
+      
+      // Load saved positions from localStorage
+      let savedPositions = {};
+      try {
+        const savedData = localStorage.getItem(`pipeline-positions-${uuid}`);
+        if (savedData) {
+          savedPositions = JSON.parse(savedData);
+          console.log('Loaded positions from localStorage:', savedPositions);
+        }
+      } catch (error) {
+        console.warn('Failed to load positions from localStorage:', error);
+      }
+      
       set({ 
         pipeline: response.pipeline, 
         nodes: response.nodes as Node[],
+        nodePositions: savedPositions,
+        hasInitialLayout: Object.keys(savedPositions).length > 0,
         loading: false 
       });
     } catch (err) {
@@ -118,7 +133,19 @@ export const createActions = (set: (partial: Partial<PipelineState> | ((state: P
   },
   
   updateNodePositions: (positions: Record<string, { x: number; y: number }>): void => {
-    set({ nodePositions: positions });
+    const { nodePositions, pipeline } = get();
+    const newPositions = { ...nodePositions, ...positions };
+    set({ nodePositions: newPositions });
+    
+    // Save to localStorage for session persistence
+    if (pipeline?.uuid) {
+      try {
+        localStorage.setItem(`pipeline-positions-${pipeline.uuid}`, JSON.stringify(newPositions));
+        console.log('Saved positions to localStorage:', newPositions);
+      } catch (error) {
+        console.warn('Failed to save positions to localStorage:', error);
+      }
+    }
   },
   
   forceRelayout: (): void => {

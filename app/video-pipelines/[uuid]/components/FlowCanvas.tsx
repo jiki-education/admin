@@ -8,13 +8,16 @@
 
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import {
   ReactFlow,
   Background,
   Controls,
+  useNodesState,
+  useEdgesState,
   type OnConnect,
   type OnNodesDelete,
+  type OnNodesChange,
   type NodeTypes,
   type NodeMouseHandler
 } from "@xyflow/react";
@@ -56,12 +59,26 @@ export default function FlowCanvas() {
     getEdges, 
     setSelectedNode, 
     connectNodes, 
-    deleteNodes 
+    deleteNodes,
+    updateNodePositions 
   } = usePipelineStore();
 
   // Get computed values from store
-  const nodes = getLayoutedNodes();
-  const edges = getEdges();
+  const storeNodes = getLayoutedNodes();
+  const storeEdges = getEdges();
+  
+  // Use React Flow's built-in state management for proper drag functionality
+  const [nodes, setNodes, onNodesChange] = useNodesState(storeNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(storeEdges);
+  
+  // Sync store state with React Flow state
+  useEffect(() => {
+    setNodes(storeNodes);
+  }, [storeNodes, setNodes]);
+  
+  useEffect(() => {
+    setEdges(storeEdges);
+  }, [storeEdges, setEdges]);
 
   // Handle new connections with validation
   const handleConnect: OnConnect = useCallback(
@@ -133,6 +150,37 @@ export default function FlowCanvas() {
     setSelectedNode(null);
   }, [setSelectedNode]);
 
+  // Enhanced node change handler that combines React Flow's built-in handling with our custom logic
+  const handleNodesChange: OnNodesChange = useCallback(
+    (changes) => {
+      console.log('Node changes:', changes);
+      
+      // Always apply React Flow's internal changes first (essential for drag functionality)
+      onNodesChange(changes);
+      
+      // Filter for position changes that are completed (dragging: false)
+      const positionChanges = changes.filter(
+        (change) => change.type === 'position' && change.dragging === false && change.position
+      );
+      
+      if (positionChanges.length > 0) {
+        console.log('Position changes detected:', positionChanges);
+        
+        // Create new positions object
+        const newPositions: Record<string, { x: number; y: number }> = {};
+        positionChanges.forEach((change) => {
+          if (change.type === 'position' && change.position) {
+            newPositions[change.id] = change.position;
+          }
+        });
+        
+        console.log('Updating node positions:', newPositions);
+        updateNodePositions(newPositions);
+      }
+    },
+    [onNodesChange, updateNodePositions]
+  );
+
   return (
     <div className="flex-1 bg-gray-50">
       <ReactFlow
@@ -140,8 +188,10 @@ export default function FlowCanvas() {
         edges={edges}
         nodeTypes={nodeTypes}
         onConnect={handleConnect}
+        onNodesChange={handleNodesChange}
         onNodesDelete={handleNodesDelete}
         onNodeClick={handleNodeClick}
+        nodesDraggable
         onPaneClick={handlePaneClick}
         fitView
         fitViewOptions={{
@@ -156,7 +206,6 @@ export default function FlowCanvas() {
           animated: false
         }}
         deleteKeyCode={["Backspace", "Delete"]}
-        selectNodesOnDrag={false}
         connectOnClick={false}
         proOptions={{ hideAttribution: true }}
       >
