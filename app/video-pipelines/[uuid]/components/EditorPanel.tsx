@@ -2,27 +2,29 @@
  * Editor Panel Component
  *
  * Displays details for the selected node and provides actions.
- * In this phase, it's read-only (editing comes in Phase 4).
+ * Uses Zustand store for centralized state management.
  */
 
 "use client";
 
 import { useTransition } from "react";
-import type { Node } from "@/lib/nodes/types";
 import { isMergeVideosNode, isRenderCodeNode } from "@/lib/nodes/types";
 import NodeDetailsHeader from "./editor-panel/NodeDetailsHeader";
 import MergeVideosNodeDetails from "./editor-panel/MergeVideosNodeDetails";
 import RenderCodeNodeDetails from "./editor-panel/RenderCodeNodeDetails";
+import { usePipelineStore } from "@/stores/usePipelineStore";
 
-interface EditorPanelProps {
-  selectedNode: Node | null;
-  pipelineUuid: string;
-  allNodes: Node[];
-  onDelete: (nodeUuid: string) => Promise<void>;
-  onRefresh: () => void;
-}
-
-export default function EditorPanel({ selectedNode, pipelineUuid, allNodes, onDelete, onRefresh }: EditorPanelProps) {
+export default function EditorPanel() {
+  // Store subscriptions
+  const { 
+    pipeline, 
+    nodes, 
+    getSelectedNode, 
+    deleteNodes, 
+    forceRelayout 
+  } = usePipelineStore();
+  
+  const selectedNode = getSelectedNode();
   const [isDeleting, startDeletion] = useTransition();
 
   if (!selectedNode) {
@@ -45,9 +47,9 @@ export default function EditorPanel({ selectedNode, pipelineUuid, allNodes, onDe
   }
 
   const handleDelete = () => {
-    if (window.confirm(`Are you sure you want to delete node "${selectedNode.uuid}"?`)) {
+    if (selectedNode && pipeline && window.confirm(`Are you sure you want to delete node "${selectedNode.uuid}"?`)) {
       startDeletion(async () => {
-        await onDelete(selectedNode.uuid);
+        await deleteNodes(pipeline.uuid, [selectedNode.uuid]);
       });
     }
   };
@@ -63,15 +65,15 @@ export default function EditorPanel({ selectedNode, pipelineUuid, allNodes, onDe
         {isMergeVideosNode(selectedNode) ? (
           <MergeVideosNodeDetails
             node={selectedNode}
-            pipelineUuid={pipelineUuid}
-            allNodes={allNodes}
-            onRefresh={onRefresh}
+            pipelineUuid={pipeline?.uuid || ""}
+            allNodes={nodes}
+            onRefresh={forceRelayout}
           />
         ) : isRenderCodeNode(selectedNode) ? (
           <RenderCodeNodeDetails
             node={selectedNode}
-            pipelineUuid={pipelineUuid}
-            onRefresh={onRefresh}
+            pipelineUuid={pipeline?.uuid || ""}
+            onRefresh={forceRelayout}
           />
         ) : (
           /* Generic Detail View */

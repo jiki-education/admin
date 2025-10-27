@@ -1,10 +1,9 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, use, useCallback } from "react";
+import { useEffect, use } from "react";
 import Link from "next/link";
-import type { VideoProductionPipeline, VideoProductionNode } from "@/lib/api/video-pipelines";
-import { getPipeline } from "@/lib/api/video-pipelines";
+import { usePipelineStore } from "@/stores/usePipelineStore";
 
 interface PipelineDetailProps {
   params: Promise<{ uuid: string }>;
@@ -13,40 +12,27 @@ interface PipelineDetailProps {
 export default function PipelineDetail({ params }: PipelineDetailProps) {
   const router = useRouter();
   const resolvedParams = use(params);
-
-  const [pipeline, setPipeline] = useState<VideoProductionPipeline | null>(null);
-  const [nodes, setNodes] = useState<VideoProductionNode[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-
-  const loadPipeline = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await getPipeline(resolvedParams.uuid);
-      setPipeline(response.pipeline);
-      setNodes(response.nodes);
-    } catch (err) {
-      console.error("Failed to load pipeline:", err);
-      setError(err instanceof Error ? err.message : "Failed to load pipeline");
-    } finally {
-      setLoading(false);
-    }
-  }, [resolvedParams.uuid]);
+  
+  const { 
+    pipeline, 
+    nodes, 
+    loading, 
+    error, 
+    loadPipeline,
+    getProgressPercentage,
+    resetStore
+  } = usePipelineStore();
 
   useEffect(() => {
     if (resolvedParams.uuid) {
-      void loadPipeline();
+      void loadPipeline(resolvedParams.uuid);
     }
-  }, [resolvedParams.uuid, loadPipeline]);
-
-  const getProgressPercentage = (progress: any) => {
-    if (!progress || progress.total === 0) {
-      return 0;
-    }
-    return Math.round((progress.completed / progress.total) * 100);
-  };
+    
+    // Cleanup store when component unmounts
+    return () => {
+      resetStore();
+    };
+  }, [resolvedParams.uuid, loadPipeline, resetStore]);
 
   if (loading) {
     return (
@@ -80,7 +66,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
     );
   }
 
-  const progressPercentage = getProgressPercentage(pipeline.metadata.progress);
+  const progressPercentage = getProgressPercentage();
 
   return (
     <div>

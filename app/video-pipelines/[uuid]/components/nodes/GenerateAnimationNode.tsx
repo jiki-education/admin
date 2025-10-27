@@ -15,7 +15,6 @@ import { getNodeStatusStyle } from "./shared/getNodeStatusStyle";
 interface GenerateAnimationNodeProps {
   data: {
     node: GenerateAnimationNodeType;
-    onSelect: () => void;
     onExecute: () => void;
   };
   selected: boolean;
@@ -28,7 +27,6 @@ export default function GenerateAnimationNode({ data, selected }: GenerateAnimat
 
   return (
     <div
-      onClick={data.onSelect}
       className={`
         bg-white rounded-lg shadow-md border cursor-pointer
         transition-all hover:shadow-lg w-[280px]

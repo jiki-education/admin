@@ -3,7 +3,7 @@
  *
  * Visual graph editor using React Flow.
  * Displays pipeline nodes and edges, handles interactions.
- * Now uses controlled state from parent (PipelineEditor).
+ * Uses Zustand store for centralized state management.
  */
 
 "use client";
@@ -13,8 +13,6 @@ import {
   ReactFlow,
   Background,
   Controls,
-  type Node as ReactFlowNode,
-  type Edge,
   type OnConnect,
   type OnNodesDelete,
   type NodeTypes,
@@ -24,6 +22,7 @@ import "@xyflow/react/dist/style.css";
 
 import type { Node } from "@/lib/nodes/types";
 import { getMaxConnections, hasInputHandle } from "@/lib/nodes/metadata";
+import { usePipelineStore } from "@/stores/usePipelineStore";
 
 // Import custom node components
 import AssetNode from "./nodes/AssetNode";
@@ -35,14 +34,7 @@ import MixAudioNode from "./nodes/MixAudioNode";
 import MergeVideosNode from "./nodes/MergeVideosNode";
 import ComposeVideoNode from "./nodes/ComposeVideoNode";
 
-interface FlowCanvasProps {
-  nodes: ReactFlowNode[]; // Pre-computed and layouted nodes
-  edges: Edge[]; // Pre-computed edges
-  selectedNodeId: string | null;
-  onNodeSelect: (nodeId: string | null) => void;
-  onConnect: (sourceId: string, targetId: string, targetHandle: string) => Promise<void>;
-  onNodesDelete: (nodeIds: string[]) => Promise<void>;
-}
+// FlowCanvas now gets all data directly from the store
 
 // Register custom node types
 const nodeTypes: NodeTypes = {
@@ -56,14 +48,20 @@ const nodeTypes: NodeTypes = {
   "compose-video": ComposeVideoNode
 };
 
-export default function FlowCanvas({
-  nodes,
-  edges,
-  selectedNodeId: _selectedNodeId,
-  onNodeSelect,
-  onConnect,
-  onNodesDelete
-}: FlowCanvasProps) {
+export default function FlowCanvas() {
+  // Store subscriptions
+  const { 
+    pipeline, 
+    getLayoutedNodes, 
+    getEdges, 
+    setSelectedNode, 
+    connectNodes, 
+    deleteNodes 
+  } = usePipelineStore();
+
+  // Get computed values from store
+  const nodes = getLayoutedNodes();
+  const edges = getEdges();
 
   // Handle new connections with validation
   const handleConnect: OnConnect = useCallback(
@@ -103,32 +101,36 @@ export default function FlowCanvas({
       }
 
       // Connection is valid, proceed
-      void onConnect(connection.source, connection.target, connection.targetHandle);
+      if (pipeline) {
+        void connectNodes(pipeline.uuid, connection.source, connection.target, connection.targetHandle);
+      }
     },
-    [onConnect, nodes, edges]
+    [pipeline, connectNodes, nodes, edges]
   );
 
   // Handle node deletion
   const handleNodesDelete: OnNodesDelete = useCallback(
     (nodesToDelete) => {
-      const nodeIds = nodesToDelete.map((node) => node.id);
-      void onNodesDelete(nodeIds);
+      if (pipeline) {
+        const nodeIds = nodesToDelete.map((node) => node.id);
+        void deleteNodes(pipeline.uuid, nodeIds);
+      }
     },
-    [onNodesDelete]
+    [pipeline, deleteNodes]
   );
 
   // Handle node click (select)
   const handleNodeClick: NodeMouseHandler = useCallback(
     (_event, node) => {
-      onNodeSelect(node.id);
+      setSelectedNode(node.id);
     },
-    [onNodeSelect]
+    [setSelectedNode]
   );
 
   // Handle canvas click (deselect)
   const handlePaneClick = useCallback(() => {
-    onNodeSelect(null);
-  }, [onNodeSelect]);
+    setSelectedNode(null);
+  }, [setSelectedNode]);
 
   return (
     <div className="flex-1 bg-gray-50">

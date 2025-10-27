@@ -1,13 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, use, useCallback } from "react";
+import { useEffect, use } from "react";
 import { useRequireAuth } from "@/lib/auth/hooks";
 import { useRouter } from "next/navigation";
-import { getPipeline } from "@/lib/api/video-pipelines";
-import type { VideoProductionPipeline } from "@/lib/api/video-pipelines";
-import type { Node } from "@/lib/nodes/types";
-import { toEditorNode } from "@/lib/nodes/types";
+import { usePipelineStore } from "@/stores/usePipelineStore";
 import PipelineLayout from "./components/PipelineLayout";
 
 interface PageProps {
@@ -18,39 +15,27 @@ export default function PipelinePage({ params }: PageProps) {
   const { uuid } = use(params);
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const router = useRouter();
-
-  const [pipeline, setPipeline] = useState<VideoProductionPipeline | null>(null);
-  const [nodes, setNodes] = useState<Node[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-
-  // Load pipeline data
-  const loadPipeline = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Get pipeline from admin API
-      const data = await getPipeline(uuid);
-      setPipeline(data.pipeline);
-      // Convert admin VideoProductionNode types to editor Node types
-      setNodes(data.nodes.map(toEditorNode));
-    } catch (err) {
-      console.error("Error loading pipeline from API:", err);
-      setError(err instanceof Error ? err.message : "Unknown API error");
-    } finally {
-      setLoading(false);
-    }
-  }, [uuid]);
+  
+  const { 
+    pipeline, 
+    loading, 
+    error, 
+    loadPipeline,
+    resetStore 
+  } = usePipelineStore();
 
   useEffect(() => {
     if (!isAuthenticated || authLoading) {
       return;
     }
 
-    void loadPipeline();
-  }, [uuid, isAuthenticated, authLoading, loadPipeline]);
+    void loadPipeline(uuid);
+    
+    // Cleanup store when component unmounts
+    return () => {
+      resetStore();
+    };
+  }, [uuid, isAuthenticated, authLoading, loadPipeline, resetStore]);
 
   // Show loading while checking auth
   if (authLoading) {
@@ -93,30 +78,11 @@ export default function PipelinePage({ params }: PageProps) {
     );
   }
 
-  // Refresh handler for pipeline data
-  const handleRefresh = async () => {
-    if (!isAuthenticated) {
-      return;
-    }
-    
-    try {
-      setError(null);
-      const data = await getPipeline(uuid);
-      setPipeline(data.pipeline);
-      setNodes(data.nodes.map(toEditorNode));
-    } catch (err) {
-      console.error("Error refreshing pipeline:", err);
-      setError(err instanceof Error ? err.message : "Failed to refresh pipeline");
-    }
-  };
-
   return (
     <div className="h-screen flex flex-col">
       <PipelineLayout 
         pipelineUuid={uuid} 
-        pipeline={pipeline} 
-        nodes={nodes} 
-        onRefresh={handleRefresh}
+        onRefresh={() => loadPipeline(uuid)}
       />
     </div>
   );
