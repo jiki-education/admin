@@ -339,7 +339,6 @@ export async function deleteNode(pipelineUuid: string, nodeUuid: string): Promis
 export async function createNode(
   pipelineUuid: string,
   nodeData: {
-    id: string;
     type: string;
     title: string;
     inputs: Record<string, unknown>;

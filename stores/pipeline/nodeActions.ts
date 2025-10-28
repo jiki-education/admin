@@ -131,18 +131,40 @@ export const createNodeActions = (
 
     toast.loading("Deleting nodes...", { id: `delete-${nodeIds.join("-")}` });
 
-    // For now, work locally without backend API calls
-    console.log("Working locally without backend API for deletion");
+    try {
+      // Delete nodes via API - call backend for each node
+      await Promise.all(
+        nodeIds.map(nodeId => apiDeleteNode(pipelineUuid, nodeId))
+      );
 
-    // Force layout recalculation after deletion
-    set((state) => ({
-      hasInitialLayout: false // This will trigger layout recalculation
-    }));
+      console.log("Nodes deleted successfully via API:", nodeIds);
 
-    toast.success(deleteDesc, {
-      id: `delete-${nodeIds.join("-")}`,
-      duration: 2000
-    });
+      // Force layout recalculation after deletion
+      set((state) => ({
+        hasInitialLayout: false // This will trigger layout recalculation
+      }));
+
+      toast.success(deleteDesc, {
+        id: `delete-${nodeIds.join("-")}`,
+        duration: 2000
+      });
+    } catch (error) {
+      console.error("Failed to delete nodes via API:", error);
+      
+      // Rollback optimistic update on error
+      set((state) => ({
+        nodes: previousNodes,
+        nodePositions: previousPositions,
+        selectedNodeId: selectedNodeId,
+        isSaving: false
+      }));
+
+      toast.error("Failed to delete nodes", {
+        id: `delete-${nodeIds.join("-")}`,
+        duration: 4000
+      });
+      return; // Early return to avoid setting isSaving to false again
+    }
 
     set({ isSaving: false });
   },
@@ -229,13 +251,58 @@ export const createNodeActions = (
 
     toast.loading("Creating node...", { id: `create-${nodeData.uuid}` });
 
-    // For now, work locally without backend API calls
-    console.log("Working locally without backend API");
+    try {
+      // Create node via API (backend generates UUID)
+      const createdNode = await apiCreateNode(pipelineUuid, {
+        type: nodeData.type,
+        title: nodeData.title,
+        inputs: nodeData.inputs,
+        config: nodeData.config,
+        asset: nodeData.asset
+      });
 
-    toast.success(createDesc, {
-      id: `create-${nodeData.uuid}`,
-      duration: 2000
-    });
+      console.log("Node created successfully via API:", createdNode);
+
+      // Update the optimistic node with the real backend data
+      set((state) => ({
+        nodes: state.nodes.map((node) => 
+          node.uuid === nodeData.uuid ? createdNode : node
+        ),
+        nodePositions: createdNode.uuid !== nodeData.uuid ? {
+          ...state.nodePositions,
+          [createdNode.uuid]: state.nodePositions[nodeData.uuid]
+        } : state.nodePositions,
+        selectedNodeId: createdNode.uuid
+      }));
+
+      // Clean up old position if UUID changed
+      if (createdNode.uuid !== nodeData.uuid) {
+        set((state) => {
+          const newPositions = { ...state.nodePositions };
+          delete newPositions[nodeData.uuid];
+          return { nodePositions: newPositions };
+        });
+      }
+
+      toast.success(createDesc, {
+        id: `create-${nodeData.uuid}`,
+        duration: 2000
+      });
+    } catch (error) {
+      console.error("Failed to create node via API:", error);
+      
+      // Rollback optimistic update on error
+      set((state) => ({
+        nodes: previousNodes,
+        nodePositions: previousPositions,
+        selectedNodeId: null
+      }));
+
+      toast.error("Failed to create node", {
+        id: `create-${nodeData.uuid}`,
+        duration: 4000
+      });
+    }
 
     set({ isSaving: false });
   }
