@@ -3,7 +3,7 @@
  * API integration for video production pipeline management endpoints
  */
 
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 
 // Node Types
 export type NodeType =
@@ -417,6 +417,17 @@ export async function executeNode(pipelineUuid: string, nodeUuid: string): Promi
     return response.data.node;
   } catch (error) {
     console.error(`Failed to execute node ${nodeUuid}:`, error);
+    
+    // Log detailed error information for 422 responses
+    if (error instanceof ApiError && error.status === 422) {
+      console.error(`422 Validation Error for node ${nodeUuid}:`, {
+        status: error.status,
+        statusText: error.statusText,
+        data: error.data,
+        message: error.message
+      });
+    }
+    
     throw error;
   }
 }

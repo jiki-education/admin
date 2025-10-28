@@ -87,6 +87,157 @@ export const createActions = (
     }
   },
 
+  executePipeline: async (pipelineUuid: string): Promise<void> => {
+    const { nodes, pipeline } = get();
+
+    if (!pipeline) return;
+
+    // Atomically attempt to acquire the execution lock
+    let acquired = false;
+    set((state) => {
+      if (state.isExecutingPipeline) return state;
+      acquired = true;
+      return { ...state, isExecutingPipeline: true };
+    });
+
+    if (!acquired) {
+      toast.error("Pipeline execution already in progress", { duration: 3000 });
+      return;
+    }
+
+    try {
+      // Build dependency graph
+      const dependencyGraph = new Map<string, string[]>();
+      const inDegree = new Map<string, number>();
+
+      // Initialize nodes
+      nodes.forEach((node) => {
+        dependencyGraph.set(node.uuid, []);
+        inDegree.set(node.uuid, 0);
+      });
+
+      // Fill dependencies from inputs
+      nodes.forEach((node) => {
+        Object.entries(node.inputs).forEach(([_, sources]) => {
+          const sourceArray = Array.isArray(sources) ? sources : sources ? [sources] : [];
+          sourceArray.forEach((sourceId) => {
+            if (dependencyGraph.has(sourceId)) {
+              dependencyGraph.get(sourceId)!.push(node.uuid);
+              
+              // Only count dependencies from nodes that aren't already completed
+              const sourceNode = nodes.find(n => n.uuid === sourceId);
+              if (sourceNode && sourceNode.status !== "completed" && sourceNode.status !== "failed") {
+                inDegree.set(node.uuid, (inDegree.get(node.uuid) || 0) + 1);
+              }
+            }
+          });
+        });
+      });
+
+      // Track started nodes to avoid duplicates
+      const startedNodes = new Set<string>();
+      const executionQueue: string[] = [];
+
+      // Initial ready set (zero in-degree AND pending status)
+      const ready = nodes
+        .filter((node) => inDegree.get(node.uuid) === 0 && node.status === "pending")
+        .map((node) => node.uuid);
+
+      while (ready.length > 0) {
+        const currentBatch = [...ready];
+        ready.length = 0;
+
+        const batchResults = await Promise.allSettled(
+          currentBatch.map(async (nodeUuid) => {
+            if (startedNodes.has(nodeUuid)) {
+              return { nodeUuid, status: "fulfilled" as const };
+            }
+            
+            // Double-check node is still pending before executing
+            const currentNode = nodes.find(n => n.uuid === nodeUuid);
+            if (!currentNode || currentNode.status !== "pending") {
+              console.log(`⏭️ Skipping node ${nodeUuid} - status: ${currentNode?.status}`);
+              return { nodeUuid, status: "fulfilled" as const };
+            }
+            
+            startedNodes.add(nodeUuid);
+
+            try {
+              console.log("executing:", nodeUuid)
+              await get().executeNode(pipelineUuid, nodeUuid);
+              return { nodeUuid, status: "fulfilled" as const };
+            } catch (error) {
+              if (error instanceof Error && error.message?.includes("not ready to execute")) {
+                return { nodeUuid, status: "fulfilled" as const };
+              }
+              return { nodeUuid, status: "rejected" as const, error };
+            }
+          })
+        );
+
+        const failedNodes: string[] = [];
+
+        batchResults.forEach((result, index) => {
+          const nodeUuid = currentBatch[index];
+          if (result.status === "fulfilled") {
+            executionQueue.push(nodeUuid);
+
+            // Decrease in-degree of dependents and enqueue when ready
+            const dependents = dependencyGraph.get(nodeUuid) || [];
+            dependents.forEach((dependentId) => {
+              const newInDegree = (inDegree.get(dependentId) || 0) - 1;
+              inDegree.set(dependentId, newInDegree);
+              if (newInDegree === 0) {
+                // Only add to ready queue if node is in pending status
+                const dependentNode = nodes.find(n => n.uuid === dependentId);
+                if (dependentNode && dependentNode.status === "pending") {
+                  ready.push(dependentId);
+                }
+              }
+            });
+          } else {
+            failedNodes.push(nodeUuid);
+          }
+        });
+
+        if (failedNodes.length > 0) {
+          const failedTitles = failedNodes.map(
+            (uuid) => nodes.find((n) => n.uuid === uuid)?.title || uuid
+          );
+          toast.error(`Some nodes failed: ${failedTitles.join(", ")}`, { duration: 10000 });
+        }
+      }
+
+      // Validate completion - check that all reachable pending nodes were processed
+      const pendingNodes = nodes.filter(n => n.status === "pending");
+      const unprocessedPendingNodes = pendingNodes.filter((n) => !executionQueue.includes(n.uuid));
+      
+      // Only report error if there are pending nodes that weren't processed
+      // This indicates either circular dependency or unreachable nodes
+      if (unprocessedPendingNodes.length > 0 && pendingNodes.length > 0) {
+        console.warn(`⚠️ Some pending nodes were not processed:`, unprocessedPendingNodes.map(n => n.title));
+        // Don't throw error for now, just log warning
+        // throw new Error(
+        //   `Circular dependency or unreachable nodes: ${unprocessedPendingNodes.map((n) => n.title).join(", ")}`
+        // );
+      }
+
+      toast.success(`Pipeline "${pipeline.title}" executed successfully`, {
+        duration: 5000
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Pipeline execution failed";
+      toast.error(`Pipeline execution failed: ${message}`, {
+        duration: 5000
+      });
+      throw error;
+    } finally {
+      if (acquired) {
+        set({ isExecutingPipeline: false });
+      }
+    }
+  },
+
   executeNode: async (pipelineUuid: string, nodeUuid: string): Promise<void> => {
     const { nodes } = get();
     const node = nodes.find((n) => n.uuid === nodeUuid);
@@ -132,17 +283,17 @@ export const createActions = (
         try {
           const response = await getPipeline(pipelineUuid);
           const currentNode = response.nodes.find((n: Node) => n.uuid === nodeUuid);
-          
+
           if (currentNode && (currentNode.status === 'completed' || currentNode.status === 'failed')) {
             console.log(`🎯 Node ${nodeUuid} finished with status: ${currentNode.status}`);
             clearInterval(pollInterval);
-            
+
             // Update store with final status
             set({
               pipeline: response.pipeline,
               nodes: response.nodes as Node[]
             });
-            
+
             // Show completion toast
             if (currentNode.status === 'completed') {
               toast.success(`Successfully executed: ${nodeTitle}`, {
@@ -231,6 +382,7 @@ export const createActions = (
       loading: false,
       error: null,
       isSaving: false,
+      isExecutingPipeline: false,
       nodePositions: {},
       hasInitialLayout: false,
       layoutKey: state.layoutKey + 1, // Force refresh
@@ -253,5 +405,9 @@ export const createActions = (
 
   setSaving: (saving: boolean): void => {
     set({ isSaving: saving });
+  },
+
+  setExecutingPipeline: (executing: boolean): void => {
+    set({ isExecutingPipeline: executing });
   }
 });

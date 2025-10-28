@@ -39,6 +39,7 @@ export interface PipelineState {
   loading: boolean;
   error: string | null;
   isSaving: boolean;
+  isExecutingPipeline: boolean;
   nodePositions: Record<string, { x: number; y: number }>;
   hasInitialLayout: boolean;
   layoutKey: number; // Force re-renders when this changes
@@ -63,6 +64,7 @@ export interface PipelineState {
   loadPipeline: (uuid: string) => Promise<void>;
   setSelectedNode: (nodeId: string | null) => void;
   executeNode: (pipelineUuid: string, nodeUuid: string) => Promise<void>;
+  executePipeline: (pipelineUuid: string) => Promise<void>;
   updateNode: (pipelineUuid: string, nodeUuid: string, updates: Partial<Node>) => Promise<void>;
   connectNodes: (pipelineUuid: string, sourceId: string, targetId: string, targetHandle: string) => Promise<void>;
   deleteNodes: (pipelineUuid: string, nodeIds: string[]) => Promise<void>;
@@ -93,6 +95,7 @@ export interface PipelineState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setSaving: (saving: boolean) => void;
+  setExecutingPipeline: (executing: boolean) => void;
 }
 
 // Initial state constant
@@ -103,6 +106,7 @@ export const initialState = {
   loading: false,
   error: null,
   isSaving: false,
+  isExecutingPipeline: false,
   nodePositions: {},
   hasInitialLayout: false,
   layoutKey: 0,
