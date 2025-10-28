@@ -36,7 +36,13 @@ export default function GenerateTalkingHeadNode({ data, selected }: GenerateTalk
       `}
     >
       {/* Header */}
-      <NodeHeader type={node.type} title={node.title} displayName={displayName} status={node.status} onExecute={data.onExecute} />
+      <NodeHeader
+        type={node.type}
+        title={node.title}
+        displayName={displayName}
+        status={node.status}
+        onExecute={data.onExecute}
+      />
 
       {/* Output Preview */}
       <NodeOutputPreview node={node} />

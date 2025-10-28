@@ -3,10 +3,12 @@
 ## Immediate Tasks (Ready for Implementation)
 
 ### Email Templates Testing
+
 - [ ] **E2E tests for tab functionality** (from EMAIL_TEMPLATES_SUMMARY_PLAN.md)
 - [ ] **API integration tests** (from EMAIL_TEMPLATES_SUMMARY_PLAN.md)
 
 ### Backend Integration - Phase 2
+
 - [x] **Implement lesson creation endpoint** ✅ **COMPLETED**
   - ✅ Backend endpoint exists: `POST /v1/admin/levels/:level_id/lessons`
   - ✅ Frontend integration completed with `createLesson` API function
@@ -14,6 +16,7 @@
   - ✅ Unit tests and E2E tests passing
 
 ### Video Pipeline Editor Migration
+
 - [ ] **Install required dependencies**
   ```bash
   pnpm add @xyflow/react dagre @dnd-kit/core @dnd-kit/modifiers @dnd-kit/sortable @dnd-kit/utilities
@@ -44,6 +47,7 @@
 ## Advanced Features (Future Implementation)
 
 ### Video Pipeline Enhancements
+
 - [ ] **Edit pipeline functionality**
 - [ ] **Advanced filtering/search for pipelines**
 - [ ] **Visual pipeline node editor improvements**
@@ -52,6 +56,7 @@
 - [ ] **Bulk operations**
 
 ### Remotion Code Editor Integration
+
 - [ ] **Phase 1: Core Remotion Integration (3-4 days)**
   - Add Remotion dependencies (@remotion/bundler, @remotion/cli, etc.)
   - Create Remotion infrastructure (lib/remotion/, components/remotion/)
@@ -70,23 +75,27 @@
   - Integrate rendered code screens as pipeline assets
 
 ### User Management Enhancements
+
 - [ ] User detail view (`/dashboard/users/[id]/page.tsx`)
 - [ ] User status change modal
 - [ ] Bulk operations (status changes, export)
 
 ### Level Management Enhancements
+
 - [ ] Drag & drop lesson reordering
 - [ ] Bulk lesson operations
 - [ ] Advanced search & filtering by lesson type
 - [ ] Performance optimizations for large lesson lists
 
 ### Email Templates
+
 - [ ] Syntax highlighting for MJML editor (optional)
 - [ ] Template preview with sample data
 - [ ] Template versioning system
 - [ ] Email template testing (send test emails)
 
 ### Testing Infrastructure Improvements
+
 - [ ] Authentication flow tests (signin/signup) with actual auth
 - [ ] Form interaction tests with authenticated sessions
 - [ ] Component testing utilities for complex UI components
@@ -98,11 +107,13 @@
 ## Backend Dependencies
 
 ### Ready to Implement (Backend Available)
+
 - ✅ **User Deletion** - Backend ready, frontend implemented
 - ✅ **Level Creation** - Backend ready, frontend implemented
 - ✅ **Lesson Creation** - Backend ready, frontend implemented
 
 ### Blocked (Waiting for Backend)
+
 - ❌ **Code Scene Management** - Backend missing scene storage endpoints:
   - `GET /api/code-scenes` - List scenes
   - `POST /api/code-scenes` - Create scene
@@ -114,6 +125,7 @@
 ## Completed Features ✅
 
 ### Email Templates
+
 - ✅ **Tab infrastructure** - TabNavigation component with Templates/Summary tabs
 - ✅ **Summary API integration** - getEmailTemplatesSummary() with proper error handling
 - ✅ **Summary view components** - SummaryTable, LocaleStatusBadge, filtering
@@ -121,10 +133,12 @@
 - ✅ **Type safety** - Complete TypeScript integration
 
 ### Backend Integration - Phase 1
+
 - ✅ **User deletion integration** - DELETE /v1/admin/users/:id fully integrated
 - ✅ **Level creation integration** - POST /v1/admin/levels fully integrated
 
 ### Video Pipeline Dashboard
+
 - ✅ **API client layer** - Complete TypeScript client with all CRUD operations
 - ✅ **Navigation integration** - Added to AppSidebar under Content section
 - ✅ **Core pages** - List, detail, and create pages implemented
@@ -132,11 +146,13 @@
 - ✅ **Testing** - Both unit tests (API client) and E2E tests (full workflow)
 
 ### User Management Features
+
 - ✅ **Admin status toggle filter** - Added admin filter to UserFilters component
 - ✅ **Items per page selector for pagination** - Enhanced UserPagination component
 - ✅ **Delete user functionality** - Fully integrated with backend
 
 ### Testing Infrastructure
+
 - ✅ **Unit testing infrastructure** - Jest + React Testing Library configured
 - ✅ **E2E test coverage** - 55 E2E tests + 57 unit tests passing
 - ✅ **API client test coverage** - Comprehensive test coverage for all API functions

@@ -10,12 +10,12 @@ async function renderScene() {
   const bundleLocation = await bundle({
     entryPoint: path.resolve("./components/remotion/Root.tsx"),
     // If you have a webpack override, make sure to import it here
-    webpackOverride: (config) => config,
+    webpackOverride: (config) => config
   });
 
   const comps = await selectComposition({
     serveUrl: bundleLocation,
-    id: compositionId,
+    id: compositionId
   });
 
   const composition = comps[0];
@@ -26,7 +26,7 @@ async function renderScene() {
     composition,
     serveUrl: bundleLocation,
     codec: "h264",
-    outputLocation: `out/${compositionId}.mp4`,
+    outputLocation: `out/${compositionId}.mp4`
   });
 
   console.debug(`Rendered video saved to out/${compositionId}.mp4`);

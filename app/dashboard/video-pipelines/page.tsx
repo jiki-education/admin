@@ -53,12 +53,12 @@ export default function VideoPipelines() {
   }, [loadPipelines]);
 
   const handlePageChange = useCallback((page: number) => {
-    setFilters(prevFilters => ({ ...prevFilters, page }));
+    setFilters((prevFilters) => ({ ...prevFilters, page }));
   }, []);
 
   const handleItemsPerPageChange = useCallback((newItemsPerPage: number) => {
     setItemsPerPage(newItemsPerPage);
-    setFilters(prev => ({ ...prev, page: 1 }));
+    setFilters((prev) => ({ ...prev, page: 1 }));
   }, []);
 
   const handleDeletePipeline = useCallback((pipeline: Pipeline) => {
@@ -80,7 +80,7 @@ export default function VideoPipelines() {
     setDeleteLoading(true);
     try {
       await deletePipeline(selectedPipeline.uuid);
-      
+
       await loadPipelines();
       handleCloseDeleteModal();
     } catch (err) {
@@ -97,9 +97,7 @@ export default function VideoPipelines() {
       <div className="space-y-6">
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-              Video Production Pipelines
-            </h1>
+            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Video Production Pipelines</h1>
             <Link
               href="/dashboard/video-pipelines/new"
               className="inline-flex items-center px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors"
@@ -114,11 +112,7 @@ export default function VideoPipelines() {
             </div>
           )}
 
-          <PipelineTable
-            pipelines={pipelines}
-            loading={loading}
-            onDelete={handleDeletePipeline}
-          />
+          <PipelineTable pipelines={pipelines} loading={loading} onDelete={handleDeletePipeline} />
 
           <PipelinePagination
             currentPage={meta.current_page}

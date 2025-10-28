@@ -70,6 +70,6 @@ function DropzoneComponent() {
       </div>
     </ComponentCard>
   );
-};
+}
 
 export default DropzoneComponent;

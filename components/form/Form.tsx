@@ -19,6 +19,6 @@ function Form({ onSubmit, children, className }: FormProps) {
       {children}
     </form>
   );
-};
+}
 
 export default Form;

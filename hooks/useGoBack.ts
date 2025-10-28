@@ -12,6 +12,6 @@ function useGoBack() {
   };
 
   return goBack;
-};
+}
 
 export default useGoBack;

@@ -13,7 +13,7 @@ export interface SceneTemplate {
 
 export const SCENE_CATEGORIES = [
   "JavaScript Basics",
-  "React Components", 
+  "React Components",
   "TypeScript",
   "CSS Animations",
   "Node.js",
@@ -23,7 +23,7 @@ export const SCENE_CATEGORIES = [
   "Best Practices"
 ] as const;
 
-export type SceneCategory = typeof SCENE_CATEGORIES[number];
+export type SceneCategory = (typeof SCENE_CATEGORIES)[number];
 
 export const SCENE_TEMPLATES: SceneTemplate[] = [
   {
@@ -50,7 +50,7 @@ export const SCENE_TEMPLATES: SceneTemplate[] = [
         },
         {
           type: "type",
-          code: "\nlet userName = \"Alice\";",
+          code: '\nlet userName = "Alice";',
           speed: "normal",
           language: "javascript"
         },
@@ -204,7 +204,7 @@ export const SCENE_TEMPLATES: SceneTemplate[] = [
         },
         {
           type: "type",
-          code: "\n    <div className=\"card\">",
+          code: '\n    <div className="card">',
           speed: "normal",
           language: "typescript"
         },
@@ -327,13 +327,13 @@ export const SCENE_TEMPLATES: SceneTemplate[] = [
         },
         {
           type: "type",
-          code: "\n  name: \"John Doe\",",
+          code: '\n  name: "John Doe",',
           speed: "normal",
           language: "typescript"
         },
         {
           type: "type",
-          code: "\n  email: \"john@example.com\"",
+          code: '\n  email: "john@example.com"',
           speed: "normal",
           language: "typescript"
         },
@@ -547,22 +547,23 @@ export const SCENE_TEMPLATES: SceneTemplate[] = [
 ];
 
 export function getTemplatesByCategory(category: SceneCategory): SceneTemplate[] {
-  return SCENE_TEMPLATES.filter(template => template.category === category);
+  return SCENE_TEMPLATES.filter((template) => template.category === category);
 }
 
 export function getTemplatesByDifficulty(difficulty: SceneTemplate["difficulty"]): SceneTemplate[] {
-  return SCENE_TEMPLATES.filter(template => template.difficulty === difficulty);
+  return SCENE_TEMPLATES.filter((template) => template.difficulty === difficulty);
 }
 
 export function searchTemplates(query: string): SceneTemplate[] {
   const lowercaseQuery = query.toLowerCase();
-  return SCENE_TEMPLATES.filter(template => 
-    template.name.toLowerCase().includes(lowercaseQuery) ||
-    template.description.toLowerCase().includes(lowercaseQuery) ||
-    template.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery))
+  return SCENE_TEMPLATES.filter(
+    (template) =>
+      template.name.toLowerCase().includes(lowercaseQuery) ||
+      template.description.toLowerCase().includes(lowercaseQuery) ||
+      template.tags.some((tag) => tag.toLowerCase().includes(lowercaseQuery))
   );
 }
 
 export function getTemplateById(id: string): SceneTemplate | undefined {
-  return SCENE_TEMPLATES.find(template => template.id === id);
+  return SCENE_TEMPLATES.find((template) => template.id === id);
 }

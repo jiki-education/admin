@@ -1,6 +1,6 @@
 import type { Node as ReactFlowNode, Edge } from "@xyflow/react";
 import type { Node } from "@/lib/nodes/types";
-import type { PipelineState } from './types';
+import type { PipelineState } from "./types";
 import { getLayoutedNodes } from "@/lib/layout";
 import { getOutputHandleColorValue } from "@/lib/nodes/display-helpers";
 import { hasInputHandle } from "@/lib/nodes/metadata";
@@ -12,9 +12,9 @@ import { hasInputHandle } from "@/lib/nodes/metadata";
 export const createGetters = (get: () => PipelineState) => ({
   getSelectedNode: (): Node | null => {
     const { nodes, selectedNodeId } = get();
-    return selectedNodeId ? nodes.find(node => node.uuid === selectedNodeId) || null : null;
+    return selectedNodeId ? nodes.find((node) => node.uuid === selectedNodeId) || null : null;
   },
-  
+
   getProgressPercentage: (): number => {
     const { pipeline } = get();
     const progress = pipeline?.metadata?.progress;
@@ -23,11 +23,11 @@ export const createGetters = (get: () => PipelineState) => ({
     }
     return Math.round((progress.completed / progress.total) * 100);
   },
-  
+
   getReactFlowNodes: (): ReactFlowNode[] => {
     const { nodes, selectedNodeId } = get();
     const { executeNode } = get();
-    
+
     return nodes.map((node) => ({
       id: node.uuid,
       type: node.type,
@@ -37,10 +37,10 @@ export const createGetters = (get: () => PipelineState) => ({
         onExecute: () => executeNode(node.pipeline_uuid, node.uuid)
       },
       selected: node.uuid === selectedNodeId,
-      dragHandle: '.drag-handle__custom'
+      dragHandle: ".drag-handle__custom"
     }));
   },
-  
+
   getEdges: (): Edge[] => {
     const { nodes } = get();
     const edgesList: Edge[] = [];
@@ -82,27 +82,25 @@ export const createGetters = (get: () => PipelineState) => ({
 
     return edgesList;
   },
-  
+
   getLayoutedNodes: (): ReactFlowNode[] => {
     const { nodePositions, hasInitialLayout, layoutConfig } = get();
     const reactFlowNodes = get().getReactFlowNodes();
     const edges = get().getEdges();
-    
+
     // Check if we have any saved positions at all
     const hasSavedPositions = Object.keys(nodePositions).length > 0;
 
     // If we have saved positions, use a hybrid approach
     if (hasSavedPositions) {
-      // Use layout for nodes without saved positions, saved positions for nodes that have them
-      const layoutedNodes = hasInitialLayout 
-        ? reactFlowNodes.map((node) => ({ ...node, position: { x: 0, y: 0 } }))
-        : getLayoutedNodes(reactFlowNodes, edges, {
-            direction: layoutConfig.direction,
-            nodeWidth: layoutConfig.nodeWidth,
-            nodeHeight: layoutConfig.nodeHeight,
-            rankSep: layoutConfig.rankSep,
-            nodeSep: layoutConfig.nodeSep
-          });
+      // Always run layout to get positions for all nodes (including new ones)
+      const layoutedNodes = getLayoutedNodes(reactFlowNodes, edges, {
+        direction: layoutConfig.direction,
+        nodeWidth: layoutConfig.nodeWidth,
+        nodeHeight: layoutConfig.nodeHeight,
+        rankSep: layoutConfig.rankSep,
+        nodeSep: layoutConfig.nodeSep
+      });
 
       // Override with saved positions where available
       return layoutedNodes.map((node) => ({
@@ -125,7 +123,9 @@ export const createGetters = (get: () => PipelineState) => ({
 
     const maxWidth = haveMeasuredDimensions
       ? Math.max(
-          ...reactFlowNodes.map((n) => (n.measured?.width != null && n.measured.width !== 0 ? n.measured.width : layoutConfig.nodeWidth)),
+          ...reactFlowNodes.map((n) =>
+            n.measured?.width != null && n.measured.width !== 0 ? n.measured.width : layoutConfig.nodeWidth
+          ),
           layoutConfig.nodeWidth
         )
       : layoutConfig.nodeWidth;

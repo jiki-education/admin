@@ -15,24 +15,19 @@ interface UseFormValidationProps {
   validationRules: ValidationRules;
 }
 
-export function useFormValidation({
-  initialData,
-  fields,
-  validationRules
-}: UseFormValidationProps) {
+export function useFormValidation({ initialData, fields, validationRules }: UseFormValidationProps) {
   const [formData, setFormData] = useState<Record<string, any>>(() => {
     const initial: Record<string, any> = {};
-    fields.forEach(field => {
-      if (initialData && field === 'data' && initialData[field]) {
-        initial[field] = typeof initialData[field] === 'string' 
-          ? initialData[field] 
-          : JSON.stringify(initialData[field], null, 2);
+    fields.forEach((field) => {
+      if (initialData && field === "data" && initialData[field]) {
+        initial[field] =
+          typeof initialData[field] === "string" ? initialData[field] : JSON.stringify(initialData[field], null, 2);
       } else {
-        let defaultValue = '';
-        if (field === 'data') {
-          defaultValue = '{}';
-        } else if (field === 'type') {
-          defaultValue = 'exercise';
+        let defaultValue = "";
+        if (field === "data") {
+          defaultValue = "{}";
+        } else if (field === "type") {
+          defaultValue = "exercise";
         }
         initial[field] = (initialData && initialData[field]) || defaultValue;
       }
@@ -45,30 +40,29 @@ export function useFormValidation({
 
   useEffect(() => {
     if (!initialData || Object.keys(initialData).length === 0) return;
-    
+
     const newFormData: Record<string, any> = {};
-    fields.forEach(field => {
-      if (field === 'data' && initialData[field]) {
-        newFormData[field] = typeof initialData[field] === 'string' 
-          ? initialData[field] 
-          : JSON.stringify(initialData[field], null, 2);
+    fields.forEach((field) => {
+      if (field === "data" && initialData[field]) {
+        newFormData[field] =
+          typeof initialData[field] === "string" ? initialData[field] : JSON.stringify(initialData[field], null, 2);
       } else {
-        newFormData[field] = initialData[field] || '';
+        newFormData[field] = initialData[field] || "";
       }
     });
     setFormData(newFormData);
   }, [initialData, fields]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value
     }));
 
     // Auto-generate slug from title if slug hasn't been manually edited
-    if (field === "title" && !slugTouched && fields.includes('slug')) {
+    if (field === "title" && !slugTouched && fields.includes("slug")) {
       const autoSlug = generateSlug(value);
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         slug: autoSlug
       }));
@@ -76,7 +70,7 @@ export function useFormValidation({
 
     // Clear field error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [field]: ""
       }));
@@ -91,20 +85,22 @@ export function useFormValidation({
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    fields.forEach(field => {
+    fields.forEach((field) => {
       const rules = validationRules[field];
-      if (!rules) {return;}
+      if (!rules) {
+        return;
+      }
 
       const value = formData[field];
 
       // Check required fields
-      if (rules.required && (!value || (typeof value === 'string' && !value.trim()))) {
+      if (rules.required && (!value || (typeof value === "string" && !value.trim()))) {
         newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
         return;
       }
 
       // Special validation for slug
-      if (field === 'slug' && value && !isValidSlug(value)) {
+      if (field === "slug" && value && !isValidSlug(value)) {
         newErrors[field] = "Slug must contain only lowercase letters, numbers, and hyphens";
         return;
       }

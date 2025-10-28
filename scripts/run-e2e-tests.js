@@ -99,8 +99,16 @@ async function runE2ETests() {
     const appRoutes = discoverRoutes(path.join(__dirname, "..", "app"));
 
     // Only warm up critical routes that are tested
-    const criticalRoutes = appRoutes.filter(route => 
-      ["/", "/signin", "/signup", "/dashboard", "/dashboard/users", "/dashboard/levels", "/dashboard/email-templates"].includes(route)
+    const criticalRoutes = appRoutes.filter((route) =>
+      [
+        "/",
+        "/signin",
+        "/signup",
+        "/dashboard",
+        "/dashboard/users",
+        "/dashboard/levels",
+        "/dashboard/email-templates"
+      ].includes(route)
     );
 
     const routesToWarm = criticalRoutes.length > 0 ? criticalRoutes : appRoutes.slice(0, 5); // Fallback to first 5 routes
@@ -110,12 +118,12 @@ async function runE2ETests() {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout per route
-        
-        await fetch(`${SERVER_URL}${route}`, { 
+
+        await fetch(`${SERVER_URL}${route}`, {
           signal: controller.signal,
-          headers: { 'User-Agent': 'E2E-Test-Warmup' }
+          headers: { "User-Agent": "E2E-Test-Warmup" }
         });
-        
+
         clearTimeout(timeoutId);
       } catch (err) {
         // Ignore errors during warmup
@@ -128,7 +136,7 @@ async function runE2ETests() {
     // Run the E2E tests
     let configFile = "jest.e2e.config.mjs";
     let modeLabel = "";
-    
+
     if (process.env.CI_MODE) {
       configFile = "jest.e2e.ci.config.mjs";
       modeLabel = " (CI MODE)";
@@ -136,7 +144,7 @@ async function runE2ETests() {
       configFile = "jest.e2e.fast.config.mjs";
       modeLabel = " (TURBO MODE)";
     }
-    
+
     console.log(`Running E2E tests with config: ${configFile}${modeLabel}...`);
     const testProcess = spawn("pnpm", ["jest", "--config", configFile, ...process.argv.slice(2)], {
       stdio: "inherit",

@@ -15,21 +15,14 @@ import RenderCodeNodeDetails from "./editor-panel/RenderCodeNodeDetails";
 import NoNodeSelected from "./editor-panel/NoNodeSelected";
 import GenericNodeDetails from "./editor-panel/GenericNodeDetails";
 import NodeTitleEditor from "./editor-panel/NodeTitleEditor";
-import { usePipelineStore } from "@/stores/usePipelineStore";
+import { usePipelineStore } from "@/stores/pipeline";
 
 export default function EditorPanel() {
   // Store subscriptions
-  const { 
-    pipeline, 
-    nodes, 
-    selectedNodeId, 
-    deleteNodes, 
-    updateNode,
-    forceRelayout 
-  } = usePipelineStore();
-  
+  const { pipeline, nodes, selectedNodeId, deleteNodes, updateNode, forceRelayout } = usePipelineStore();
+
   // Find the selected node reactively
-  const selectedNode = selectedNodeId ? nodes.find(node => node.uuid === selectedNodeId) || null : null;
+  const selectedNode = selectedNodeId ? nodes.find((node) => node.uuid === selectedNodeId) || null : null;
   const [isDeleting, startDeletion] = useTransition();
 
   if (!selectedNode) {
@@ -60,11 +53,7 @@ export default function EditorPanel() {
             onRefresh={forceRelayout}
           />
         ) : isRenderCodeNode(selectedNode) ? (
-          <RenderCodeNodeDetails
-            node={selectedNode}
-            pipelineUuid={pipeline?.uuid || ""}
-            onRefresh={forceRelayout}
-          />
+          <RenderCodeNodeDetails node={selectedNode} pipelineUuid={pipeline?.uuid || ""} onRefresh={forceRelayout} />
         ) : (
           <GenericNodeDetails node={selectedNode} />
         )}
@@ -79,13 +68,9 @@ export default function EditorPanel() {
         >
           {isDeleting ? "Deleting..." : "Delete Node"}
         </button>
-        
+
         {/* Node Title Editor */}
-        <NodeTitleEditor 
-          node={selectedNode} 
-          pipelineUuid={pipeline?.uuid || ""} 
-          onUpdate={updateNode}
-        />
+        <NodeTitleEditor node={selectedNode} pipelineUuid={pipeline?.uuid || ""} onUpdate={updateNode} />
       </div>
     </div>
   );

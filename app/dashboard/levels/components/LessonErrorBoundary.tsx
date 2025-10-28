@@ -12,10 +12,7 @@ interface LessonErrorBoundaryState {
   error?: Error;
 }
 
-export default class LessonErrorBoundary extends React.Component<
-  LessonErrorBoundaryProps,
-  LessonErrorBoundaryState
-> {
+export default class LessonErrorBoundary extends React.Component<LessonErrorBoundaryProps, LessonErrorBoundaryState> {
   constructor(props: LessonErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
@@ -54,13 +51,9 @@ export default class LessonErrorBoundary extends React.Component<
               </div>
             </div>
             <div className="flex-1">
-              <h3 className="text-sm font-medium text-red-800 dark:text-red-400">
-                Something went wrong
-              </h3>
+              <h3 className="text-sm font-medium text-red-800 dark:text-red-400">Something went wrong</h3>
               <div className="mt-2 text-sm text-red-700 dark:text-red-300">
-                <p>
-                  An error occurred while loading the lesson data. This might be a temporary issue.
-                </p>
+                <p>An error occurred while loading the lesson data. This might be a temporary issue.</p>
                 {this.state.error && (
                   <details className="mt-2">
                     <summary className="cursor-pointer text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200">

@@ -13,7 +13,13 @@ import SummaryTable from "./components/SummaryTable";
 import SummaryFilters from "./components/SummaryFilters";
 import type { EmailTemplate, EmailTemplateFilters, EmailTemplateType, EmailTemplateSummaryResponse } from "./types";
 import type { SummaryFilters as SummaryFiltersType } from "./components/SummaryFilters";
-import { getEmailTemplates, getEmailTemplateTypes, createEmailTemplate, deleteEmailTemplate, getEmailTemplatesSummary } from "@/lib/api/email-templates";
+import {
+  getEmailTemplates,
+  getEmailTemplateTypes,
+  createEmailTemplate,
+  deleteEmailTemplate,
+  getEmailTemplatesSummary
+} from "@/lib/api/email-templates";
 import { useModal } from "@/hooks/useModal";
 import { useRequireAuth } from "@/lib/auth/hooks";
 
@@ -26,16 +32,16 @@ export default function EmailTemplates() {
   const [filters, setFilters] = useState<EmailTemplateFilters>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Tab state
   const [activeTab, setActiveTab] = useState<"templates" | "summary">("templates");
-  
+
   // Summary state
   const [summaryData, setSummaryData] = useState<EmailTemplateSummaryResponse | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [summaryFilters, setSummaryFilters] = useState<SummaryFiltersType>({});
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -48,7 +54,6 @@ export default function EmailTemplates() {
   // Selected template for delete
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
   const [operationLoading, setOperationLoading] = useState(false);
-
 
   const loadTemplates = useCallback(async () => {
     try {
@@ -127,33 +132,41 @@ export default function EmailTemplates() {
     setCurrentPage(page);
   }, []);
 
-  const handleDeleteTemplate = useCallback((template: EmailTemplate) => {
-    setSelectedTemplate(template);
-    deleteModal.openModal();
-  }, [deleteModal]);
+  const handleDeleteTemplate = useCallback(
+    (template: EmailTemplate) => {
+      setSelectedTemplate(template);
+      deleteModal.openModal();
+    },
+    [deleteModal]
+  );
 
   const handleCreateTemplate = useCallback(() => {
     setSelectedTemplate(null);
     createModal.openModal();
   }, [createModal]);
 
-  const handleSaveTemplate = useCallback(async (templateData: Omit<EmailTemplate, 'id'>) => {
-    setOperationLoading(true);
-    try {
-      // Create new template
-      await createEmailTemplate(templateData);
-      // Reload templates after successful save
-      await loadTemplates();
-    } catch (error) {
-      console.error("Failed to save template:", error);
-      throw error; // Re-throw to let the modal handle it
-    } finally {
-      setOperationLoading(false);
-    }
-  }, [loadTemplates]);
+  const handleSaveTemplate = useCallback(
+    async (templateData: Omit<EmailTemplate, "id">) => {
+      setOperationLoading(true);
+      try {
+        // Create new template
+        await createEmailTemplate(templateData);
+        // Reload templates after successful save
+        await loadTemplates();
+      } catch (error) {
+        console.error("Failed to save template:", error);
+        throw error; // Re-throw to let the modal handle it
+      } finally {
+        setOperationLoading(false);
+      }
+    },
+    [loadTemplates]
+  );
 
   const handleConfirmDelete = useCallback(async () => {
-    if (!selectedTemplate) { return };
+    if (!selectedTemplate) {
+      return;
+    }
 
     setOperationLoading(true);
     try {
@@ -191,12 +204,8 @@ export default function EmailTemplates() {
       <div className="space-y-6">
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-              Email Templates Management
-            </h1>
-            <Button onClick={handleCreateTemplate}>
-              Create Template
-            </Button>
+            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Email Templates Management</h1>
+            <Button onClick={handleCreateTemplate}>Create Template</Button>
           </div>
 
           {error && (
@@ -206,10 +215,7 @@ export default function EmailTemplates() {
           )}
 
           <div className="mb-6">
-            <TabNavigation
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
+            <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
 
           {activeTab === "templates" && (
@@ -221,11 +227,7 @@ export default function EmailTemplates() {
                 onClearFilters={handleClearFilters}
               />
 
-              <EmailTemplateTable
-                templates={templates}
-                onDelete={handleDeleteTemplate}
-                loading={loading}
-              />
+              <EmailTemplateTable templates={templates} onDelete={handleDeleteTemplate} loading={loading} />
 
               <EmailTemplatePagination
                 currentPage={currentPage}
@@ -243,13 +245,13 @@ export default function EmailTemplates() {
                   <p className="text-red-700 dark:text-red-400">{summaryError}</p>
                 </div>
               )}
-              
+
               {summaryLoading && (
                 <div className="text-center py-12">
                   <div className="text-lg text-gray-500 dark:text-gray-400">Loading summary...</div>
                 </div>
               )}
-              
+
               {!summaryLoading && !summaryError && summaryData && (
                 <>
                   <SummaryFilters
@@ -258,18 +260,13 @@ export default function EmailTemplates() {
                     templateTypes={templateTypes}
                     onClearFilters={handleClearSummaryFilters}
                   />
-                  
-                  <SummaryTable
-                    summaryData={summaryData}
-                    filters={summaryFilters}
-                  />
+
+                  <SummaryTable summaryData={summaryData} filters={summaryFilters} />
                 </>
               )}
-              
+
               {!summaryLoading && !summaryError && !summaryData && (
-                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                  No summary data available
-                </div>
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">No summary data available</div>
               )}
             </>
           )}

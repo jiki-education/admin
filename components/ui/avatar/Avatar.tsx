@@ -48,6 +48,6 @@ function Avatar({ src, alt = "User Avatar", size = "medium", status = "none" }: 
       )}
     </div>
   );
-};
+}
 
 export default Avatar;

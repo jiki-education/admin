@@ -14,12 +14,7 @@ interface SummaryFiltersProps {
   onClearFilters: () => void;
 }
 
-function SummaryFilters({ 
-  filters, 
-  onFiltersChange, 
-  templateTypes, 
-  onClearFilters 
-}: SummaryFiltersProps) {
+function SummaryFilters({ filters, onFiltersChange, templateTypes, onClearFilters }: SummaryFiltersProps) {
   const handleFilterChange = (key: keyof SummaryFilters, value: string) => {
     const newFilters = { ...filters };
     if (value === "") {
@@ -34,9 +29,8 @@ function SummaryFilters({
     onFiltersChange(newFilters);
   };
 
-  const hasActiveFilters = Object.keys(filters).some(key => 
-    filters[key as keyof SummaryFilters] !== undefined && 
-    filters[key as keyof SummaryFilters] !== ""
+  const hasActiveFilters = Object.keys(filters).some(
+    (key) => filters[key as keyof SummaryFilters] !== undefined && filters[key as keyof SummaryFilters] !== ""
   );
 
   return (
@@ -44,7 +38,7 @@ function SummaryFilters({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Template Type Filter */}
         <div>
-          <label 
+          <label
             htmlFor="template-type-filter"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
@@ -67,7 +61,7 @@ function SummaryFilters({
 
         {/* Locale Status Filter */}
         <div>
-          <label 
+          <label
             htmlFor="locale-status-filter"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
@@ -88,10 +82,7 @@ function SummaryFilters({
 
         {/* Search Filter */}
         <div>
-          <label 
-            htmlFor="search-filter"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
+          <label htmlFor="search-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Search Template Slug
           </label>
           <div className="relative">

@@ -1,7 +1,7 @@
 // E2E test setup
 // jest-puppeteer provides global variables, this file ensures proper typing
 
-import type { Browser, Page } from 'puppeteer';
+import type { Browser, Page } from "puppeteer";
 
 declare global {
   var page: Page;

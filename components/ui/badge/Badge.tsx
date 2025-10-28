@@ -13,14 +13,7 @@ interface BadgeProps {
   children: React.ReactNode; // Badge content
 }
 
-export function Badge({
-  variant = "light",
-  color = "primary",
-  size = "md",
-  startIcon,
-  endIcon,
-  children
-}: BadgeProps) {
+export function Badge({ variant = "light", color = "primary", size = "md", startIcon, endIcon, children }: BadgeProps) {
   const baseStyles = "inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium";
 
   // Define size styles
@@ -62,5 +55,4 @@ export function Badge({
       {endIcon && <span className="ml-1">{endIcon}</span>}
     </span>
   );
-};
-
+}

@@ -24,11 +24,13 @@ export default function LessonCard({
   canMoveDown
 }: LessonCardProps) {
   return (
-    <div className={`border rounded-lg p-4 space-y-3 ${
-      isSelected 
-        ? "bg-blue-50 border-blue-200 dark:bg-blue-900/10 dark:border-blue-800" 
-        : "bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
-    }`}>
+    <div
+      className={`border rounded-lg p-4 space-y-3 ${
+        isSelected
+          ? "bg-blue-50 border-blue-200 dark:bg-blue-900/10 dark:border-blue-800"
+          : "bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+      }`}
+    >
       {/* Header with checkbox and position */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -50,9 +52,7 @@ export default function LessonCard({
 
       {/* Title */}
       <div>
-        <h3 className="font-medium text-gray-900 dark:text-white text-sm">
-          {lesson.title}
-        </h3>
+        <h3 className="font-medium text-gray-900 dark:text-white text-sm">{lesson.title}</h3>
       </div>
 
       {/* Slug */}
@@ -65,9 +65,7 @@ export default function LessonCard({
       {/* Description */}
       {lesson.description && (
         <div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-            {lesson.description}
-          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{lesson.description}</p>
         </div>
       )}
 
@@ -93,11 +91,7 @@ export default function LessonCard({
             <span aria-hidden="true">↓</span>
           </button>
         </div>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={onEdit}
-        >
+        <Button size="sm" variant="outline" onClick={onEdit}>
           Edit
         </Button>
       </div>

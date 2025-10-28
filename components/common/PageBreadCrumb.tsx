@@ -39,6 +39,6 @@ function PageBreadcrumb({ pageTitle }: BreadcrumbProps) {
       </nav>
     </div>
   );
-};
+}
 
 export default PageBreadcrumb;

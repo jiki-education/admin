@@ -9,7 +9,6 @@ import UserPagination from "./components/UserPagination";
 import DeleteUserModal from "./components/DeleteUserModal";
 
 export default function Users() {
-
   const [users, setUsers] = useState<User[]>([]);
   const [filters, setFilters] = useState<UserFiltersType>({});
   const [loading, setLoading] = useState(true);
@@ -60,12 +59,12 @@ export default function Users() {
   }, []);
 
   const handlePageChange = useCallback((page: number) => {
-    setFilters(prevFilters => ({ ...prevFilters, page }));
+    setFilters((prevFilters) => ({ ...prevFilters, page }));
   }, []);
 
   const handleItemsPerPageChange = useCallback((newItemsPerPage: number) => {
     setItemsPerPage(newItemsPerPage);
-    setFilters(prev => ({ ...prev, page: 1 })); // Reset to page 1 when changing items per page
+    setFilters((prev) => ({ ...prev, page: 1 })); // Reset to page 1 when changing items per page
   }, []);
 
   const handleDeleteUser = useCallback((user: User) => {
@@ -87,7 +86,7 @@ export default function Users() {
     setDeleteLoading(true);
     try {
       await deleteUser(selectedUser.id);
-      
+
       // Reload users after successful delete
       await loadUsers();
       handleCloseDeleteModal();
@@ -105,9 +104,7 @@ export default function Users() {
       <div className="space-y-6">
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-              User Management
-            </h1>
+            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">User Management</h1>
           </div>
 
           {error && (
@@ -116,17 +113,9 @@ export default function Users() {
             </div>
           )}
 
-          <UserFilters
-            filters={filters}
-            onFiltersChange={handleFiltersChange}
-            onClearFilters={handleClearFilters}
-          />
+          <UserFilters filters={filters} onFiltersChange={handleFiltersChange} onClearFilters={handleClearFilters} />
 
-          <UserTable
-            users={users}
-            loading={loading}
-            onDelete={handleDeleteUser}
-          />
+          <UserTable users={users} loading={loading} onDelete={handleDeleteUser} />
 
           <UserPagination
             currentPage={meta.current_page}

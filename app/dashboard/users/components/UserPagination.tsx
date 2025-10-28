@@ -33,18 +33,12 @@ export default function UserPagination({
   return (
     <div className="flex items-center justify-between mt-6">
       <div className="flex items-center space-x-4">
-        <span className="text-sm text-gray-600 dark:text-gray-400">
-          Items per page:
-        </span>
+        <span className="text-sm text-gray-600 dark:text-gray-400">Items per page:</span>
         <div className="w-40">
-          <Select
-            options={itemsPerPageOptions}
-            value={itemsPerPage.toString()}
-            onChange={handleItemsPerPageChange}
-          />
+          <Select options={itemsPerPageOptions} value={itemsPerPage.toString()} onChange={handleItemsPerPageChange} />
         </div>
       </div>
-      
+
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

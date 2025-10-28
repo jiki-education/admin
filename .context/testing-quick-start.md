@@ -13,6 +13,7 @@ pnpm test
 ## 📋 Available Test Commands
 
 ### Unit Tests (New!)
+
 ```bash
 pnpm test               # Run all unit tests once
 pnpm test:watch         # Run tests in watch mode (auto-rerun on changes)
@@ -21,6 +22,7 @@ pnpm test:ci            # Run tests for CI (no watch, with coverage)
 ```
 
 ### E2E Tests (Existing)
+
 ```bash
 pnpm test:e2e           # Run E2E tests
 pnpm test:e2e:watch     # E2E in watch mode
@@ -28,6 +30,7 @@ pnpm test:e2e:headful   # E2E with visible browser
 ```
 
 ### Run Specific Tests
+
 ```bash
 pnpm test slug          # Run tests matching "slug"
 pnpm test LevelForm     # Run tests matching "LevelForm"
@@ -51,6 +54,7 @@ pnpm test --verbose     # Run with detailed output
 ## 🛠️ Development Workflow
 
 ### **Recommended Workflow:**
+
 ```bash
 # Start development server
 pnpm dev
@@ -60,6 +64,7 @@ pnpm test:watch
 ```
 
 ### **Before Committing:**
+
 ```bash
 # Run all tests
 pnpm test
@@ -91,6 +96,7 @@ pnpm format
 ## 🚨 Troubleshooting
 
 ### Tests Not Running?
+
 ```bash
 # Clear cache and reinstall
 rm -rf node_modules .next
@@ -99,11 +105,13 @@ pnpm test
 ```
 
 ### Import Errors?
+
 - Check that `@/` path alias is working
 - Verify file extensions (.ts, .tsx)
 - Make sure dependencies are installed
 
 ### Component Tests Failing?
+
 - Check that mocks are set up correctly
 - Verify React Testing Library queries
 - Look for async operations that need `waitFor()`

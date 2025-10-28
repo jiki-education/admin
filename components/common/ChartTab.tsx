@@ -38,6 +38,6 @@ function ChartTab() {
       </button>
     </div>
   );
-};
+}
 
 export default ChartTab;

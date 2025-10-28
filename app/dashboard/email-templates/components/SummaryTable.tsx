@@ -29,26 +29,22 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
 
     // Apply filters
     if (filters.type) {
-      filtered = filtered.filter(template => template.type === filters.type);
+      filtered = filtered.filter((template) => template.type === filters.type);
     }
 
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
-      filtered = filtered.filter(template => 
-        template.slug.toLowerCase().includes(searchLower) ||
-        template.type.toLowerCase().includes(searchLower)
+      filtered = filtered.filter(
+        (template) =>
+          template.slug.toLowerCase().includes(searchLower) || template.type.toLowerCase().includes(searchLower)
       );
     }
 
     if (filters.localeStatus && filters.localeStatus !== "all") {
-      filtered = filtered.filter(template => {
+      filtered = filtered.filter((template) => {
         const implementedLocales = template.locales;
-        const missingLocales = summaryData.locales.supported.filter(
-          locale => !implementedLocales.includes(locale)
-        );
-        const wipLocales = summaryData.locales.wip.filter(
-          locale => implementedLocales.includes(locale)
-        );
+        const missingLocales = summaryData.locales.supported.filter((locale) => !implementedLocales.includes(locale));
+        const wipLocales = summaryData.locales.wip.filter((locale) => implementedLocales.includes(locale));
 
         switch (filters.localeStatus) {
           case "complete":
@@ -84,12 +80,12 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
           bValue = b.locales.length;
           break;
         case "missing":
-          aValue = summaryData.locales.supported.filter(locale => !a.locales.includes(locale)).length;
-          bValue = summaryData.locales.supported.filter(locale => !b.locales.includes(locale)).length;
+          aValue = summaryData.locales.supported.filter((locale) => !a.locales.includes(locale)).length;
+          bValue = summaryData.locales.supported.filter((locale) => !b.locales.includes(locale)).length;
           break;
         case "wip":
-          aValue = summaryData.locales.wip.filter(locale => a.locales.includes(locale)).length;
-          bValue = summaryData.locales.wip.filter(locale => b.locales.includes(locale)).length;
+          aValue = summaryData.locales.wip.filter((locale) => a.locales.includes(locale)).length;
+          bValue = summaryData.locales.wip.filter((locale) => b.locales.includes(locale)).length;
           break;
         default:
           aValue = a.type;
@@ -99,10 +95,9 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
       if (typeof aValue === "string" && typeof bValue === "string") {
         const result = aValue.localeCompare(bValue);
         return sortDirection === "asc" ? result : -result;
-      } 
-        const result = (aValue as number) - (bValue as number);
-        return sortDirection === "asc" ? result : -result;
-      
+      }
+      const result = (aValue as number) - (bValue as number);
+      return sortDirection === "asc" ? result : -result;
     });
   };
 
@@ -110,11 +105,16 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
     if (sortField !== field) {
       return (
         <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+          />
         </svg>
       );
     }
-    
+
     return sortDirection === "asc" ? (
       <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -133,19 +133,19 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
       <div className="text-sm text-gray-600 dark:text-gray-400">
         Showing {filteredAndSortedTemplates.length} of {summaryData.email_templates.length} template groups
       </div>
-      
+
       <div className="overflow-x-auto">
-        <table 
+        <table
           className="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
           role="table"
           aria-label="Email template summary table"
         >
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => handleSort("type")}
-                onKeyDown={(e) => e.key === 'Enter' && handleSort("type")}
+                onKeyDown={(e) => e.key === "Enter" && handleSort("type")}
                 tabIndex={0}
                 role="columnheader"
                 aria-sort={sortField === "type" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
@@ -155,10 +155,10 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
                   {getSortIcon("type")}
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => handleSort("slug")}
-                onKeyDown={(e) => e.key === 'Enter' && handleSort("slug")}
+                onKeyDown={(e) => e.key === "Enter" && handleSort("slug")}
                 tabIndex={0}
                 role="columnheader"
                 aria-sort={sortField === "slug" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
@@ -168,23 +168,25 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
                   {getSortIcon("slug")}
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => handleSort("implemented")}
-                onKeyDown={(e) => e.key === 'Enter' && handleSort("implemented")}
+                onKeyDown={(e) => e.key === "Enter" && handleSort("implemented")}
                 tabIndex={0}
                 role="columnheader"
-                aria-sort={sortField === "implemented" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                aria-sort={
+                  sortField === "implemented" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"
+                }
               >
                 <div className="flex items-center space-x-1">
                   <span>Implemented Locales</span>
                   {getSortIcon("implemented")}
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => handleSort("missing")}
-                onKeyDown={(e) => e.key === 'Enter' && handleSort("missing")}
+                onKeyDown={(e) => e.key === "Enter" && handleSort("missing")}
                 tabIndex={0}
                 role="columnheader"
                 aria-sort={sortField === "missing" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
@@ -194,10 +196,10 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
                   {getSortIcon("missing")}
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => handleSort("wip")}
-                onKeyDown={(e) => e.key === 'Enter' && handleSort("wip")}
+                onKeyDown={(e) => e.key === "Enter" && handleSort("wip")}
                 tabIndex={0}
                 role="columnheader"
                 aria-sort={sortField === "wip" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
@@ -213,16 +215,14 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
             {filteredAndSortedTemplates.map((template, index) => {
               const implementedLocales = template.locales;
               const missingLocales = summaryData.locales.supported.filter(
-                locale => !implementedLocales.includes(locale)
+                (locale) => !implementedLocales.includes(locale)
               );
-              const wipLocales = summaryData.locales.wip.filter(
-                locale => implementedLocales.includes(locale)
-              );
-              
+              const wipLocales = summaryData.locales.wip.filter((locale) => implementedLocales.includes(locale));
+
               return (
-                <tr 
-                  key={`${template.type}-${template.slug}`} 
-                  className={index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'}
+                <tr
+                  key={`${template.type}-${template.slug}`}
+                  className={index % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-800"}
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {template.type}
@@ -232,7 +232,7 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-1">
-                      {implementedLocales.map(locale => (
+                      {implementedLocales.map((locale) => (
                         <LocaleStatusBadge
                           key={locale}
                           locale={locale}
@@ -245,7 +245,7 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-1">
-                      {missingLocales.map(locale => (
+                      {missingLocales.map((locale) => (
                         <LocaleStatusBadge
                           key={locale}
                           locale={locale}
@@ -258,7 +258,7 @@ function SummaryTable({ summaryData, filters = {} }: SummaryTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-1">
-                      {wipLocales.map(locale => (
+                      {wipLocales.map((locale) => (
                         <LocaleStatusBadge
                           key={locale}
                           locale={locale}

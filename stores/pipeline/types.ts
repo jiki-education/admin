@@ -1,10 +1,10 @@
 import type { Node as ReactFlowNode, Edge } from "@xyflow/react";
-import type { VideoProductionPipeline } from '@/lib/api/video-pipelines';
+import type { VideoProductionPipeline } from "@/lib/api/video-pipelines";
 import type { Node } from "@/lib/nodes/types";
 
 // Undo/Redo State Types
 export interface HistoryEntry {
-  type: 'connect' | 'delete' | 'execute';
+  type: "connect" | "delete" | "execute";
   timestamp: number;
   data: {
     nodes: Node[];
@@ -15,8 +15,8 @@ export interface HistoryEntry {
 }
 
 // Layout configuration types
-export type LayoutDirection = 'LR' | 'TB'; // Only LR and TB are supported by dagre
-export type LayoutAlgorithm = 'dagre' | 'force' | 'circular' | 'grid';
+export type LayoutDirection = "LR" | "TB"; // Only LR and TB are supported by dagre
+export type LayoutAlgorithm = "dagre" | "force" | "circular" | "grid";
 
 export interface LayoutConfig {
   algorithm: LayoutAlgorithm;
@@ -41,6 +41,7 @@ export interface PipelineState {
   isSaving: boolean;
   nodePositions: Record<string, { x: number; y: number }>;
   hasInitialLayout: boolean;
+  layoutKey: number; // Force re-renders when this changes
 
   // Layout State
   layoutConfig: LayoutConfig;
@@ -65,15 +66,18 @@ export interface PipelineState {
   updateNode: (pipelineUuid: string, nodeUuid: string, updates: Partial<Node>) => Promise<void>;
   connectNodes: (pipelineUuid: string, sourceId: string, targetId: string, targetHandle: string) => Promise<void>;
   deleteNodes: (pipelineUuid: string, nodeIds: string[]) => Promise<void>;
-  createNode: (pipelineUuid: string, nodeData: {
-    uuid: string;
-    type: string;
-    title: string;
-    inputs: Record<string, unknown>;
-    config: Record<string, unknown>;
-    asset?: Record<string, unknown>;
-    position?: { x: number; y: number };
-  }) => Promise<void>;
+  createNode: (
+    pipelineUuid: string,
+    nodeData: {
+      uuid: string;
+      type: string;
+      title: string;
+      inputs: Record<string, unknown>;
+      config: Record<string, unknown>;
+      asset?: Record<string, unknown>;
+      position?: { x: number; y: number };
+    }
+  ) => Promise<void>;
   updateNodePositions: (positions: Record<string, { x: number; y: number }>) => void;
   forceRelayout: () => void;
   setLayoutConfig: (config: Partial<LayoutConfig>) => void;
@@ -83,7 +87,7 @@ export interface PipelineState {
   // Undo/Redo Actions
   undo: () => void;
   redo: () => void;
-  saveToHistory: (type: HistoryEntry['type'], description: string) => void;
+  saveToHistory: (type: HistoryEntry["type"], description: string) => void;
 
   // Internal State Management
   setLoading: (loading: boolean) => void;
@@ -101,17 +105,18 @@ export const initialState = {
   isSaving: false,
   nodePositions: {},
   hasInitialLayout: false,
+  layoutKey: 0,
   layoutConfig: {
-    algorithm: 'dagre' as LayoutAlgorithm,
-    direction: 'LR' as LayoutDirection,
+    algorithm: "dagre" as LayoutAlgorithm,
+    direction: "LR" as LayoutDirection,
     nodeWidth: 280,
     nodeHeight: 240,
     rankSep: 150,
     nodeSep: 50,
-    autoSpacing: true,
+    autoSpacing: true
   },
   history: [],
   historyIndex: -1,
   canUndo: false,
-  canRedo: false,
+  canRedo: false
 };

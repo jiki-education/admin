@@ -19,7 +19,9 @@ function Switch({
   const [isChecked, setIsChecked] = useState(defaultChecked);
 
   const handleToggle = () => {
-    if (disabled) {return;}
+    if (disabled) {
+      return;
+    }
     const newCheckedState = !isChecked;
     setIsChecked(newCheckedState);
     if (onChange) {
@@ -58,6 +60,6 @@ function Switch({
       {label}
     </label>
   );
-};
+}
 
 export default Switch;

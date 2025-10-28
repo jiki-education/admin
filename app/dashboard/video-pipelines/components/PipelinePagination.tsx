@@ -25,11 +25,7 @@ export default function PipelinePagination({
     const range = [];
     const rangeWithDots = [];
 
-    for (
-      let i = Math.max(2, currentPage - delta);
-      i <= Math.min(totalPages - 1, currentPage + delta);
-      i++
-    ) {
+    for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
       range.push(i);
     }
 
@@ -60,7 +56,7 @@ export default function PipelinePagination({
         <span className="text-sm text-gray-700 dark:text-gray-300">
           Showing {startItem} to {endItem} of {totalCount} pipelines
         </span>
-        
+
         <div className="flex items-center space-x-2">
           <label className="text-sm text-gray-700 dark:text-gray-300">Show:</label>
           <select
@@ -89,9 +85,7 @@ export default function PipelinePagination({
           {getVisiblePages().map((page, index) => (
             <span key={index}>
               {page === "..." ? (
-                <span className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                  ...
-                </span>
+                <span className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300">...</span>
               ) : (
                 <button
                   onClick={() => onPageChange(page as number)}

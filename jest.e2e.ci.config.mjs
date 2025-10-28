@@ -29,10 +29,7 @@ const config = {
   detectOpenHandles: true, // Help debug CI issues
   forceExit: false,
   // CI-specific settings
-  coveragePathIgnorePatterns: [
-    "/node_modules/",
-    "/tests/"
-  ],
+  coveragePathIgnorePatterns: ["/node_modules/", "/tests/"],
   testResultsProcessor: undefined // Clean results for CI
 };
 

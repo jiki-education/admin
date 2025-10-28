@@ -71,9 +71,7 @@ export default function DeletePipelineModal({
           </div>
 
           <div className="text-center mb-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Delete Pipeline
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Delete Pipeline</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
               Are you sure you want to delete the pipeline &quot;{pipeline.title}&quot;?
             </p>
@@ -94,7 +92,7 @@ export default function DeletePipelineModal({
               </div>
               <div className="flex justify-between mt-1">
                 <span>Total Cost:</span>
-                <span>${pipeline.metadata.totalCost?.toFixed(2) || '0.00'}</span>
+                <span>${pipeline.metadata.totalCost?.toFixed(2) || "0.00"}</span>
               </div>
             </div>
           </div>

@@ -69,18 +69,14 @@ export default function GenericNodeDetails({ node }: GenericNodeDetailsProps) {
       {/* Metadata */}
       {node.metadata && Object.keys(node.metadata).length > 0 && (
         <Section title="Metadata">
-          <pre className="text-xs bg-gray-50 p-3 rounded overflow-x-auto">
-            {JSON.stringify(node.metadata, null, 2)}
-          </pre>
+          <pre className="text-xs bg-gray-50 p-3 rounded overflow-x-auto">{JSON.stringify(node.metadata, null, 2)}</pre>
         </Section>
       )}
 
       {/* Output */}
       {node.output && Object.keys(node.output).length > 0 && (
         <Section title="Output">
-          <pre className="text-xs bg-gray-50 p-3 rounded overflow-x-auto">
-            {JSON.stringify(node.output, null, 2)}
-          </pre>
+          <pre className="text-xs bg-gray-50 p-3 rounded overflow-x-auto">{JSON.stringify(node.output, null, 2)}</pre>
         </Section>
       )}
     </>

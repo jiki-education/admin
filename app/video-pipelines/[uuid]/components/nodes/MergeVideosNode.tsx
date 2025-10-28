@@ -35,7 +35,13 @@ export default function MergeVideosNode({ data, selected }: MergeVideosNodeProps
         ${statusStyle.shadow}
       `}
     >
-      <NodeHeader type={node.type} title={node.title} displayName={displayName} status={node.status} onExecute={data.onExecute} />
+      <NodeHeader
+        type={node.type}
+        title={node.title}
+        displayName={displayName}
+        status={node.status}
+        onExecute={data.onExecute}
+      />
       <NodeOutputPreview node={node} />
 
       {/* Handles */}

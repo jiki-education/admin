@@ -20,7 +20,6 @@ export default function EditEmailTemplate() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-
   const loadTemplate = useCallback(async () => {
     if (!templateId || isNaN(templateId)) {
       setError("Invalid template ID");
@@ -31,10 +30,7 @@ export default function EditEmailTemplate() {
     try {
       setLoading(true);
       setError(null);
-      const [templateData, types] = await Promise.all([
-        getEmailTemplate(templateId),
-        getEmailTemplateTypes()
-      ]);
+      const [templateData, types] = await Promise.all([getEmailTemplate(templateId), getEmailTemplateTypes()]);
       setTemplate(templateData);
       setTemplateTypes(types);
     } catch (err) {
@@ -51,22 +47,25 @@ export default function EditEmailTemplate() {
     }
   }, [isAuthenticated, loadTemplate]);
 
-  const handleSaveTemplate = useCallback(async (templateData: EmailTemplate | Omit<EmailTemplate, 'id'>) => {
-    setSaving(true);
-    try {
-      if ('id' in templateData) {
-        await updateEmailTemplate(templateData.id, templateData);
-      } else {
-        throw new Error("Template ID is required for editing");
+  const handleSaveTemplate = useCallback(
+    async (templateData: EmailTemplate | Omit<EmailTemplate, "id">) => {
+      setSaving(true);
+      try {
+        if ("id" in templateData) {
+          await updateEmailTemplate(templateData.id, templateData);
+        } else {
+          throw new Error("Template ID is required for editing");
+        }
+        router.push("/dashboard/email-templates");
+      } catch (error) {
+        console.error("Failed to update template:", error);
+        throw error;
+      } finally {
+        setSaving(false);
       }
-      router.push("/dashboard/email-templates");
-    } catch (error) {
-      console.error("Failed to update template:", error);
-      throw error;
-    } finally {
-      setSaving(false);
-    }
-  }, [router]);
+    },
+    [router]
+  );
 
   const handleBack = useCallback(() => {
     router.push("/dashboard/email-templates");
@@ -94,9 +93,7 @@ export default function EditEmailTemplate() {
         <PageBreadcrumb pageTitle="Edit Email Template" />
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-              Edit Email Template
-            </h1>
+            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Edit Email Template</h1>
             <Button variant="outline" onClick={handleBack}>
               Back to Templates
             </Button>
@@ -112,13 +109,11 @@ export default function EditEmailTemplate() {
   return (
     <div>
       <PageBreadcrumb pageTitle="Edit Email Template" />
-      
+
       <div className="space-y-6">
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-              Edit Email Template
-            </h1>
+            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Edit Email Template</h1>
             <Button variant="outline" onClick={handleBack}>
               Back to Templates
             </Button>

@@ -115,6 +115,6 @@ function CountryMap({ mapColor }: CountryMapProps) {
       }}
     />
   );
-};
+}
 
 export default CountryMap;

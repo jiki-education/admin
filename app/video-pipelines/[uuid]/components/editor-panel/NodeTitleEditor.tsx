@@ -37,19 +37,17 @@ export default function NodeTitleEditor({ node, pipelineUuid, onUpdate }: NodeTi
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSave();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       handleCancel();
     }
   };
 
   return (
     <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Node Title
-      </label>
-      
+      <label className="block text-sm font-medium text-gray-700 mb-2">Node Title</label>
+
       {isEditing ? (
         <div className="space-y-3">
           <input
@@ -65,10 +63,10 @@ export default function NodeTitleEditor({ node, pipelineUuid, onUpdate }: NodeTi
           <div className="flex gap-2">
             <button
               onClick={handleSave}
-              disabled={isUpdating || title.trim() === ''}
+              disabled={isUpdating || title.trim() === ""}
               className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors"
             >
-              {isUpdating ? 'Saving...' : 'Save'}
+              {isUpdating ? "Saving..." : "Save"}
             </button>
             <button
               onClick={handleCancel}

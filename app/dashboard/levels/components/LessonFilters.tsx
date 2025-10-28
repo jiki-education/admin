@@ -20,11 +20,7 @@ const LESSON_TYPES = [
   { value: "assessment", label: "Assessment" }
 ];
 
-export default function LessonFilters({
-  lessons,
-  onFilterChange,
-  className = ""
-}: LessonFiltersProps) {
+export default function LessonFilters({ lessons, onFilterChange, className = "" }: LessonFiltersProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [showFilters, setShowFilters] = useState(false);
@@ -36,16 +32,17 @@ export default function LessonFilters({
     // Filter by search term (title and description)
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
-      filteredLessons = filteredLessons.filter(lesson =>
-        lesson.title.toLowerCase().includes(searchLower) ||
-        (lesson.description && lesson.description.toLowerCase().includes(searchLower)) ||
-        lesson.slug.toLowerCase().includes(searchLower)
+      filteredLessons = filteredLessons.filter(
+        (lesson) =>
+          lesson.title.toLowerCase().includes(searchLower) ||
+          (lesson.description && lesson.description.toLowerCase().includes(searchLower)) ||
+          lesson.slug.toLowerCase().includes(searchLower)
       );
     }
 
     // Filter by type
     if (selectedType) {
-      filteredLessons = filteredLessons.filter(lesson => lesson.type === selectedType);
+      filteredLessons = filteredLessons.filter((lesson) => lesson.type === selectedType);
     }
 
     onFilterChange(filteredLessons);
@@ -58,12 +55,15 @@ export default function LessonFilters({
 
   const hasActiveFilters = searchTerm.trim() || selectedType;
   const totalLessons = lessons.length;
-  
+
   // Count lessons by type for the dropdown
-  const typeCounts = lessons.reduce((acc, lesson) => {
-    acc[lesson.type] = (acc[lesson.type] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const typeCounts = lessons.reduce(
+    (acc, lesson) => {
+      acc[lesson.type] = (acc[lesson.type] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -111,7 +111,10 @@ export default function LessonFilters({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Type Filter */}
             <div>
-              <label htmlFor="lesson-type-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="lesson-type-filter"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Lesson Type
               </label>
               <select
@@ -131,16 +134,12 @@ export default function LessonFilters({
 
             {/* Lesson Count Summary */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Summary
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Summary</label>
               <div className="p-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   <div>Total: {totalLessons} lessons</div>
                   {hasActiveFilters && (
-                    <div className="text-blue-600 dark:text-blue-400 font-medium">
-                      Filtered results will show here
-                    </div>
+                    <div className="text-blue-600 dark:text-blue-400 font-medium">Filtered results will show here</div>
                   )}
                 </div>
               </div>
@@ -160,7 +159,7 @@ export default function LessonFilters({
           )}
           {selectedType && (
             <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-              Type: {LESSON_TYPES.find(t => t.value === selectedType)?.label}
+              Type: {LESSON_TYPES.find((t) => t.value === selectedType)?.label}
             </span>
           )}
         </div>

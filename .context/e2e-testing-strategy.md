@@ -11,44 +11,54 @@
 ## Step-by-Step Process
 
 ### Phase 1: Foundation Test
+
 Start with the absolute minimum:
+
 ```javascript
-describe('Basic App Functionality', () => {
-  it('should load the home page', async () => {
+describe("Basic App Functionality", () => {
+  it("should load the home page", async () => {
     await page.goto(`${baseUrl}/`);
-    const body = await page.$('body');
+    const body = await page.$("body");
     expect(body).toBeTruthy();
   });
 });
 ```
+
 **Verify this passes before proceeding.**
 
 ### Phase 2: Authentication Flow
+
 Add one auth test:
+
 ```javascript
-it('should redirect to signin when not authenticated', async () => {
+it("should redirect to signin when not authenticated", async () => {
   await page.goto(`${baseUrl}/dashboard`);
   await page.waitForNavigation();
-  expect(page.url()).toContain('/signin');
+  expect(page.url()).toContain("/signin");
 });
 ```
+
 **Verify this passes before proceeding.**
 
 ### Phase 3: Basic Navigation
+
 Add simple navigation:
+
 ```javascript
-it('should navigate to dashboard after mock login', async () => {
+it("should navigate to dashboard after mock login", async () => {
   await page.goto(`${baseUrl}/signin`);
   await page.click('button:has-text("Mock Login")');
   await page.waitForNavigation();
-  expect(page.url()).toContain('/dashboard');
+  expect(page.url()).toContain("/dashboard");
 });
 ```
+
 **Verify this passes before proceeding.**
 
 ## Testing Rules
 
 ### DO:
+
 - Start with page loads and basic navigation
 - Use simple selectors first (`button`, `h1`, `body`)
 - Test one user action per test
@@ -57,6 +67,7 @@ it('should navigate to dashboard after mock login', async () => {
 - Keep tests independent of each other
 
 ### DON'T:
+
 - Write multiple complex tests at once
 - Test implementation details
 - Use complex selectors until simple ones work
@@ -65,6 +76,7 @@ it('should navigate to dashboard after mock login', async () => {
 - Use deprecated Puppeteer APIs like `waitForTimeout()`
 
 ## File Structure
+
 ```
 tests/e2e/
 ├── 01-basic.test.ts           # Foundation tests
@@ -78,17 +90,18 @@ tests/e2e/
 ```
 
 ## Test Template
-```typescript
-import './setup';
 
-describe('Feature Name', () => {
+```typescript
+import "./setup";
+
+describe("Feature Name", () => {
   const baseUrl = process.env.TEST_URL || "http://localhost:3064";
 
   beforeEach(async () => {
     await page.goto(`${baseUrl}/`);
   });
 
-  it('should do one specific thing', async () => {
+  it("should do one specific thing", async () => {
     // 1. Navigate to page
     // 2. Perform one action
     // 3. Check one result
@@ -98,6 +111,7 @@ describe('Feature Name', () => {
 ```
 
 ## Debugging Process
+
 1. If test fails, check if page loads at all
 2. Check browser console for errors: `page.on('console', console.log)`
 3. Take screenshots on failure: `await page.screenshot({path: 'debug.png'})`
@@ -105,6 +119,7 @@ describe('Feature Name', () => {
 5. Simplify the test until it passes, then build back up
 
 ## Success Metrics
+
 - Each test file has maximum 5 tests
 - Each test has maximum 3 assertions
 - All tests pass consistently
@@ -112,6 +127,7 @@ describe('Feature Name', () => {
 - No flaky tests (tests that sometimes fail)
 
 ## Implementation Order
+
 1. ✅ Basic page loads (auth.test.ts - home page loading)
 2. ✅ Authentication flow (email-templates.test.ts - redirect to signin)
 3. ✅ Main navigation (navigation.test.ts - all main pages)

@@ -12,11 +12,11 @@ Represents a learning level with basic metadata:
 
 ```typescript
 interface AdminLevel {
-  id: number;           // Unique identifier
-  slug: string;         // URL-friendly identifier
-  title: string;        // Display name
-  description: string;  // Level description
-  position: number;     // Ordering position
+  id: number; // Unique identifier
+  slug: string; // URL-friendly identifier
+  title: string; // Display name
+  description: string; // Level description
+  position: number; // Ordering position
 }
 ```
 
@@ -26,13 +26,13 @@ Represents individual lessons within a level:
 
 ```typescript
 interface AdminLesson {
-  id: number;                    // Unique identifier
-  slug: string;                  // URL-friendly identifier
-  title: string;                 // Display name
-  description: string;           // Lesson description
-  type: string;                  // Lesson type (see types below)
-  position: number;              // Ordering within level
-  data: Record<string, any>;     // Flexible JSON data structure
+  id: number; // Unique identifier
+  slug: string; // URL-friendly identifier
+  title: string; // Display name
+  description: string; // Lesson description
+  type: string; // Lesson type (see types below)
+  position: number; // Ordering within level
+  data: Record<string, any>; // Flexible JSON data structure
 }
 ```
 
@@ -99,11 +99,13 @@ updateLesson(levelId: number, lessonId: number, data: Partial<AdminLesson>): Pro
 ## Key Features
 
 ### Level Management
+
 - **Filterable listing** with title/slug search
 - **Pagination** for large datasets
 - **Direct navigation** to lesson management
 
 ### Lesson Management
+
 - **Position-based ordering** with drag/reorder controls
 - **Bulk editing** for multiple lessons simultaneously
 - **Type-specific handling** based on lesson type
@@ -115,16 +117,18 @@ updateLesson(levelId: number, lessonId: number, data: Partial<AdminLesson>): Pro
 The `data` field in `AdminLesson` supports flexible JSON content based on lesson type:
 
 #### Video Lessons
+
 ```typescript
 {
   sources: Array<{
-    host: string;  // e.g., "mux"
-    id: string;    // Video playback ID
+    host: string; // e.g., "mux"
+    id: string; // Video playback ID
   }>;
 }
 ```
 
 #### Exercise Lessons
+
 ```typescript
 {
   // Exercise-specific configuration
@@ -141,7 +145,7 @@ The `data` field in `AdminLesson` supports flexible JSON content based on lesson
 ### User Experience Features
 
 - **Loading states** with skeleton components
-- **Error boundaries** for graceful error handling  
+- **Error boundaries** for graceful error handling
 - **Optimistic updates** for reordering operations
 - **Form validation** with real-time feedback
 - **Responsive design** for various screen sizes
@@ -149,17 +153,20 @@ The `data` field in `AdminLesson` supports flexible JSON content based on lesson
 ## State Management
 
 ### Level Listing (`/dashboard/levels`)
+
 - Manages level list with filtering and pagination
 - Uses URL query parameters for stateful filters
 - Implements loading/error states
 
 ### Level Detail (`/dashboard/levels/[id]`)
+
 - Manages lesson collection for a specific level
 - Handles lesson reordering through position updates
 - Supports bulk operations on selected lessons
 - Implements filtered views of lessons
 
 ### Lesson Editor (`/dashboard/levels/[id]/lessons/[lessonId]/edit`)
+
 - Form state management for lesson properties
 - JSON validation for lesson data
 - Save/cancel operations with navigation

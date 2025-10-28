@@ -18,15 +18,17 @@ export default function LessonReorderControls({
   const [isReordering, setIsReordering] = useState(false);
 
   const reorderLesson = async (lessonId: number, direction: "up" | "down"): Promise<void> => {
-    if (isReordering) {return;}
+    if (isReordering) {
+      return;
+    }
 
     setIsReordering(true);
     try {
       // Create a sorted copy of lessons
       const sortedLessons = [...lessons].sort((a, b) => a.position - b.position);
-      
+
       // Find the lesson to move
-      const currentIndex = sortedLessons.findIndex(lesson => lesson.id === lessonId);
+      const currentIndex = sortedLessons.findIndex((lesson) => lesson.id === lessonId);
       if (currentIndex === -1) {
         throw new Error("Lesson not found");
       }
@@ -51,21 +53,21 @@ export default function LessonReorderControls({
       // Swap positions using a three-step process to avoid uniqueness conflicts
       const currentPosition = currentLesson.position;
       const targetPosition = targetLesson.position;
-      
+
       // Use a temporary position that won't conflict (negative number)
       const tempPosition = -Math.max(currentPosition, targetPosition) - 1;
 
       // Step 1: Move current lesson to temporary position
       await updateLesson(levelId, currentLesson.id, { position: tempPosition });
-      
-      // Step 2: Move target lesson to current lesson's original position  
+
+      // Step 2: Move target lesson to current lesson's original position
       await updateLesson(levelId, targetLesson.id, { position: currentPosition });
-      
+
       // Step 3: Move current lesson to target lesson's original position
       await updateLesson(levelId, currentLesson.id, { position: targetPosition });
 
       // Update local state optimistically
-      const updatedLessons = lessons.map(lesson => {
+      const updatedLessons = lessons.map((lesson) => {
         if (lesson.id === currentLesson.id) {
           return { ...lesson, position: targetPosition };
         }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, use } from "react";
 import { useRequireAuth } from "@/lib/auth/hooks";
 import { useRouter } from "next/navigation";
-import { usePipelineStore } from "@/stores/usePipelineStore";
+import { usePipelineStore } from "@/stores/pipeline";
 import PipelineLayout from "./components/PipelineLayout";
 
 interface PageProps {
@@ -15,14 +15,8 @@ export default function PipelinePage({ params }: PageProps) {
   const { uuid } = use(params);
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const router = useRouter();
-  
-  const { 
-    pipeline, 
-    loading, 
-    error, 
-    loadPipeline,
-    resetStore 
-  } = usePipelineStore();
+
+  const { pipeline, loading, error, loadPipeline, resetStore } = usePipelineStore();
 
   useEffect(() => {
     if (!isAuthenticated || authLoading) {
@@ -30,7 +24,7 @@ export default function PipelinePage({ params }: PageProps) {
     }
 
     void loadPipeline(uuid);
-    
+
     // Cleanup store when component unmounts
     return () => {
       resetStore();
@@ -80,10 +74,7 @@ export default function PipelinePage({ params }: PageProps) {
 
   return (
     <div className="h-screen flex flex-col">
-      <PipelineLayout 
-        pipelineUuid={uuid} 
-        onRefresh={() => loadPipeline(uuid)}
-      />
+      <PipelineLayout pipelineUuid={uuid} onRefresh={() => loadPipeline(uuid)} />
     </div>
   );
 }

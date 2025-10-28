@@ -36,6 +36,6 @@ function AvatarText({ name, className = "" }: AvatarTextProps) {
       <span className="text-sm font-medium">{initials}</span>
     </div>
   );
-};
+}
 
 export default AvatarText;

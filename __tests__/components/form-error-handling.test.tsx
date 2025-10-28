@@ -1,10 +1,10 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import LevelForm from '@/app/dashboard/levels/components/LevelForm';
-import LessonForm from '@/app/dashboard/levels/components/LessonForm';
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import LevelForm from "@/app/dashboard/levels/components/LevelForm";
+import LessonForm from "@/app/dashboard/levels/components/LessonForm";
 
 // Mock JSONEditor for LessonForm tests
-jest.mock('@/app/dashboard/levels/components/JSONEditor', () => {
+jest.mock("@/app/dashboard/levels/components/JSONEditor", () => {
   return function MockJSONEditor({ value, onChange, onValidation }: any) {
     return (
       <textarea
@@ -19,31 +19,23 @@ jest.mock('@/app/dashboard/levels/components/JSONEditor', () => {
   };
 });
 
-describe('Form Error Handling', () => {
-  test('LevelForm displays API errors and allows retry', async () => {
-    const mockOnSave = jest.fn()
-      .mockRejectedValueOnce(new Error('Slug already exists'))
-      .mockResolvedValueOnce({});
+describe("Form Error Handling", () => {
+  test("LevelForm displays API errors and allows retry", async () => {
+    const mockOnSave = jest.fn().mockRejectedValueOnce(new Error("Slug already exists")).mockResolvedValueOnce({});
     const mockOnCancel = jest.fn();
 
-    render(
-      <LevelForm
-        mode="create"
-        onSave={mockOnSave}
-        onCancel={mockOnCancel}
-      />
-    );
+    render(<LevelForm mode="create" onSave={mockOnSave} onCancel={mockOnCancel} />);
 
     // Fill in valid form data
-    fireEvent.change(screen.getByLabelText(/title/i), { 
-      target: { value: 'Test Level' } 
+    fireEvent.change(screen.getByLabelText(/title/i), {
+      target: { value: "Test Level" }
     });
-    fireEvent.change(screen.getByLabelText(/description/i), { 
-      target: { value: 'Test description' } 
+    fireEvent.change(screen.getByLabelText(/description/i), {
+      target: { value: "Test description" }
     });
 
     // Submit form - should fail first time
-    const submitButton = screen.getByRole('button', { name: /create level/i });
+    const submitButton = screen.getByRole("button", { name: /create level/i });
     fireEvent.click(submitButton);
 
     // Wait for error to appear
@@ -55,37 +47,30 @@ describe('Form Error Handling', () => {
     // In the actual implementation, general errors persist until another submit attempt
     // Let's verify that the button is correctly disabled after error
     expect(submitButton).toBeDisabled();
-    
+
     // In a real scenario, the user would fix the issue (like changing the slug)
     // and retry. The general error would be replaced by the new submission result.
     // Let's verify the error is displayed properly
     expect(mockOnSave).toHaveBeenCalledTimes(1);
   });
 
-  test('LessonForm handles validation errors and shows field-specific messages', async () => {
+  test("LessonForm handles validation errors and shows field-specific messages", async () => {
     const mockOnSave = jest.fn();
     const mockOnCancel = jest.fn();
 
-    render(
-      <LessonForm
-        mode="create"
-        levelId={1}
-        onSave={mockOnSave}
-        onCancel={mockOnCancel}
-      />
-    );
+    render(<LessonForm mode="create" levelId={1} onSave={mockOnSave} onCancel={mockOnCancel} />);
 
-    const submitButton = screen.getByRole('button', { name: /create lesson/i });
+    const submitButton = screen.getByRole("button", { name: /create lesson/i });
 
     // Try to submit with invalid slug format
-    fireEvent.change(screen.getByLabelText(/title/i), { 
-      target: { value: 'Test Lesson' } 
+    fireEvent.change(screen.getByLabelText(/title/i), {
+      target: { value: "Test Lesson" }
     });
-    fireEvent.change(screen.getByLabelText(/slug/i), { 
-      target: { value: 'Invalid Slug!' } 
+    fireEvent.change(screen.getByLabelText(/slug/i), {
+      target: { value: "Invalid Slug!" }
     });
-    fireEvent.change(screen.getByLabelText(/description/i), { 
-      target: { value: 'Test description' } 
+    fireEvent.change(screen.getByLabelText(/description/i), {
+      target: { value: "Test description" }
     });
 
     // The button should be disabled due to validation
@@ -95,8 +80,8 @@ describe('Form Error Handling', () => {
     expect(mockOnSave).not.toHaveBeenCalled();
 
     // Fix the slug
-    fireEvent.change(screen.getByLabelText(/slug/i), { 
-      target: { value: 'valid-slug' } 
+    fireEvent.change(screen.getByLabelText(/slug/i), {
+      target: { value: "valid-slug" }
     });
 
     // Button should now be enabled since form is valid
@@ -105,28 +90,22 @@ describe('Form Error Handling', () => {
     });
   });
 
-  test('forms handle network errors gracefully', async () => {
-    const networkError = new Error('Network request failed');
+  test("forms handle network errors gracefully", async () => {
+    const networkError = new Error("Network request failed");
     const mockOnSave = jest.fn().mockRejectedValue(networkError);
     const mockOnCancel = jest.fn();
 
-    render(
-      <LevelForm
-        mode="create"
-        onSave={mockOnSave}
-        onCancel={mockOnCancel}
-      />
-    );
+    render(<LevelForm mode="create" onSave={mockOnSave} onCancel={mockOnCancel} />);
 
     // Fill in valid form data
-    fireEvent.change(screen.getByLabelText(/title/i), { 
-      target: { value: 'Test Level' } 
+    fireEvent.change(screen.getByLabelText(/title/i), {
+      target: { value: "Test Level" }
     });
-    fireEvent.change(screen.getByLabelText(/description/i), { 
-      target: { value: 'Test description' } 
+    fireEvent.change(screen.getByLabelText(/description/i), {
+      target: { value: "Test description" }
     });
 
-    const submitButton = screen.getByRole('button', { name: /create level/i });
+    const submitButton = screen.getByRole("button", { name: /create level/i });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -136,7 +115,7 @@ describe('Form Error Handling', () => {
     // Form should still be usable after error (button may be disabled due to form validation)
     // But the form should be functional and the error should be displayed
     expect(screen.getByText(/network request failed/i)).toBeInTheDocument();
-    
+
     // Check that after fixing the error state, the button works again
     await waitFor(() => {
       // The button might be disabled during the save attempt, but error should be visible

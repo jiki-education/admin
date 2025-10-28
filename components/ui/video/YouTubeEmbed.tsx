@@ -9,12 +9,7 @@ interface YouTubeEmbedProps {
   className?: string;
 }
 
-function YouTubeEmbed({
-  videoId,
-  aspectRatio = "16:9",
-  title = "YouTube video",
-  className = ""
-}: YouTubeEmbedProps) {
+function YouTubeEmbed({ videoId, aspectRatio = "16:9", title = "YouTube video", className = "" }: YouTubeEmbedProps) {
   const aspectRatioClass = {
     "16:9": "aspect-video",
     "4:3": "aspect-4/3",
@@ -34,6 +29,6 @@ function YouTubeEmbed({
       ></iframe>
     </div>
   );
-};
+}
 
 export default YouTubeEmbed;

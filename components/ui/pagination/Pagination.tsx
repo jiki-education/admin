@@ -9,13 +9,7 @@ interface PaginationProps {
   itemLabel: string; // e.g., "users", "templates", "levels"
 }
 
-export default function Pagination({
-  currentPage,
-  totalPages,
-  totalCount,
-  onPageChange,
-  itemLabel
-}: PaginationProps) {
+export default function Pagination({ currentPage, totalPages, totalCount, onPageChange, itemLabel }: PaginationProps) {
   if (totalPages <= 1) {
     return null;
   }
@@ -77,33 +71,23 @@ export default function Pagination({
   return (
     <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 dark:border-gray-700 dark:bg-white/[0.03]">
       <div className="flex flex-1 justify-between sm:hidden">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handlePrevious}
-          disabled={currentPage === 1}
-        >
+        <Button variant="outline" size="sm" onClick={handlePrevious} disabled={currentPage === 1}>
           Previous
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleNext}
-          disabled={currentPage === totalPages}
-        >
+        <Button variant="outline" size="sm" onClick={handleNext} disabled={currentPage === totalPages}>
           Next
         </Button>
       </div>
-      
+
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-gray-700 dark:text-gray-300">
             Showing page <span className="font-medium">{currentPage}</span> of{" "}
-            <span className="font-medium">{totalPages}</span>{" "}
-            (<span className="font-medium">{totalCount}</span> total {itemLabel})
+            <span className="font-medium">{totalPages}</span> (<span className="font-medium">{totalCount}</span> total{" "}
+            {itemLabel})
           </p>
         </div>
-        
+
         <div>
           <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
             <Button
@@ -115,8 +99,8 @@ export default function Pagination({
             >
               Previous
             </Button>
-            
-            {pageNumbers.map((page, index) => (
+
+            {pageNumbers.map((page, index) =>
               page === "..." ? (
                 <span
                   key={`ellipsis-${index}`}
@@ -135,8 +119,8 @@ export default function Pagination({
                   {page}
                 </Button>
               )
-            ))}
-            
+            )}
+
             <Button
               variant="outline"
               size="sm"

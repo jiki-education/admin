@@ -42,5 +42,4 @@ export function EcommerceMetrics() {
       {/* <!-- Metric Item End --> */}
     </div>
   );
-};
-
+}

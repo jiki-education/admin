@@ -29,7 +29,9 @@ export default function DeleteConfirmModal({
     }
   };
 
-  if (!template) { return null };
+  if (!template) {
+    return null;
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-md p-6">
@@ -52,9 +54,7 @@ export default function DeleteConfirmModal({
         </div>
 
         {/* Title */}
-        <h3 className="mb-2 text-lg font-semibold text-gray-800 dark:text-white/90">
-          Delete Email Template
-        </h3>
+        <h3 className="mb-2 text-lg font-semibold text-gray-800 dark:text-white/90">Delete Email Template</h3>
 
         {/* Description */}
         <div className="mb-6 space-y-2 text-sm text-gray-600 dark:text-gray-400">
@@ -64,24 +64,17 @@ export default function DeleteConfirmModal({
               #{template.id} - {template.subject}
             </div>
             <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Type: <span className="font-mono">{template.type}</span> |
-              Slug: <span className="font-mono">{template.slug}</span> |
-              Locale: <span className="font-mono">{template.locale.toUpperCase()}</span>
+              Type: <span className="font-mono">{template.type}</span> | Slug:{" "}
+              <span className="font-mono">{template.slug}</span> | Locale:{" "}
+              <span className="font-mono">{template.locale.toUpperCase()}</span>
             </div>
           </div>
-          <p className="text-red-600 dark:text-red-400 font-medium">
-            This action cannot be undone.
-          </p>
+          <p className="text-red-600 dark:text-red-400 font-medium">This action cannot be undone.</p>
         </div>
 
         {/* Actions */}
         <div className="flex items-center justify-center gap-3">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={onClose}
-            disabled={loading}
-          >
+          <Button size="sm" variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
           <Button

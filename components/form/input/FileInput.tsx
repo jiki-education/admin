@@ -13,6 +13,6 @@ function FileInput({ className, onChange }: FileInputProps) {
       onChange={onChange}
     />
   );
-};
+}
 
 export default FileInput;

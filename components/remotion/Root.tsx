@@ -6,7 +6,7 @@ import type { SceneConfig } from "@/lib/remotion/types";
 
 export const RemotionRoot: React.FC = () => {
   const fps = 30;
-  
+
   // Example scene configuration
   const exampleConfig: SceneConfig = {
     title: "Basic Variable Example",
@@ -14,7 +14,7 @@ export const RemotionRoot: React.FC = () => {
     actions: [
       {
         type: "type",
-        code: "let greeting = \"Hello World\";",
+        code: 'let greeting = "Hello World";',
         speed: "normal",
         language: "javascript"
       }

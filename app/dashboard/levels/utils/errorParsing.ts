@@ -4,17 +4,17 @@
  */
 export function parseValidationErrors(message: string): Record<string, string> {
   const errors: Record<string, string> = {};
-  
+
   // Remove "Validation failed: " prefix if present
   const cleanMessage = message.replace(/^Validation failed:\s*/, "");
-  
+
   // Split by comma and process each error
   const errorParts = cleanMessage.split(", ");
-  
+
   for (const part of errorParts) {
     // Match patterns like "Title can't be blank" or "Slug has already been taken"
     const match = part.match(/^([A-Za-z_]+)\s+(.+)$/);
-    
+
     if (match) {
       const [, field, error] = match;
       const fieldKey = field.toLowerCase();
@@ -24,12 +24,12 @@ export function parseValidationErrors(message: string): Record<string, string> {
       errors.general = part;
     }
   }
-  
+
   // If no field-specific errors were found, treat the whole message as general
   if (Object.keys(errors).length === 0) {
     errors.general = message;
   }
-  
+
   return errors;
 }
 
@@ -38,7 +38,7 @@ export function parseValidationErrors(message: string): Record<string, string> {
  */
 export function formatErrorMessage(fieldName: string, errorMessage: string): string {
   // Remove field name prefix if it exists in the error message
-  const cleanError = errorMessage.replace(new RegExp(`^${fieldName}\\s+`, 'i'), '');
+  const cleanError = errorMessage.replace(new RegExp(`^${fieldName}\\s+`, "i"), "");
   return cleanError;
 }
 

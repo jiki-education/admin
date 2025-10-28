@@ -9,10 +9,7 @@ interface LevelTableProps {
   loading?: boolean;
 }
 
-export default function LevelTable({
-  levels,
-  loading = false
-}: LevelTableProps) {
+export default function LevelTable({ levels, loading = false }: LevelTableProps) {
   if (loading) {
     return (
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -28,9 +25,7 @@ export default function LevelTable({
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="p-8 text-center">
           <div className="text-gray-600 dark:text-gray-400 mb-4">No levels found</div>
-          <p className="text-sm text-gray-500 dark:text-gray-500">
-            Try adjusting your filters or check back later.
-          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-500">Try adjusting your filters or check back later.</p>
         </div>
       </div>
     );
@@ -86,19 +81,13 @@ export default function LevelTable({
               {levels.map((level) => (
                 <TableRow key={level.id}>
                   <TableCell className="px-5 py-4 text-start">
-                    <span className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      #{level.id}
-                    </span>
+                    <span className="font-medium text-gray-800 text-theme-sm dark:text-white/90">#{level.id}</span>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start">
-                    <div className="font-medium text-gray-900 dark:text-white">
-                      {level.title}
-                    </div>
+                    <div className="font-medium text-gray-900 dark:text-white">{level.title}</div>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">
-                      {level.slug}
-                    </code>
+                    <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">{level.slug}</code>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start">
                     <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">

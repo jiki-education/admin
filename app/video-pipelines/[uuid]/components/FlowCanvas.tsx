@@ -19,7 +19,8 @@ import {
   type OnNodesDelete,
   type OnNodesChange,
   type NodeTypes,
-  type NodeMouseHandler
+  type NodeMouseHandler,
+  type Node as ReactFlowNode
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -53,29 +54,32 @@ const nodeTypes: NodeTypes = {
 
 export default function FlowCanvas() {
   // Store subscriptions
-  const { 
-    pipeline, 
-    getLayoutedNodes, 
-    getEdges, 
-    setSelectedNode, 
-    connectNodes, 
+  const {
+    pipeline,
+    nodes: rawNodes,
+    getLayoutedNodes,
+    getEdges,
+    setSelectedNode,
+    connectNodes,
     deleteNodes,
-    updateNodePositions 
+    updateNodePositions,
+    layoutKey,
+    hasInitialLayout
   } = usePipelineStore();
 
   // Get computed values from store
-  const storeNodes = getLayoutedNodes();
   const storeEdges = getEdges();
-  
+
   // Use React Flow's built-in state management for proper drag functionality
-  const [nodes, setNodes, onNodesChange] = useNodesState(storeNodes);
+  const [flowNodes, setNodes, onNodesChange] = useNodesState<ReactFlowNode>([]);
   const [edges, setEdges] = useEdgesState(storeEdges);
-  
+
   // Sync store state with React Flow state
   useEffect(() => {
+    const storeNodes = getLayoutedNodes();
     setNodes(storeNodes);
-  }, [storeNodes, setNodes]);
-  
+  }, [rawNodes, layoutKey, hasInitialLayout, getLayoutedNodes, setNodes]);
+
   useEffect(() => {
     setEdges(storeEdges);
   }, [storeEdges, setEdges]);
@@ -89,8 +93,8 @@ export default function FlowCanvas() {
       }
 
       // Find target node
-      const targetNode = nodes.find((n) => n.id === connection.target);
-      if (!targetNode || !targetNode.data.node) {
+      const targetNode = flowNodes.find((n) => n.id === connection.target);
+      if (!targetNode?.data.node) {
         return;
       }
 
@@ -119,10 +123,12 @@ export default function FlowCanvas() {
 
       // Connection is valid, proceed
       if (pipeline) {
-        void connectNodes(pipeline.uuid, connection.source, connection.target, connection.targetHandle);
+        connectNodes(pipeline.uuid, connection.source, connection.target, connection.targetHandle).catch((error) =>
+          console.error(error)
+        );
       }
     },
-    [pipeline, connectNodes, nodes, edges]
+    [pipeline, connectNodes, flowNodes, edges]
   );
 
   // Handle node deletion
@@ -130,7 +136,7 @@ export default function FlowCanvas() {
     (nodesToDelete) => {
       if (pipeline) {
         const nodeIds = nodesToDelete.map((node) => node.id);
-        void deleteNodes(pipeline.uuid, nodeIds);
+        deleteNodes(pipeline.uuid, nodeIds).catch((error) => console.error(error));
       }
     },
     [pipeline, deleteNodes]
@@ -150,25 +156,25 @@ export default function FlowCanvas() {
   }, [setSelectedNode]);
 
   // Enhanced node change handler that combines React Flow's built-in handling with our custom logic
-  const handleNodesChange: OnNodesChange = useCallback(
+  const handleNodesChange: OnNodesChange<ReactFlowNode> = useCallback(
     (changes) => {
       // Always apply React Flow's internal changes first (essential for drag functionality)
       onNodesChange(changes);
-      
+
       // Filter for position changes that are completed (dragging: false)
       const positionChanges = changes.filter(
-        (change) => change.type === 'position' && change.dragging === false && change.position
+        (change) => change.type === "position" && change.dragging === false && change.position
       );
-      
+
       if (positionChanges.length > 0) {
         // Create new positions object
         const newPositions: Record<string, { x: number; y: number }> = {};
         positionChanges.forEach((change) => {
-          if (change.type === 'position' && change.position) {
+          if (change.type === "position" && change.position) {
             newPositions[change.id] = change.position;
           }
         });
-        
+
         updateNodePositions(newPositions);
       }
     },
@@ -178,7 +184,7 @@ export default function FlowCanvas() {
   return (
     <div className="flex-1 bg-gray-50">
       <ReactFlow
-        nodes={nodes}
+        nodes={flowNodes}
         edges={edges}
         nodeTypes={nodeTypes}
         onConnect={handleConnect}

@@ -1,6 +1,6 @@
 /**
  * Smart Node Positioning System
- * 
+ *
  * Provides intelligent node placement logic for the video production pipeline editor.
  * Finds optimal positions for new nodes while avoiding overlaps and considering
  * viewport, zoom level, and existing node layout.
@@ -28,7 +28,7 @@ export interface PositioningOptions {
   centerY?: number;
   gridSnap?: boolean;
   minSpacing?: number;
-  preferredDirection?: 'right' | 'down' | 'left' | 'up';
+  preferredDirection?: "right" | "down" | "left" | "up";
 }
 
 /**
@@ -37,7 +37,7 @@ export interface PositioningOptions {
 export function snapToGrid(position: Position, gridSize: number = GRID_SIZE): Position {
   return {
     x: Math.round(position.x / gridSize) * gridSize,
-    y: Math.round(position.y / gridSize) * gridSize,
+    y: Math.round(position.y / gridSize) * gridSize
   };
 }
 
@@ -69,7 +69,7 @@ function isPositionValid(
     x: position.x - NODE_WIDTH / 2,
     y: position.y - NODE_HEIGHT / 2,
     width: NODE_WIDTH + minSpacing,
-    height: NODE_HEIGHT + minSpacing,
+    height: NODE_HEIGHT + minSpacing
   };
 
   for (const node of existingNodes) {
@@ -79,7 +79,7 @@ function isPositionValid(
         x: nodePosition.x - NODE_WIDTH / 2 - minSpacing / 2,
         y: nodePosition.y - NODE_HEIGHT / 2 - minSpacing / 2,
         width: NODE_WIDTH + minSpacing,
-        height: NODE_HEIGHT + minSpacing,
+        height: NODE_HEIGHT + minSpacing
       };
 
       if (rectanglesOverlap(candidateRect, existingRect)) {
@@ -94,11 +94,7 @@ function isPositionValid(
 /**
  * Generate candidate positions in a spiral pattern around a center point
  */
-function* generateSpiralPositions(
-  centerX: number,
-  centerY: number,
-  gridSize: number = GRID_SIZE
-): Generator<Position> {
+function* generateSpiralPositions(centerX: number, centerY: number, gridSize: number = GRID_SIZE): Generator<Position> {
   // Start at center
   yield { x: centerX, y: centerY };
 
@@ -124,7 +120,7 @@ function* generateSpiralPositions(
 function* generateDirectionalPositions(
   centerX: number,
   centerY: number,
-  direction: 'right' | 'down' | 'left' | 'up',
+  direction: "right" | "down" | "left" | "up",
   gridSize: number = GRID_SIZE
 ): Generator<Position> {
   const spacing = NODE_WIDTH + MIN_SPACING;
@@ -134,32 +130,32 @@ function* generateDirectionalPositions(
     let positions: Position[] = [];
 
     switch (direction) {
-      case 'right':
+      case "right":
         positions = [
           { x: centerX + distance, y: centerY },
           { x: centerX + distance, y: centerY - spacing },
-          { x: centerX + distance, y: centerY + spacing },
+          { x: centerX + distance, y: centerY + spacing }
         ];
         break;
-      case 'down':
+      case "down":
         positions = [
           { x: centerX, y: centerY + distance },
           { x: centerX - spacing, y: centerY + distance },
-          { x: centerX + spacing, y: centerY + distance },
+          { x: centerX + spacing, y: centerY + distance }
         ];
         break;
-      case 'left':
+      case "left":
         positions = [
           { x: centerX - distance, y: centerY },
           { x: centerX - distance, y: centerY - spacing },
-          { x: centerX - distance, y: centerY + spacing },
+          { x: centerX - distance, y: centerY + spacing }
         ];
         break;
-      case 'up':
+      case "up":
         positions = [
           { x: centerX, y: centerY - distance },
           { x: centerX - spacing, y: centerY - distance },
-          { x: centerX + spacing, y: centerY - distance },
+          { x: centerX + spacing, y: centerY - distance }
         ];
         break;
     }
@@ -174,7 +170,7 @@ function* generateDirectionalPositions(
 
 /**
  * Calculate optimal position for a new node
- * 
+ *
  * Uses intelligent placement algorithms to find the best position:
  * 1. If preferredDirection is specified, search in that direction first
  * 2. Otherwise, use spiral search pattern from center
@@ -206,9 +202,7 @@ export function calculateNodePosition(
   let effectiveCenterY = centerY;
 
   if (centerX === CANVAS_CENTER_X && centerY === CANVAS_CENTER_Y) {
-    const positions = existingNodes
-      .map(node => nodePositions[node.uuid])
-      .filter(Boolean);
+    const positions = existingNodes.map((node) => nodePositions[node.uuid]).filter(Boolean);
 
     if (positions.length > 0) {
       effectiveCenterX = positions.reduce((sum, pos) => sum + pos.x, 0) / positions.length;
@@ -229,10 +223,13 @@ export function calculateNodePosition(
   }
 
   // Fallback: place far to the right if no position found
-  return snapToGrid({
-    x: effectiveCenterX + MAX_SEARCH_RADIUS,
-    y: effectiveCenterY
-  }, gridSize);
+  return snapToGrid(
+    {
+      x: effectiveCenterX + MAX_SEARCH_RADIUS,
+      y: effectiveCenterY
+    },
+    gridSize
+  );
 }
 
 /**
@@ -241,40 +238,38 @@ export function calculateNodePosition(
 export function suggestPlacementDirection(
   existingNodes: Node[],
   nodePositions: Record<string, Position>
-): 'right' | 'down' | 'left' | 'up' | undefined {
+): "right" | "down" | "left" | "up" | undefined {
   if (existingNodes.length === 0) {
     return undefined; // No preference for first node
   }
 
-  const positions = existingNodes
-    .map(node => nodePositions[node.uuid])
-    .filter(Boolean);
+  const positions = existingNodes.map((node) => nodePositions[node.uuid]).filter(Boolean);
 
   if (positions.length === 0) {
     return undefined;
   }
 
   // Calculate bounding box of existing nodes
-  const minX = Math.min(...positions.map(p => p.x));
-  const maxX = Math.max(...positions.map(p => p.x));
-  const minY = Math.min(...positions.map(p => p.y));
-  const maxY = Math.max(...positions.map(p => p.y));
+  const minX = Math.min(...positions.map((p) => p.x));
+  const maxX = Math.max(...positions.map((p) => p.x));
+  const minY = Math.min(...positions.map((p) => p.y));
+  const maxY = Math.max(...positions.map((p) => p.y));
 
   const width = maxX - minX;
   const height = maxY - minY;
 
   // If layout is wider than tall, prefer placing vertically
   if (width > height * 1.5) {
-    return 'down';
+    return "down";
   }
-  
+
   // If layout is taller than wide, prefer placing horizontally
   if (height > width * 1.5) {
-    return 'right';
+    return "right";
   }
 
   // For roughly square layouts, prefer right (left-to-right flow)
-  return 'right';
+  return "right";
 }
 
 /**
@@ -292,22 +287,22 @@ export function calculatePositionNearNode(
     return null;
   }
 
-  const direction = options.preferredDirection || 'right';
+  const direction = options.preferredDirection || "right";
   const spacing = NODE_WIDTH + (options.minSpacing || MIN_SPACING);
 
   let candidatePosition: Position;
 
   switch (direction) {
-    case 'right':
+    case "right":
       candidatePosition = { x: targetPosition.x + spacing, y: targetPosition.y };
       break;
-    case 'down':
+    case "down":
       candidatePosition = { x: targetPosition.x, y: targetPosition.y + spacing };
       break;
-    case 'left':
+    case "left":
       candidatePosition = { x: targetPosition.x - spacing, y: targetPosition.y };
       break;
-    case 'up':
+    case "up":
       candidatePosition = { x: targetPosition.x, y: targetPosition.y - spacing };
       break;
   }
@@ -325,6 +320,6 @@ export function calculatePositionNearNode(
   return calculateNodePosition(existingNodes, nodePositions, {
     ...options,
     centerX: targetPosition.x,
-    centerY: targetPosition.y,
+    centerY: targetPosition.y
   });
 }

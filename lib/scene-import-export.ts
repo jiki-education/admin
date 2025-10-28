@@ -114,23 +114,18 @@ export function importScene(jsonString: string): {
 /**
  * Download a scene configuration as a JSON file
  */
-export function downloadSceneFile(
-  title: string,
-  config: SceneConfig,
-  description?: string,
-  exportedBy?: string
-): void {
+export function downloadSceneFile(title: string, config: SceneConfig, description?: string, exportedBy?: string): void {
   const jsonContent = exportScene(title, config, description, exportedBy);
   const blob = new Blob([jsonContent], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-  
+
   const link = document.createElement("a");
   link.href = url;
   link.download = `${title.replace(/[^a-zA-Z0-9-_]/g, "_")}_scene.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  
+
   URL.revokeObjectURL(url);
 }
 
@@ -146,7 +141,7 @@ export function pickSceneFile(): Promise<{
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".json";
-    
+
     input.onchange = (event) => {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (!file) {
@@ -163,24 +158,24 @@ export function pickSceneFile(): Promise<{
         const result = importScene(content);
         resolve(result);
       };
-      
+
       reader.onerror = () => {
         resolve({
           success: false,
           error: "Failed to read file"
         });
       };
-      
+
       reader.readAsText(file);
     };
-    
+
     input.oncancel = () => {
       resolve({
         success: false,
         error: "File selection cancelled"
       });
     };
-    
+
     document.body.appendChild(input);
     input.click();
     document.body.removeChild(input);

@@ -1,6 +1,6 @@
 /**
  * Node Default Configuration Generator
- * 
+ *
  * Provides sensible default configurations for each node type when creating new nodes.
  * Includes default titles, empty inputs, and provider-specific configurations.
  */
@@ -15,7 +15,7 @@ import { getNodeInputConfig } from "./metadata";
 export function generateNodeTitle(nodeType: NodeType, existingNodes: Node[]): string {
   const baseNames: Record<NodeType, string> = {
     asset: "Asset",
-    "generate-talking-head": "Talking Head", 
+    "generate-talking-head": "Talking Head",
     "generate-animation": "Animation",
     "generate-voiceover": "Voiceover",
     "render-code": "Code Screen",
@@ -25,10 +25,10 @@ export function generateNodeTitle(nodeType: NodeType, existingNodes: Node[]): st
   };
 
   const baseName = baseNames[nodeType];
-  
+
   // Find existing nodes of the same type
-  const sameTypeNodes = existingNodes.filter(node => node.type === nodeType);
-  
+  const sameTypeNodes = existingNodes.filter((node) => node.type === nodeType);
+
   if (sameTypeNodes.length === 0) {
     return baseName;
   }
@@ -207,11 +207,9 @@ export function generateDefaultNodeConfig(
   const title = generateNodeTitle(nodeType, existingNodes);
   const inputs = generateDefaultInputs(nodeType);
   const config = generateDefaultConfig(nodeType);
-  
+
   // Only asset nodes have asset data
-  const asset = nodeType === "asset" && assetType 
-    ? generateDefaultAsset(assetType)
-    : undefined;
+  const asset = nodeType === "asset" && assetType ? generateDefaultAsset(assetType) : undefined;
 
   return {
     title,
@@ -241,7 +239,7 @@ export const NODE_TYPE_DESCRIPTIONS: Record<NodeType, string> = {
 export const NODE_CATEGORIES: Record<string, NodeType[]> = {
   "Content Generation": ["generate-talking-head", "generate-animation", "generate-voiceover", "render-code"],
   "Media Processing": ["mix-audio", "merge-videos", "compose-video"],
-  "Assets": ["asset"]
+  Assets: ["asset"]
 };
 
 /**
@@ -292,10 +290,7 @@ export function requiresImmediateConfiguration(nodeType: NodeType): boolean {
  */
 export function getConfigurationHints(nodeType: NodeType): string[] {
   const hints: Record<NodeType, string[]> = {
-    asset: [
-      "Choose the type of asset (text, image, audio, video, JSON)",
-      "Provide content or upload a file"
-    ],
+    asset: ["Choose the type of asset (text, image, audio, video, JSON)", "Provide content or upload a file"],
     "generate-talking-head": [
       "Select an avatar from HeyGen's library",
       "Connect an audio input or generate voiceover first",

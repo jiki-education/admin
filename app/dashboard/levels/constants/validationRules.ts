@@ -38,7 +38,7 @@ export const LESSON_VALIDATION_RULES: ValidationRules = {
       if (!value || !value.trim()) {
         return "Lesson data is required";
       }
-      
+
       try {
         JSON.parse(value);
         return null;

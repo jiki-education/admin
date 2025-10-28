@@ -6,15 +6,15 @@
 import { api } from "@/lib/api";
 
 // Node Types
-export type NodeType = 
-  | "asset"                  // Static file references
-  | "generate-talking-head"  // HeyGen talking head videos
-  | "generate-animation"     // Veo 3 / Runway animations
-  | "generate-voiceover"     // ElevenLabs text-to-speech
-  | "render-code"           // Remotion code screen animations
-  | "mix-audio"             // FFmpeg audio replacement
-  | "merge-videos"          // FFmpeg video concatenation
-  | "compose-video";        // FFmpeg picture-in-picture overlays
+export type NodeType =
+  | "asset" // Static file references
+  | "generate-talking-head" // HeyGen talking head videos
+  | "generate-animation" // Veo 3 / Runway animations
+  | "generate-voiceover" // ElevenLabs text-to-speech
+  | "render-code" // Remotion code screen animations
+  | "mix-audio" // FFmpeg audio replacement
+  | "merge-videos" // FFmpeg video concatenation
+  | "compose-video"; // FFmpeg picture-in-picture overlays
 
 export type NodeStatus = "pending" | "in_progress" | "completed" | "failed";
 
@@ -23,8 +23,8 @@ export interface NodeInputSlot {
   type: "single" | "multiple";
   required: boolean;
   description: string;
-  minCount?: number;    // For multiple inputs
-  maxCount?: number;    // For multiple inputs (null = unlimited)
+  minCount?: number; // For multiple inputs
+  maxCount?: number; // For multiple inputs (null = unlimited)
 }
 
 export interface NodeInputs {
@@ -44,44 +44,44 @@ export interface NodeConfig {
 // Asset Data Structure
 export interface NodeAsset {
   type: "text" | "image" | "audio" | "video" | "json";
-  content?: string | object;  // Inline content for text/json assets
-  source?: string;            // S3 URI or external URL for media assets
+  content?: string | object; // Inline content for text/json assets
+  source?: string; // S3 URI or external URL for media assets
 }
 
 // Metadata Structure
 export interface NodeMetadata {
   // Process tracking
-  processUuid?: string;     // Unique execution identifier
-  startedAt?: string;       // ISO8601 execution start time
-  completedAt?: string;     // ISO8601 execution completion time
-  
+  processUuid?: string; // Unique execution identifier
+  startedAt?: string; // ISO8601 execution start time
+  completedAt?: string; // ISO8601 execution completion time
+
   // External API integration
-  audioId?: string;         // ElevenLabs job ID
-  videoId?: string;         // HeyGen job ID
-  jobId?: string;           // Generic external job ID
-  stage?: string;           // Current processing stage
-  
+  audioId?: string; // ElevenLabs job ID
+  videoId?: string; // HeyGen job ID
+  jobId?: string; // Generic external job ID
+  stage?: string; // Current processing stage
+
   // Error tracking
-  error?: string;           // Error message for failed executions
-  
+  error?: string; // Error message for failed executions
+
   // Cost and performance
-  cost?: number;            // Estimated cost for this node
-  retries?: number;         // Number of retry attempts
-  
+  cost?: number; // Estimated cost for this node
+  retries?: number; // Number of retry attempts
+
   // Output properties
-  duration?: number;        // Duration in seconds (for audio/video)
-  resolution?: string;      // Video resolution (e.g., "1920x1080")
+  duration?: number; // Duration in seconds (for audio/video)
+  resolution?: string; // Video resolution (e.g., "1920x1080")
 }
 
 // Output Structure
 export interface NodeOutput {
-  s3Key?: string;          // S3 object key for output file
-  duration?: number;       // Duration in seconds (for audio/video)
-  size?: number;           // File size in bytes
-  width?: number;          // Video width in pixels
-  height?: number;         // Video height in pixels
-  format?: string;         // File format (mp4, mp3, etc.)
-  url?: string;            // Temporary or permanent URL to output
+  s3Key?: string; // S3 object key for output file
+  duration?: number; // Duration in seconds (for audio/video)
+  size?: number; // File size in bytes
+  width?: number; // Video width in pixels
+  height?: number; // Video height in pixels
+  format?: string; // File format (mp4, mp3, etc.)
+  url?: string; // Temporary or permanent URL to output
 }
 
 // Validation Errors Structure
@@ -97,34 +97,34 @@ export interface ValidationErrors {
 // Pipeline structures
 export interface PipelineProgress {
   pending: number;
-  in_progress: number;  // Matches server response field name
+  in_progress: number; // Matches server response field name
   completed: number;
   failed: number;
-  total: number;        // Add total field from server response
+  total: number; // Add total field from server response
 }
 
 export interface PipelineMetadata {
-  totalCost?: number;        // Actual total cost incurred
+  totalCost?: number; // Actual total cost incurred
   estimatedTotalCost?: number; // Estimated cost for entire pipeline
   progress?: PipelineProgress; // Node progress summary
 }
 
 export interface PipelineConfig {
   storage?: {
-    bucket: string;        // S3 bucket name
-    prefix: string;        // S3 key prefix for outputs
+    bucket: string; // S3 bucket name
+    prefix: string; // S3 key prefix for outputs
   };
   workingDirectory?: string; // Local working directory path
 }
 
 export interface VideoProductionPipeline {
-  uuid: string;         // UUID primary key (from server response)
-  version: string;      // Pipeline version (default: "1.0")
-  title: string;        // Human-readable pipeline title
+  uuid: string; // UUID primary key (from server response)
+  version: string; // Pipeline version (default: "1.0")
+  title: string; // Human-readable pipeline title
   config: PipelineConfig; // JSONB - Pipeline configuration
   metadata: PipelineMetadata; // JSONB - Progress and cost tracking
-  createdAt?: string;   // ISO8601 timestamp (optional in server response)
-  updatedAt?: string;   // ISO8601 timestamp (optional in server response)
+  createdAt?: string; // ISO8601 timestamp (optional in server response)
+  updatedAt?: string; // ISO8601 timestamp (optional in server response)
 }
 
 // Legacy Pipeline interface for backward compatibility
@@ -139,27 +139,27 @@ export interface Pipeline {
 }
 
 export interface VideoProductionNode {
-  uuid: string;         // UUID primary key (from server response)
-  pipeline_uuid: string; // Foreign key to pipeline (from server response)  
-  title: string;        // Human-readable node title
-  
+  uuid: string; // UUID primary key (from server response)
+  pipeline_uuid: string; // Foreign key to pipeline (from server response)
+  title: string; // Human-readable node title
+
   // Structure (Next.js writes these fields)
-  type: NodeType;       // Node type
+  type: NodeType; // Node type
   inputs: NodeInputValues; // JSONB - Input values (node UUIDs)
-  config: NodeConfig;   // JSONB - Node configuration
-  asset?: NodeAsset;    // JSONB - Asset data for asset nodes
-  
+  config: NodeConfig; // JSONB - Node configuration
+  asset?: NodeAsset; // JSONB - Asset data for asset nodes
+
   // Execution state (Rails writes these fields)
-  status: NodeStatus;   // Execution status
+  status: NodeStatus; // Execution status
   metadata?: NodeMetadata; // JSONB - Process tracking and external API data
-  output?: NodeOutput;  // JSONB - Execution results
-  
+  output?: NodeOutput; // JSONB - Execution results
+
   // Validation state (Rails writes these fields)
-  is_valid: boolean;    // Whether node passes validation (from server response)
+  is_valid: boolean; // Whether node passes validation (from server response)
   validation_errors: ValidationErrors; // JSONB - Validation error details (from server response)
-  
-  created_at?: string;  // ISO8601 timestamp (optional in server response)
-  updated_at?: string;  // ISO8601 timestamp (optional in server response)
+
+  created_at?: string; // ISO8601 timestamp (optional in server response)
+  updated_at?: string; // ISO8601 timestamp (optional in server response)
 }
 
 // Legacy Node interface for backward compatibility
@@ -171,7 +171,7 @@ export interface Node {
   inputs: Record<string, unknown>;
   config: Record<string, unknown>;
   asset?: Record<string, unknown>;
-  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  status: "pending" | "in_progress" | "completed" | "failed";
   metadata?: Record<string, unknown>;
   output?: Record<string, unknown>;
   created_at: string;
@@ -234,7 +234,9 @@ export async function getPipelines(filters?: PipelineFilters): Promise<Pipelines
  * GET /v1/admin/video_production/pipelines/:uuid
  * GET /v1/admin/video_production/pipelines/:uuid/nodes
  */
-export async function getPipeline(uuid: string): Promise<{ pipeline: VideoProductionPipeline; nodes: VideoProductionNode[] }> {
+export async function getPipeline(
+  uuid: string
+): Promise<{ pipeline: VideoProductionPipeline; nodes: VideoProductionNode[] }> {
   // Fetch pipeline and nodes separately (following video-production pattern)
   const [pipelineResponse, nodesResponse] = await Promise.all([
     api.get<{ pipeline: VideoProductionPipeline }>(`/admin/video_production/pipelines/${uuid}`),
@@ -288,7 +290,9 @@ export async function connectNodes(
   inputKey: string
 ): Promise<void> {
   // First fetch the target node to get its current inputs
-  const nodeResponse = await api.get<{ node: VideoProductionNode }>(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${targetNodeUuid}`);
+  const nodeResponse = await api.get<{ node: VideoProductionNode }>(
+    `/admin/video_production/pipelines/${pipelineUuid}/nodes/${targetNodeUuid}`
+  );
   const node = nodeResponse.data.node;
 
   // Update the inputs - check if it's an array or single value
@@ -343,9 +347,12 @@ export async function createNode(
     asset?: Record<string, unknown>;
   }
 ): Promise<VideoProductionNode> {
-  const response = await api.post<{ node: VideoProductionNode }>(`/admin/video_production/pipelines/${pipelineUuid}/nodes`, {
-    node: nodeData
-  });
+  const response = await api.post<{ node: VideoProductionNode }>(
+    `/admin/video_production/pipelines/${pipelineUuid}/nodes`,
+    {
+      node: nodeData
+    }
+  );
   return response.data.node;
 }
 
@@ -358,9 +365,12 @@ export async function updateNode(
   nodeUuid: string,
   updates: Partial<VideoProductionNode>
 ): Promise<VideoProductionNode> {
-  const response = await api.patch<{ node: VideoProductionNode }>(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`, {
-    node: updates
-  });
+  const response = await api.patch<{ node: VideoProductionNode }>(
+    `/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`,
+    {
+      node: updates
+    }
+  );
   return response.data.node;
 }
 
@@ -375,7 +385,9 @@ export async function reorderNodeInputs(
   newOrder: string[]
 ): Promise<void> {
   // First fetch the target node to get its current inputs
-  const nodeResponse = await api.get<{ node: VideoProductionNode }>(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`);
+  const nodeResponse = await api.get<{ node: VideoProductionNode }>(
+    `/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`
+  );
   const node = nodeResponse.data.node;
 
   // Update the inputs with new order
@@ -394,17 +406,14 @@ export async function reorderNodeInputs(
  * Execute a node in a pipeline
  * POST /v1/admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid/execute
  */
-export async function executeNode(
-  pipelineUuid: string,
-  nodeUuid: string
-): Promise<VideoProductionNode> {
+export async function executeNode(pipelineUuid: string, nodeUuid: string): Promise<VideoProductionNode> {
   console.log(`Executing node ${nodeUuid} in pipeline ${pipelineUuid}`);
-  
+
   try {
     const response = await api.post<{ node: VideoProductionNode }>(
       `/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}/execute`
     );
-    
+
     return response.data.node;
   } catch (error) {
     console.error(`Failed to execute node ${nodeUuid}:`, error);
@@ -430,10 +439,10 @@ export interface GenerateVoiceoverNode extends VideoProductionNode {
   };
   config: {
     provider: "elevenlabs";
-    voiceId?: string;        // ElevenLabs voice ID
-    stability?: number;      // Voice stability (0-1)
+    voiceId?: string; // ElevenLabs voice ID
+    stability?: number; // Voice stability (0-1)
     similarityBoost?: number; // Voice similarity boost (0-1)
-    style?: number;          // Voice style (0-1)
+    style?: number; // Voice style (0-1)
     useSpeakerBoost?: boolean; // Enable speaker boost
   };
 }
@@ -442,15 +451,15 @@ export interface GenerateVoiceoverNode extends VideoProductionNode {
 export interface GenerateTalkingHeadNode extends VideoProductionNode {
   type: "generate-talking-head";
   inputs: {
-    audio: string;      // Required reference to audio node
+    audio: string; // Required reference to audio node
     background?: string; // Optional reference to image asset
   };
   config: {
     provider: "heygen";
-    avatarId: string;   // HeyGen avatar ID (e.g., "Monica_inSleeveless_20220819")
-    width?: number;     // Video width in pixels (default: 1280)
-    height?: number;    // Video height in pixels (default: 720)
-    test?: boolean;     // Use test mode (free but watermarked)
+    avatarId: string; // HeyGen avatar ID (e.g., "Monica_inSleeveless_20220819")
+    width?: number; // Video width in pixels (default: 1280)
+    height?: number; // Video height in pixels (default: 720)
+    test?: boolean; // Use test mode (free but watermarked)
   };
 }
 
@@ -458,25 +467,25 @@ export interface GenerateTalkingHeadNode extends VideoProductionNode {
 export interface GenerateAnimationNode extends VideoProductionNode {
   type: "generate-animation";
   inputs: {
-    prompt?: string;    // Reference to asset node with animation prompt
-    image?: string;     // Reference to image asset for image-to-video
+    prompt?: string; // Reference to asset node with animation prompt
+    image?: string; // Reference to image asset for image-to-video
   };
   config: {
     provider: "veo3";
-    duration?: number;  // Animation duration in seconds
+    duration?: number; // Animation duration in seconds
     aspectRatio?: "16:9" | "9:16" | "1:1";
-    style?: string;     // Animation style prompt
+    style?: string; // Animation style prompt
   };
 }
 
 // Code Configuration for Render Code Node
 export interface CodeConfig {
-  language: string;     // Programming language
-  theme: string;        // Syntax highlighting theme
-  title?: string;       // Code block title
-  code: string;         // Source code content
+  language: string; // Programming language
+  theme: string; // Syntax highlighting theme
+  title?: string; // Code block title
+  code: string; // Source code content
   highlights?: Array<{
-    line: number;       // Line number to highlight
+    line: number; // Line number to highlight
     description: string; // Explanation of the highlighted line
   }>;
 }
@@ -485,14 +494,14 @@ export interface CodeConfig {
 export interface RenderCodeNode extends VideoProductionNode {
   type: "render-code";
   inputs: {
-    config: string;     // Required reference to asset node with code config
+    config: string; // Required reference to asset node with code config
   };
   config: {
     provider: "remotion";
-    sceneId?: string;   // Remotion scene/composition ID
-    duration?: number;  // Animation duration in seconds
-    width?: number;     // Video width in pixels
-    height?: number;    // Video height in pixels
+    sceneId?: string; // Remotion scene/composition ID
+    duration?: number; // Animation duration in seconds
+    width?: number; // Video width in pixels
+    height?: number; // Video height in pixels
   };
 }
 
@@ -500,14 +509,14 @@ export interface RenderCodeNode extends VideoProductionNode {
 export interface MixAudioNode extends VideoProductionNode {
   type: "mix-audio";
   inputs: {
-    video: string;      // Required reference to video node
-    audio: string;      // Required reference to audio node
+    video: string; // Required reference to video node
+    audio: string; // Required reference to audio node
   };
   config: {
     provider: "ffmpeg";
     audioVolume?: number; // Audio volume (0-1, default: 1)
-    fadeIn?: number;     // Fade in duration in seconds
-    fadeOut?: number;    // Fade out duration in seconds
+    fadeIn?: number; // Fade in duration in seconds
+    fadeOut?: number; // Fade out duration in seconds
   };
 }
 
@@ -529,14 +538,14 @@ export interface ComposeVideoNode extends VideoProductionNode {
   type: "compose-video";
   inputs: {
     background: string; // Required reference to background video
-    overlay: string;    // Required reference to overlay video
+    overlay: string; // Required reference to overlay video
   };
   config: {
     provider: "ffmpeg";
     position: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "center";
-    opacity?: number;   // Overlay opacity (0-1, default: 1)
-    scale?: number;     // Overlay scale (default: 1)
-    offsetX?: number;   // Horizontal offset in pixels
-    offsetY?: number;   // Vertical offset in pixels
+    opacity?: number; // Overlay opacity (0-1, default: 1)
+    scale?: number; // Overlay scale (default: 1)
+    offsetX?: number; // Horizontal offset in pixels
+    offsetY?: number; // Vertical offset in pixels
   };
 }

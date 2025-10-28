@@ -245,7 +245,7 @@ function Calendar() {
       </Modal>
     </div>
   );
-};
+}
 
 function renderEventContent(eventInfo: EventContentArg) {
   const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar.toLowerCase()}`;
@@ -256,6 +256,6 @@ function renderEventContent(eventInfo: EventContentArg) {
       <div className="fc-event-title">{eventInfo.event.title}</div>
     </div>
   );
-};
+}
 
 export default Calendar;

@@ -23,6 +23,6 @@ function Label({ htmlFor, children, className }: LabelProps) {
       {children}
     </label>
   );
-};
+}
 
 export default Label;

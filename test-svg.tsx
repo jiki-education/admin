@@ -1,6 +1,6 @@
 // Test component to verify SVG imports work
-import React from 'react';
-import { PlusIcon, CloseIcon } from '@/icons';
+import React from "react";
+import { PlusIcon, CloseIcon } from "@/icons";
 
 export default function TestSVG() {
   return (
