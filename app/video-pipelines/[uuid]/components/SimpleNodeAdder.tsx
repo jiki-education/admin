@@ -29,19 +29,11 @@ const ASSET_TYPES = [
 
 export default function SimpleNodeAdder({ isOpen, onToggle, onAddNode }: SimpleNodeAdderProps) {
   if (!isOpen) {
-    return (
-      <button
-        onClick={onToggle}
-        className="fixed bottom-4 right-4 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg transition-colors"
-        title="Add Node"
-      >
-        +
-      </button>
-    );
+    return null;
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 bg-white border border-gray-200 rounded-lg shadow-xl w-80">
+    <div className="fixed bottom-20 right-[25rem] z-50 bg-white border border-gray-200 rounded-lg shadow-xl w-80">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <h3 className="font-semibold text-gray-900">Add Node</h3>

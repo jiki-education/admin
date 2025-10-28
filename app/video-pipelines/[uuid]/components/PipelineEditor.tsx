@@ -128,84 +128,21 @@ export default function PipelineEditor() {
           </div>
         )}
 
-        {/* Advanced Controls Toolbar */}
-        <div className="absolute top-4 left-4 z-40 bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex items-center space-x-2">
-          <button
-            onClick={undo}
-            disabled={!canUndo}
-            className="p-2 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            title="Undo (Cmd/Ctrl + Z)"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
-              />
-            </svg>
-          </button>
 
-          <button
-            onClick={redo}
-            disabled={!canRedo}
-            className="p-2 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            title="Redo (Cmd/Ctrl + Shift + Z)"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6"
-              />
-            </svg>
-          </button>
-
-          <div className="w-px h-6 bg-gray-300"></div>
-
-          <button
-            onClick={forceRelayout}
-            className="p-2 rounded hover:bg-gray-100 transition-colors"
-            title="Auto-layout (R)"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Keyboard shortcuts help */}
-        {!nodeAdderOpen && (
-          <div className="absolute bottom-4 left-4 z-40 bg-black bg-opacity-70 text-white text-xs p-3 rounded-lg max-w-xs">
-            <div className="font-semibold mb-2">Keyboard Shortcuts:</div>
-            <div className="space-y-1">
-              <div>
-                <kbd className="bg-gray-700 px-1 rounded">⌘/Ctrl Z</kbd> Undo
-              </div>
-              <div>
-                <kbd className="bg-gray-700 px-1 rounded">⌘/Ctrl ⇧ Z</kbd> Redo
-              </div>
-              <div>
-                <kbd className="bg-gray-700 px-1 rounded">R</kbd> Auto-layout
-              </div>
-              <div>
-                <kbd className="bg-gray-700 px-1 rounded">P</kbd> Add nodes
-              </div>
-              <div>
-                <kbd className="bg-gray-700 px-1 rounded">Del</kbd> Delete selected
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Flow Canvas */}
         <FlowCanvas />
+
+        {/* Add Node Button - positioned at bottom right of canvas, left of the editor panel */}
+        <div className="absolute bottom-4 right-[25rem] z-40">
+          <button
+            onClick={() => setNodeAdderOpen(!nodeAdderOpen)}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg transition-colors"
+            title="Add Node (P)"
+          >
+            +
+          </button>
+        </div>
 
         {/* Editor Panel */}
         <EditorPanel />
