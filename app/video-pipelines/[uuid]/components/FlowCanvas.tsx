@@ -67,22 +67,17 @@ export default function FlowCanvas() {
     hasInitialLayout
   } = usePipelineStore();
 
-  // Get computed values from store
-  const storeEdges = getEdges();
-
   // Use React Flow's built-in state management for proper drag functionality
   const [flowNodes, setNodes, onNodesChange] = useNodesState<ReactFlowNode>([]);
-  const [edges, setEdges] = useEdgesState(storeEdges);
+  const [edges, setEdges] = useEdgesState([]);
 
   // Sync store state with React Flow state
   useEffect(() => {
     const storeNodes = getLayoutedNodes();
+    const storeEdges = getEdges();
     setNodes(storeNodes);
-  }, [rawNodes, layoutKey, hasInitialLayout, getLayoutedNodes, setNodes]);
-
-  useEffect(() => {
     setEdges(storeEdges);
-  }, [storeEdges, setEdges]);
+  }, [rawNodes, layoutKey, hasInitialLayout, getLayoutedNodes, getEdges, setNodes, setEdges]);
 
   // Handle new connections with validation
   const handleConnect: OnConnect = useCallback(

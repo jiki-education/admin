@@ -3,10 +3,9 @@ import type { PipelineState } from "./types";
 import {
   connectNodes as apiConnectNodes,
   deleteNode as apiDeleteNode,
-  createNode as apiCreateNode
+  createNode as apiCreateNode,
 } from "@/lib/api/video-pipelines";
 import type { Node } from "@/lib/nodes/types";
-import { toEditorNode } from "@/lib/nodes/types";
 
 /**
  * Node-specific actions
@@ -36,16 +35,29 @@ export const createNodeActions = (
     set((state) => ({
       nodes: state.nodes.map((node) => {
         if (node.uuid === targetId) {
-          // Get current array (or empty array if doesn't exist)
-          const currentValue = (node.inputs as Record<string, string[]>)[targetHandle] ?? [];
+          // Get current value - could be string, string[], or undefined
+          const currentValue = node.inputs[targetHandle];
 
-          // Check if already connected
-          if (currentValue.includes(sourceId)) {
-            return node; // Already connected, no change
+          let newValue: string | string[];
+
+          if (Array.isArray(currentValue)) {
+            // Input is an array - check if already connected
+            if (currentValue.includes(sourceId)) {
+              return node; // Already connected, no change
+            }
+            // Append to array
+            newValue = [...currentValue, sourceId];
+          } else if (typeof currentValue === 'string') {
+            // Input is a single string - check if already connected
+            if (currentValue === sourceId) {
+              return node; // Already connected, no change
+            }
+            // Convert to array with both values
+            newValue = [currentValue, sourceId];
+          } else {
+            // Input is undefined/empty - set as single value
+            newValue = sourceId;
           }
-
-          // Append to array
-          const newValue = [...currentValue, sourceId];
 
           // Update the target node's inputs (preserving discriminated union)
           return {
@@ -64,15 +76,9 @@ export const createNodeActions = (
     toast.loading("Connecting nodes...", { id: `connect-${sourceId}-${targetId}` });
 
     try {
-      // Connect nodes via API
       await apiConnectNodes(pipelineUuid, sourceId, targetId, targetHandle);
 
       console.log("Nodes connected successfully via API:", connectionDesc);
-
-      // Force layout recalculation for the new connection
-      set((state) => ({
-        hasInitialLayout: false // This will trigger layout recalculation
-      }));
 
       toast.success(connectionDesc, {
         id: `connect-${sourceId}-${targetId}`,
@@ -80,7 +86,7 @@ export const createNodeActions = (
       });
     } catch (error) {
       console.error("Failed to connect nodes via API:", error);
-      
+
       // Rollback optimistic update on error
       set((state) => ({
         nodes: previousNodes,
@@ -91,7 +97,7 @@ export const createNodeActions = (
         id: `connect-${sourceId}-${targetId}`,
         duration: 4000
       });
-      return; // Early return to avoid setting isSaving to false again
+      return;
     }
 
     set({ isSaving: false });
@@ -168,7 +174,7 @@ export const createNodeActions = (
       });
     } catch (error) {
       console.error("Failed to delete nodes via API:", error);
-      
+
       // Rollback optimistic update on error
       set((state) => ({
         nodes: previousNodes,
@@ -237,9 +243,9 @@ export const createNodeActions = (
       nodes: [...state.nodes, newNode],
       nodePositions: nodeData.position
         ? {
-            ...state.nodePositions,
-            [nodeData.uuid]: nodeData.position
-          }
+          ...state.nodePositions,
+          [nodeData.uuid]: nodeData.position
+        }
         : state.nodePositions,
       selectedNodeId: nodeData.uuid,
       isSaving: true,
@@ -283,7 +289,7 @@ export const createNodeActions = (
 
       // Update the optimistic node with the real backend data
       set((state) => ({
-        nodes: state.nodes.map((node) => 
+        nodes: state.nodes.map((node) =>
           node.uuid === nodeData.uuid ? createdNode : node
         ),
         nodePositions: createdNode.uuid !== nodeData.uuid ? {
@@ -308,7 +314,7 @@ export const createNodeActions = (
       });
     } catch (error) {
       console.error("Failed to create node via API:", error);
-      
+
       // Rollback optimistic update on error
       set((state) => ({
         nodes: previousNodes,
