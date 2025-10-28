@@ -18,12 +18,14 @@ interface RenderCodeNodeDetailsProps {
   node: RenderCodeNode;
   pipelineUuid: string;
   onRefresh: () => void;
+  onUpdate?: (pipelineUuid: string, nodeUuid: string, updates: Partial<RenderCodeNode>) => Promise<void>;
 }
 
 export default function RenderCodeNodeDetails({
   node,
   pipelineUuid: _pipelineUuid,
-  onRefresh
+  onRefresh,
+  onUpdate: _onUpdate
 }: RenderCodeNodeDetailsProps) {
   const [scenes, setScenes] = useState<CodeScene[]>([]);
   const [loading, setLoading] = useState(true);

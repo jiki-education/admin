@@ -13,7 +13,7 @@ import NodeDetailsHeader from "./editor-panel/NodeDetailsHeader";
 import MergeVideosNodeDetails from "./editor-panel/MergeVideosNodeDetails";
 import RenderCodeNodeDetails from "./editor-panel/RenderCodeNodeDetails";
 import NoNodeSelected from "./editor-panel/NoNodeSelected";
-import GenericNodeDetails from "./editor-panel/GenericNodeDetails";
+import EditableNodeDetails from "./editor-panel/EditableNodeDetails";
 import NodeTitleEditor from "./editor-panel/NodeTitleEditor";
 import { usePipelineStore } from "@/stores/pipeline";
 
@@ -51,11 +51,16 @@ export default function EditorPanel() {
             pipelineUuid={pipeline?.uuid || ""}
             allNodes={nodes}
             onRefresh={forceRelayout}
+            onUpdate={updateNode}
           />
         ) : isRenderCodeNode(selectedNode) ? (
-          <RenderCodeNodeDetails node={selectedNode} pipelineUuid={pipeline?.uuid || ""} onRefresh={forceRelayout} />
+          <RenderCodeNodeDetails node={selectedNode} pipelineUuid={pipeline?.uuid || ""} onRefresh={forceRelayout} onUpdate={updateNode} />
         ) : (
-          <GenericNodeDetails node={selectedNode} />
+          <EditableNodeDetails
+            node={selectedNode}
+            pipelineUuid={pipeline?.uuid || ""}
+            onUpdate={updateNode}
+          />
         )}
       </div>
 
