@@ -31,7 +31,7 @@ export default function Levels() {
       setLoading(true);
       setError(null);
       const response = await getAdminLevels(filters);
-      console.debug('Response:', response)
+      console.debug("Response:", response);
       setLevels(response.results);
       setMeta(response.meta);
     } catch (err) {
@@ -57,7 +57,7 @@ export default function Levels() {
   }, []);
 
   const handlePageChange = useCallback((page: number) => {
-    setFilters(prevFilters => ({ ...prevFilters, page }));
+    setFilters((prevFilters) => ({ ...prevFilters, page }));
   }, []);
 
   const handleAddNewLevel = useCallback(() => {
@@ -71,12 +71,8 @@ export default function Levels() {
       <div className="space-y-6">
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-              Level Management
-            </h1>
-            <Button onClick={handleAddNewLevel}>
-              Add New Level
-            </Button>
+            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Level Management</h1>
+            <Button onClick={handleAddNewLevel}>Add New Level</Button>
           </div>
 
           {error && (
@@ -85,16 +81,9 @@ export default function Levels() {
             </div>
           )}
 
-          <LevelFilters
-            filters={filters}
-            onFiltersChange={handleFiltersChange}
-            onClearFilters={handleClearFilters}
-          />
+          <LevelFilters filters={filters} onFiltersChange={handleFiltersChange} onClearFilters={handleClearFilters} />
 
-          <LevelTable
-            levels={levels}
-            loading={loading}
-          />
+          <LevelTable levels={levels} loading={loading} />
 
           <LevelPagination
             currentPage={meta.current_page}

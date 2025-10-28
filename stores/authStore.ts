@@ -131,7 +131,7 @@ export const useAuthStore = create<AuthStore>((set, _get) => ({
         try {
           const { getUserEmail } = await import("@/lib/auth/storage");
           const email = getUserEmail();
-          
+
           if (email) {
             const user: User = { email };
             set({

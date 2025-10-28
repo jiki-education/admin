@@ -1,6 +1,6 @@
 /**
  * Code Scene Pipeline Integration Utilities
- * 
+ *
  * Functions for integrating code scenes with video pipeline workflow,
  * including asset management and render job tracking.
  */
@@ -72,8 +72,8 @@ export function estimateRenderDuration(config: SceneConfig): number {
 
   // Add buffer for fade in/out and transitions
   totalFrames += fps; // 1 second buffer
-  
-  return Math.round(totalFrames / fps * 100) / 100; // Round to 2 decimal places
+
+  return Math.round((totalFrames / fps) * 100) / 100; // Round to 2 decimal places
 }
 
 /**
@@ -85,9 +85,9 @@ export function generateVideoFileName(scene: CodeScene): string {
     .replace(/[^a-z0-9]/g, "_")
     .replace(/_+/g, "_")
     .replace(/^_|_$/g, "");
-  
+
   const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, "");
-  
+
   return `code_scene_${sanitizedTitle}_${timestamp}.mp4`;
 }
 
@@ -110,7 +110,7 @@ export function validateSceneForRendering(config: SceneConfig): {
 
   for (let i = 0; i < config.actions.length; i++) {
     const action = config.actions[i];
-    
+
     if (action.type === "type") {
       if (!action.code || action.code.trim().length === 0) {
         errors.push(`Type action at position ${i + 1} has no code content`);
@@ -159,10 +159,10 @@ export function analyzeSceneComplexity(config: SceneConfig): {
   }
 
   const estimatedDuration = estimateRenderDuration(config);
-  
+
   // Determine complexity based on various factors
   let complexityScore: "simple" | "moderate" | "complex" = "simple";
-  
+
   if (totalActions >= 10 || totalCharacters >= 500 || estimatedDuration >= 60) {
     complexityScore = "complex";
   } else if (totalActions >= 5 || totalCharacters >= 200 || estimatedDuration >= 30) {
@@ -183,11 +183,7 @@ export function analyzeSceneComplexity(config: SceneConfig): {
  * API functions that would be implemented once backend is available
  */
 
-export function startSceneRender(
-  _pipelineId: string,
-  _nodeId: string,
-  _sceneId: string
-): Promise<{ jobId: string }> {
+export function startSceneRender(_pipelineId: string, _nodeId: string, _sceneId: string): Promise<{ jobId: string }> {
   // TODO: Implement when backend API is available
   throw new Error("Scene rendering will be implemented when the Rails API is available");
 }
@@ -197,11 +193,7 @@ export function getRenderJobStatus(_jobId: string): Promise<CodeSceneRenderJob> 
   throw new Error("Render job status will be implemented when the Rails API is available");
 }
 
-export function updateNodeSceneConfiguration(
-  _pipelineId: string,
-  _nodeId: string,
-  _sceneId: string
-): Promise<void> {
+export function updateNodeSceneConfiguration(_pipelineId: string, _nodeId: string, _sceneId: string): Promise<void> {
   // TODO: Implement when backend API is available
   throw new Error("Node configuration update will be implemented when the Rails API is available");
 }

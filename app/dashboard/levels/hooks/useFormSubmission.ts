@@ -23,41 +23,44 @@ export function useFormSubmission({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     try {
       setSaving(true);
-      
+
       let transformedData = formData;
-      
+
       // Apply data transformation if provided
       if (dataTransform) {
         transformedData = dataTransform(formData);
       } else {
         // Default transformation - trim string fields
-        transformedData = Object.keys(formData).reduce((acc, key) => {
-          const value = formData[key];
-          if (typeof value === 'string') {
-            acc[key] = value.trim();
-          } else {
-            acc[key] = value;
-          }
-          return acc;
-        }, {} as Record<string, any>);
+        transformedData = Object.keys(formData).reduce(
+          (acc, key) => {
+            const value = formData[key];
+            if (typeof value === "string") {
+              acc[key] = value.trim();
+            } else {
+              acc[key] = value;
+            }
+            return acc;
+          },
+          {} as Record<string, any>
+        );
       }
 
       await onSave(transformedData);
     } catch (error) {
       console.error("Failed to save:", error);
-      
+
       // Handle API validation errors
       if (error instanceof ApiError && error.status === 422) {
         const errorData = error.data as { error?: { message?: string } };
         const errorMessage = errorData?.error?.message;
-        
+
         if (errorMessage && errorParser) {
           // Parse backend validation errors using provided parser
           const fieldErrors = errorParser(errorMessage);

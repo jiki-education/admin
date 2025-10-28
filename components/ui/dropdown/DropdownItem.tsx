@@ -26,8 +26,12 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
     if (tag === "button") {
       event.preventDefault();
     }
-    if (onClick) {onClick();}
-    if (onItemClick) {onItemClick();}
+    if (onClick) {
+      onClick();
+    }
+    if (onItemClick) {
+      onItemClick();
+    }
   };
 
   if (tag === "a" && href) {

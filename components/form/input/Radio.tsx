@@ -11,16 +11,7 @@ interface RadioProps {
   disabled?: boolean; // Optional disabled state for the radio button
 }
 
-function Radio({
-  id,
-  name,
-  value,
-  checked,
-  label,
-  onChange,
-  className = "",
-  disabled = false
-}: RadioProps) {
+function Radio({ id, name, value, checked, label, onChange, className = "", disabled = false }: RadioProps) {
   return (
     <label
       htmlFor={id}
@@ -48,6 +39,6 @@ function Radio({
       {label}
     </label>
   );
-};
+}
 
 export default Radio;

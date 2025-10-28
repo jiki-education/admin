@@ -4,11 +4,11 @@
  */
 
 import { api } from "@/lib/api";
-import type { 
-  EmailTemplate, 
-  EmailTemplateFilters, 
+import type {
+  EmailTemplate,
+  EmailTemplateFilters,
   EmailTemplateType,
-  EmailTemplateSummaryResponse 
+  EmailTemplateSummaryResponse
 } from "@/app/dashboard/email-templates/types";
 
 interface EmailTemplatesResponse {
@@ -47,11 +47,11 @@ export async function getEmailTemplates(filters?: EmailTemplateFilters): Promise
  */
 export async function getEmailTemplateTypes(): Promise<EmailTemplateType[]> {
   const response = await api.get<EmailTemplateTypesResponse>("/admin/email_templates/types");
-  
+
   // Convert string array to options format
-  return response.data.types.map(type => ({
+  return response.data.types.map((type) => ({
     value: type,
-    label: type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' ')
+    label: type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, " ")
   }));
 }
 
@@ -68,7 +68,7 @@ export async function getEmailTemplate(id: number): Promise<EmailTemplate> {
  * Create new email template
  * POST /v1/admin/email_templates
  */
-export async function createEmailTemplate(template: Omit<EmailTemplate, 'id'>): Promise<EmailTemplate> {
+export async function createEmailTemplate(template: Omit<EmailTemplate, "id">): Promise<EmailTemplate> {
   const response = await api.post<{ email_template: EmailTemplate }>("/admin/email_templates", {
     email_template: template
   });

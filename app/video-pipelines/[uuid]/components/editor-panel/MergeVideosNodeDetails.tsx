@@ -20,16 +20,23 @@ interface MergeVideosNodeDetailsProps {
   pipelineUuid: string;
   allNodes: Node[]; // Pass all nodes to look up titles
   onRefresh: () => void; // Callback to refresh parent after reorder
+  onUpdate?: (pipelineUuid: string, nodeUuid: string, updates: Partial<Node>) => Promise<void>; // Update callback
 }
 
 export default function MergeVideosNodeDetails({
   node,
   pipelineUuid,
   allNodes,
-  onRefresh
+  onRefresh,
+  onUpdate
 }: MergeVideosNodeDetailsProps) {
   const [segments, setSegments] = useState<string[]>(node.inputs.segments);
   const [isReordering, setIsReordering] = useState(false);
+  
+  // Config editing state
+  const [isEditingConfig, setIsEditingConfig] = useState(false);
+  const [configData, setConfigData] = useState(JSON.stringify(node.config, null, 2));
+  const [isUpdatingConfig, setIsUpdatingConfig] = useState(false);
 
   // Create a lookup map for node titles
   const nodeMap = useMemo(() => {
@@ -74,6 +81,34 @@ export default function MergeVideosNodeDetails({
       });
   };
 
+  const handleEditConfig = () => {
+    setIsEditingConfig(true);
+    setConfigData(JSON.stringify(node.config, null, 2));
+  };
+
+  const handleCancelConfigEdit = () => {
+    setIsEditingConfig(false);
+    setConfigData(JSON.stringify(node.config, null, 2));
+  };
+
+  const handleSaveConfig = async () => {
+    if (!onUpdate) {
+      return;
+    }
+
+    setIsUpdatingConfig(true);
+    try {
+      const parsedConfig = JSON.parse(configData);
+      await onUpdate(pipelineUuid, node.uuid, { config: parsedConfig });
+      setIsEditingConfig(false);
+    } catch (error) {
+      console.error("Failed to update config:", error);
+      // Error handling is done in the store action
+    } finally {
+      setIsUpdatingConfig(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Segments Section */}
@@ -109,16 +144,58 @@ export default function MergeVideosNodeDetails({
 
         {/* Config */}
         <Section title="Configuration">
-          {Object.keys(node.config).length === 0 ? (
-            <p className="text-sm text-gray-500">No configuration</p>
+          {isEditingConfig ? (
+            <div className="space-y-3">
+              <textarea
+                value={configData}
+                onChange={(e) => setConfigData(e.target.value)}
+                className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs font-mono"
+                placeholder="Enter config JSON..."
+                disabled={isUpdatingConfig}
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSaveConfig}
+                  disabled={isUpdatingConfig}
+                  className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isUpdatingConfig ? "Saving..." : "Save"}
+                </button>
+                <button
+                  onClick={handleCancelConfigEdit}
+                  disabled={isUpdatingConfig}
+                  className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           ) : (
             <div className="space-y-2">
-              {Object.entries(node.config).map(([key, value]) => (
-                <div key={key} className="text-sm">
-                  <span className="font-semibold text-gray-700">{key}:</span>{" "}
-                  <span className="text-gray-600">{JSON.stringify(value)}</span>
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0">
+                  {Object.keys(node.config).length === 0 ? (
+                    <p className="text-sm text-gray-500">No configuration</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {Object.entries(node.config).map(([key, value]) => (
+                        <div key={key} className="text-sm">
+                          <span className="font-semibold text-gray-700">{key}:</span>{" "}
+                          <span className="text-gray-600">{JSON.stringify(value)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ))}
+                {onUpdate && (
+                  <button
+                    onClick={handleEditConfig}
+                    className="ml-3 px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </Section>

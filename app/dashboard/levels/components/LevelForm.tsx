@@ -14,19 +14,13 @@ interface LevelFormProps {
   onSave: (data: CreateLevelData) => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
-  mode: 'create' | 'edit';
+  mode: "create" | "edit";
 }
 
-export default function LevelForm({
-  initialData,
-  onSave,
-  onCancel,
-  loading = false,
-  mode
-}: LevelFormProps) {
+export default function LevelForm({ initialData, onSave, onCancel, loading = false, mode }: LevelFormProps) {
   const { formData, errors, handleInputChange, handleSlugChange, validateForm, setFieldErrors } = useFormValidation({
     initialData,
-    fields: ['title', 'slug', 'description'],
+    fields: ["title", "slug", "description"],
     validationRules: LEVEL_VALIDATION_RULES
   });
 
@@ -59,7 +53,7 @@ export default function LevelForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <RequiredFieldsNotice />
       <FormErrorSummary errors={errors} />
-      
+
       <FormField
         type="text"
         name="title"
@@ -70,7 +64,7 @@ export default function LevelForm({
         placeholder="Enter level title"
         required
       />
-      
+
       <FormField
         type="text"
         name="slug"
@@ -83,7 +77,7 @@ export default function LevelForm({
         helpText="URL-friendly identifier. Auto-generated from title, but you can customize it."
         required
       />
-      
+
       <FormField
         type="textarea"
         name="description"
@@ -95,11 +89,11 @@ export default function LevelForm({
         rows={4}
         required
       />
-      
+
       <FormActions
         onCancel={onCancel}
         onSubmit={handleSubmit}
-        submitLabel={mode === 'create' ? 'Create Level' : 'Save Changes'}
+        submitLabel={mode === "create" ? "Create Level" : "Save Changes"}
         loading={saving || loading}
         disabled={!isFormValid()}
       />

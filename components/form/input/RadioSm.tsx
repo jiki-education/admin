@@ -40,6 +40,6 @@ function RadioSm({ id, name, value, checked, label, onChange, className = "" }: 
       {label}
     </label>
   );
-};
+}
 
 export default RadioSm;

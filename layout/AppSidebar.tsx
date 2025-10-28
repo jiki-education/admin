@@ -4,14 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar, SIDEBAR_WIDTH_EXPANDED, SIDEBAR_WIDTH_COLLAPSED } from "../context/SidebarContext";
-import {
-  BoxCubeIcon,
-  ChevronDownIcon,
-  GridIcon,
-  HorizontaLDots,
-  PageIcon,
-  UserCircleIcon
-} from "../icons/index";
+import { BoxCubeIcon, ChevronDownIcon, GridIcon, HorizontaLDots, PageIcon, UserCircleIcon } from "../icons/index";
 
 interface NavItem {
   name: string;
@@ -29,9 +22,7 @@ const navItems: NavItem[] = [
   {
     icon: <UserCircleIcon />,
     name: "Users",
-    subItems: [
-      { name: "User Management", path: "/dashboard/users", pro: false }
-    ]
+    subItems: [{ name: "User Management", path: "/dashboard/users", pro: false }]
   },
   {
     icon: <PageIcon />,
@@ -47,9 +38,7 @@ const othersItems: NavItem[] = [
   {
     icon: <BoxCubeIcon />,
     name: "System",
-    subItems: [
-      { name: "Email Templates", path: "/dashboard/email-templates", pro: false }
-    ]
+    subItems: [{ name: "Email Templates", path: "/dashboard/email-templates", pro: false }]
   }
 ];
 
@@ -64,24 +53,27 @@ function AppSidebar() {
           {nav.subItems ? (
             <button
               onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`menu-item group  ${openSubmenu?.type === menuType && openSubmenu.index === index
-                ? "menu-item-active"
-                : "menu-item-inactive"
-                } cursor-pointer ${!isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"}`}
+              className={`menu-item group  ${
+                openSubmenu?.type === menuType && openSubmenu.index === index
+                  ? "menu-item-active"
+                  : "menu-item-inactive"
+              } cursor-pointer ${!isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"}`}
             >
               <span
-                className={` ${openSubmenu?.type === menuType && openSubmenu.index === index
-                  ? "menu-item-icon-active"
-                  : "menu-item-icon-inactive"
-                  }`}
+                className={` ${
+                  openSubmenu?.type === menuType && openSubmenu.index === index
+                    ? "menu-item-icon-active"
+                    : "menu-item-icon-inactive"
+                }`}
               >
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && <span className={`menu-item-text`}>{nav.name}</span>}
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200  ${openSubmenu?.type === menuType && openSubmenu.index === index ? "rotate-180 text-brand-500" : ""
-                    }`}
+                  className={`ml-auto w-5 h-5 transition-transform duration-200  ${
+                    openSubmenu?.type === menuType && openSubmenu.index === index ? "rotate-180 text-brand-500" : ""
+                  }`}
                 />
               )}
             </button>
@@ -116,23 +108,26 @@ function AppSidebar() {
                   <li key={subItem.name}>
                     <Link
                       href={subItem.path}
-                      className={`menu-dropdown-item ${isActive(subItem.path) ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"
-                        }`}
+                      className={`menu-dropdown-item ${
+                        isActive(subItem.path) ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"
+                      }`}
                     >
                       {subItem.name}
                       <span className="flex items-center gap-1 ml-auto">
                         {subItem.new && (
                           <span
-                            className={`ml-auto ${isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
-                              } menu-dropdown-badge `}
+                            className={`ml-auto ${
+                              isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
+                            } menu-dropdown-badge `}
                           >
                             new
                           </span>
                         )}
                         {subItem.pro && (
                           <span
-                            className={`ml-auto ${isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
-                              } menu-dropdown-badge `}
+                            className={`ml-auto ${
+                              isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
+                            } menu-dropdown-badge `}
                           >
                             pro
                           </span>
@@ -162,7 +157,7 @@ function AppSidebar() {
   useEffect(() => {
     // Check if the current path matches any submenu item
     let matchingSubmenu: { type: "main" | "others"; index: number } | null = null;
-    
+
     ["main", "others"].forEach((menuType) => {
       const items = menuType === "main" ? navItems : othersItems;
       items.forEach((nav, index) => {
@@ -238,8 +233,9 @@ function AppSidebar() {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-                  }`}
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                  !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+                }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? "Menu" : <HorizontaLDots />}
               </h2>
@@ -248,8 +244,9 @@ function AppSidebar() {
 
             <div className="">
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-                  }`}
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                  !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+                }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? "Others" : <HorizontaLDots />}
               </h2>
@@ -260,6 +257,6 @@ function AppSidebar() {
       </div>
     </aside>
   );
-};
+}
 
 export default AppSidebar;

@@ -14,18 +14,14 @@ interface MultiSelectProps {
   disabled?: boolean;
 }
 
-function MultiSelect({
-  label,
-  options,
-  defaultSelected = [],
-  onChange,
-  disabled = false
-}: MultiSelectProps) {
+function MultiSelect({ label, options, defaultSelected = [], onChange, disabled = false }: MultiSelectProps) {
   const [selectedOptions, setSelectedOptions] = useState<string[]>(defaultSelected);
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
-    if (disabled) {return;}
+    if (disabled) {
+      return;
+    }
     setIsOpen((prev) => !prev);
   };
 
@@ -35,13 +31,17 @@ function MultiSelect({
       : [...selectedOptions, optionValue];
 
     setSelectedOptions(newSelectedOptions);
-    if (onChange) {onChange(newSelectedOptions);}
+    if (onChange) {
+      onChange(newSelectedOptions);
+    }
   };
 
   const removeOption = (index: number, value: string) => {
     const newSelectedOptions = selectedOptions.filter((opt) => opt !== value);
     setSelectedOptions(newSelectedOptions);
-    if (onChange) {onChange(newSelectedOptions);}
+    if (onChange) {
+      onChange(newSelectedOptions);
+    }
   };
 
   const selectedValuesText = selectedOptions.map(
@@ -152,6 +152,6 @@ function MultiSelect({
       </div>
     </div>
   );
-};
+}
 
 export default MultiSelect;

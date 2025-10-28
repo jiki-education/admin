@@ -39,14 +39,13 @@ export default function UserDropdown() {
         </span>
 
         <div className="mr-1">
-          <span className="block text-xs text-gray-500 dark:text-gray-400">
-            {user?.email || "user@example.com"}
-          </span>
+          <span className="block text-xs text-gray-500 dark:text-gray-400">{user?.email || "user@example.com"}</span>
         </div>
 
         <svg
-          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
-            }`}
+          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
           width="18"
           height="20"
           viewBox="0 0 18 20"

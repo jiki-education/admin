@@ -10,11 +10,7 @@ interface EmailTemplateTableProps {
   loading?: boolean;
 }
 
-export default function EmailTemplateTable({
-  templates,
-  onDelete,
-  loading = false
-}: EmailTemplateTableProps) {
+export default function EmailTemplateTable({ templates, onDelete, loading = false }: EmailTemplateTableProps) {
   const router = useRouter();
 
   const handleEdit = (template: EmailTemplate) => {
@@ -35,9 +31,7 @@ export default function EmailTemplateTable({
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="p-8 text-center">
           <div className="text-gray-600 dark:text-gray-400 mb-4">No email templates found</div>
-          <p className="text-sm text-gray-500 dark:text-gray-500">
-            Create your first template to get started.
-          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-500">Create your first template to get started.</p>
         </div>
       </div>
     );
@@ -93,9 +87,7 @@ export default function EmailTemplateTable({
               {templates.map((template) => (
                 <TableRow key={template.id}>
                   <TableCell className="px-5 py-4 text-start">
-                    <span className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      #{template.id}
-                    </span>
+                    <span className="font-medium text-gray-800 text-theme-sm dark:text-white/90">#{template.id}</span>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start">
                     <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
@@ -103,9 +95,7 @@ export default function EmailTemplateTable({
                     </span>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    <code className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                      {template.slug}
-                    </code>
+                    <code className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{template.slug}</code>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start">
                     <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
@@ -113,17 +103,11 @@ export default function EmailTemplateTable({
                     </span>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    <div className="max-w-xs truncate">
-                      {template.subject}
-                    </div>
+                    <div className="max-w-xs truncate">{template.subject}</div>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start">
                     <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEdit(template)}
-                      >
+                      <Button size="sm" variant="outline" onClick={() => handleEdit(template)}>
                         Edit
                       </Button>
                       <Button

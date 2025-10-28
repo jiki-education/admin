@@ -21,19 +21,14 @@ const LESSON_TYPES = [
   { value: "assessment", label: "Assessment" }
 ];
 
-export default function LessonEditForm({
-  lesson,
-  onSave,
-  onCancel,
-  loading = false
-}: LessonEditFormProps) {
+export default function LessonEditForm({ lesson, onSave, onCancel, loading = false }: LessonEditFormProps) {
   const [formData, setFormData] = useState({
     title: lesson.title,
     description: lesson.description,
     type: lesson.type,
     data: JSON.stringify(lesson.data, null, 2)
   });
-  
+
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -47,14 +42,14 @@ export default function LessonEditForm({
   }, [lesson]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value
     }));
   };
 
   const handleJSONChange = (value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       data: value
     }));
@@ -66,7 +61,7 @@ export default function LessonEditForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (jsonError) {
       alert("Please fix JSON errors before saving.");
       return;
@@ -74,7 +69,7 @@ export default function LessonEditForm({
 
     try {
       setSaving(true);
-      
+
       let parsedData = {};
       if (formData.data.trim()) {
         try {
@@ -102,11 +97,7 @@ export default function LessonEditForm({
   };
 
   const isFormValid = () => {
-    return (
-      formData.title.trim().length > 0 &&
-      formData.type.length > 0 &&
-      !jsonError
-    );
+    return formData.title.trim().length > 0 && formData.type.length > 0 && !jsonError;
   };
 
   return (
@@ -172,18 +163,10 @@ export default function LessonEditForm({
 
       {/* Form Actions */}
       <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={saving}
-        >
+        <Button type="button" variant="outline" onClick={onCancel} disabled={saving}>
           Cancel
         </Button>
-        <Button
-          type="submit"
-          disabled={!isFormValid() || saving || loading}
-        >
+        <Button type="submit" disabled={!isFormValid() || saving || loading}>
           {saving ? "Saving..." : "Save Changes"}
         </Button>
       </div>

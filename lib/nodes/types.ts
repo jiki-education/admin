@@ -32,7 +32,7 @@ import type {
  * Maps 'id' -> 'uuid' and 'pipelineId' -> 'pipeline_uuid' for compatibility
  */
 interface EditorNodeBase {
-  uuid: string;          // Mapped from VideoProductionNode.id
+  uuid: string; // Mapped from VideoProductionNode.id
   pipeline_uuid: string; // Mapped from VideoProductionNode.pipelineId
 }
 
@@ -40,14 +40,14 @@ interface EditorNodeBase {
  * Node types that adapt admin's video pipeline types for editor compatibility
  * These maintain the interface expected by the video production editor components
  */
-export type AssetNode = Omit<AdminAssetNode, 'id' | 'pipelineId'> & EditorNodeBase;
-export type GenerateTalkingHeadNode = Omit<AdminGenerateTalkingHeadNode, 'id' | 'pipelineId'> & EditorNodeBase;
-export type GenerateAnimationNode = Omit<AdminGenerateAnimationNode, 'id' | 'pipelineId'> & EditorNodeBase;
-export type GenerateVoiceoverNode = Omit<AdminGenerateVoiceoverNode, 'id' | 'pipelineId'> & EditorNodeBase;
-export type RenderCodeNode = Omit<AdminRenderCodeNode, 'id' | 'pipelineId'> & EditorNodeBase;
-export type MixAudioNode = Omit<AdminMixAudioNode, 'id' | 'pipelineId'> & EditorNodeBase;
-export type MergeVideosNode = Omit<AdminMergeVideosNode, 'id' | 'pipelineId'> & EditorNodeBase;
-export type ComposeVideoNode = Omit<AdminComposeVideoNode, 'id' | 'pipelineId'> & EditorNodeBase;
+export type AssetNode = Omit<AdminAssetNode, "id" | "pipelineId"> & EditorNodeBase;
+export type GenerateTalkingHeadNode = Omit<AdminGenerateTalkingHeadNode, "id" | "pipelineId"> & EditorNodeBase;
+export type GenerateAnimationNode = Omit<AdminGenerateAnimationNode, "id" | "pipelineId"> & EditorNodeBase;
+export type GenerateVoiceoverNode = Omit<AdminGenerateVoiceoverNode, "id" | "pipelineId"> & EditorNodeBase;
+export type RenderCodeNode = Omit<AdminRenderCodeNode, "id" | "pipelineId"> & EditorNodeBase;
+export type MixAudioNode = Omit<AdminMixAudioNode, "id" | "pipelineId"> & EditorNodeBase;
+export type MergeVideosNode = Omit<AdminMergeVideosNode, "id" | "pipelineId"> & EditorNodeBase;
+export type ComposeVideoNode = Omit<AdminComposeVideoNode, "id" | "pipelineId"> & EditorNodeBase;
 
 /**
  * Converts VideoProductionNode to editor-compatible Node

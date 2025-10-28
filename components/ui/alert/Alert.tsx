@@ -10,14 +10,7 @@ interface AlertProps {
   linkText?: string; // Link text
 }
 
-function Alert({
-  variant,
-  title,
-  message,
-  showLink = false,
-  linkHref = "#",
-  linkText = "Learn more"
-}: AlertProps) {
+function Alert({ variant, title, message, showLink = false, linkHref = "#", linkText = "Learn more" }: AlertProps) {
   // Tailwind classes for each variant
   const variantClasses = {
     success: {
@@ -124,6 +117,6 @@ function Alert({
       </div>
     </div>
   );
-};
+}
 
 export default Alert;

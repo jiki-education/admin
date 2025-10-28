@@ -9,11 +9,7 @@ interface UserTableProps {
   onDelete?: (user: User) => void;
 }
 
-export default function UserTable({
-  users,
-  loading = false,
-  onDelete
-}: UserTableProps) {
+export default function UserTable({ users, loading = false, onDelete }: UserTableProps) {
   if (loading) {
     return (
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -29,9 +25,7 @@ export default function UserTable({
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="p-8 text-center">
           <div className="text-gray-600 dark:text-gray-400 mb-4">No users found</div>
-          <p className="text-sm text-gray-500 dark:text-gray-500">
-            Try adjusting your filters or check back later.
-          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-500">Try adjusting your filters or check back later.</p>
         </div>
       </div>
     );
@@ -87,14 +81,10 @@ export default function UserTable({
               {users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="px-5 py-4 text-start">
-                    <span className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      #{user.id}
-                    </span>
+                    <span className="font-medium text-gray-800 text-theme-sm dark:text-white/90">#{user.id}</span>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start">
-                    <div className="font-medium text-gray-900 dark:text-white">
-                      {user.name || "—"}
-                    </div>
+                    <div className="font-medium text-gray-900 dark:text-white">{user.name || "—"}</div>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     {user.email}

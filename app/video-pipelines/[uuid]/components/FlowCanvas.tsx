@@ -3,27 +3,31 @@
  *
  * Visual graph editor using React Flow.
  * Displays pipeline nodes and edges, handles interactions.
- * Now uses controlled state from parent (PipelineEditor).
+ * Uses Zustand store for centralized state management.
  */
 
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import {
   ReactFlow,
   Background,
   Controls,
-  type Node as ReactFlowNode,
-  type Edge,
+  useNodesState,
+  useEdgesState,
   type OnConnect,
   type OnNodesDelete,
+  type OnNodesChange,
   type NodeTypes,
-  type NodeMouseHandler
+  type NodeMouseHandler,
+  type Node as ReactFlowNode,
+  type Edge
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
 import type { Node } from "@/lib/nodes/types";
 import { getMaxConnections, hasInputHandle } from "@/lib/nodes/metadata";
+import { usePipelineStore } from "@/stores/usePipelineStore";
 
 // Import custom node components
 import AssetNode from "./nodes/AssetNode";
@@ -35,14 +39,7 @@ import MixAudioNode from "./nodes/MixAudioNode";
 import MergeVideosNode from "./nodes/MergeVideosNode";
 import ComposeVideoNode from "./nodes/ComposeVideoNode";
 
-interface FlowCanvasProps {
-  nodes: ReactFlowNode[]; // Pre-computed and layouted nodes
-  edges: Edge[]; // Pre-computed edges
-  selectedNodeId: string | null;
-  onNodeSelect: (nodeId: string | null) => void;
-  onConnect: (sourceId: string, targetId: string, targetHandle: string) => Promise<void>;
-  onNodesDelete: (nodeIds: string[]) => Promise<void>;
-}
+// FlowCanvas now gets all data directly from the store
 
 // Register custom node types
 const nodeTypes: NodeTypes = {
@@ -56,14 +53,32 @@ const nodeTypes: NodeTypes = {
   "compose-video": ComposeVideoNode
 };
 
-export default function FlowCanvas({
-  nodes,
-  edges,
-  selectedNodeId: _selectedNodeId,
-  onNodeSelect,
-  onConnect,
-  onNodesDelete
-}: FlowCanvasProps) {
+export default function FlowCanvas() {
+  // Store subscriptions
+  const {
+    pipeline,
+    nodes: rawNodes,
+    getLayoutedNodes,
+    getEdges,
+    setSelectedNode,
+    connectNodes,
+    deleteNodes,
+    updateNodePositions,
+    layoutKey,
+    hasInitialLayout
+  } = usePipelineStore();
+
+  // Use React Flow's built-in state management for proper drag functionality
+  const [flowNodes, setNodes, onNodesChange] = useNodesState<ReactFlowNode>([]);
+  const [edges, setEdges] = useEdgesState<Edge>([]);
+
+  // Sync store state with React Flow state
+  useEffect(() => {
+    const storeNodes = getLayoutedNodes();
+    const storeEdges = getEdges();
+    setNodes(storeNodes);
+    setEdges(storeEdges);
+  }, [rawNodes, layoutKey, hasInitialLayout, getLayoutedNodes, getEdges, setNodes, setEdges]);
 
   // Handle new connections with validation
   const handleConnect: OnConnect = useCallback(
@@ -74,8 +89,8 @@ export default function FlowCanvas({
       }
 
       // Find target node
-      const targetNode = nodes.find((n) => n.id === connection.target);
-      if (!targetNode || !targetNode.data.node) {
+      const targetNode = flowNodes.find((n) => n.id === connection.target);
+      if (!targetNode?.data.node) {
         return;
       }
 
@@ -103,42 +118,76 @@ export default function FlowCanvas({
       }
 
       // Connection is valid, proceed
-      void onConnect(connection.source, connection.target, connection.targetHandle);
+      if (pipeline) {
+        connectNodes(pipeline.uuid, connection.source, connection.target, connection.targetHandle).catch((error) =>
+          console.error(error)
+        );
+      }
     },
-    [onConnect, nodes, edges]
+    [pipeline, connectNodes, flowNodes, edges]
   );
 
   // Handle node deletion
   const handleNodesDelete: OnNodesDelete = useCallback(
     (nodesToDelete) => {
-      const nodeIds = nodesToDelete.map((node) => node.id);
-      void onNodesDelete(nodeIds);
+      if (pipeline) {
+        const nodeIds = nodesToDelete.map((node) => node.id);
+        deleteNodes(pipeline.uuid, nodeIds).catch((error) => console.error(error));
+      }
     },
-    [onNodesDelete]
+    [pipeline, deleteNodes]
   );
 
   // Handle node click (select)
   const handleNodeClick: NodeMouseHandler = useCallback(
     (_event, node) => {
-      onNodeSelect(node.id);
+      setSelectedNode(node.id);
     },
-    [onNodeSelect]
+    [setSelectedNode]
   );
 
   // Handle canvas click (deselect)
   const handlePaneClick = useCallback(() => {
-    onNodeSelect(null);
-  }, [onNodeSelect]);
+    setSelectedNode(null);
+  }, [setSelectedNode]);
+
+  // Enhanced node change handler that combines React Flow's built-in handling with our custom logic
+  const handleNodesChange: OnNodesChange<ReactFlowNode> = useCallback(
+    (changes) => {
+      // Always apply React Flow's internal changes first (essential for drag functionality)
+      onNodesChange(changes);
+
+      // Filter for position changes that are completed (dragging: false)
+      const positionChanges = changes.filter(
+        (change) => change.type === "position" && change.dragging === false && change.position
+      );
+
+      if (positionChanges.length > 0) {
+        // Create new positions object
+        const newPositions: Record<string, { x: number; y: number }> = {};
+        positionChanges.forEach((change) => {
+          if (change.type === "position" && change.position) {
+            newPositions[change.id] = change.position;
+          }
+        });
+
+        updateNodePositions(newPositions);
+      }
+    },
+    [onNodesChange, updateNodePositions]
+  );
 
   return (
     <div className="flex-1 bg-gray-50">
       <ReactFlow
-        nodes={nodes}
+        nodes={flowNodes}
         edges={edges}
         nodeTypes={nodeTypes}
         onConnect={handleConnect}
+        onNodesChange={handleNodesChange}
         onNodesDelete={handleNodesDelete}
         onNodeClick={handleNodeClick}
+        nodesDraggable
         onPaneClick={handlePaneClick}
         fitView
         fitViewOptions={{
@@ -153,7 +202,6 @@ export default function FlowCanvas({
           animated: false
         }}
         deleteKeyCode={["Backspace", "Delete"]}
-        selectNodesOnDrag={false}
         connectOnClick={false}
         proOptions={{ hideAttribution: true }}
       >

@@ -17,7 +17,9 @@ export default function ErrorDisplay({
   className = ""
 }: ErrorDisplayProps) {
   return (
-    <div className={`rounded-xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-900/20 ${className}`}>
+    <div
+      className={`rounded-xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-900/20 ${className}`}
+    >
       <div className="flex items-start space-x-3">
         <div className="flex-shrink-0">
           <div className="w-6 h-6 text-red-400">
@@ -31,20 +33,14 @@ export default function ErrorDisplay({
           </div>
         </div>
         <div className="flex-1">
-          <h3 className="text-base font-medium text-red-800 dark:text-red-400">
-            {title}
-          </h3>
+          <h3 className="text-base font-medium text-red-800 dark:text-red-400">{title}</h3>
           <div className="mt-2 text-sm text-red-700 dark:text-red-300">
             <p>{message}</p>
           </div>
           {(onRetry || onGoBack) && (
             <div className="mt-4 flex items-center gap-3">
               {onRetry && (
-                <Button
-                  size="sm"
-                  onClick={onRetry}
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                >
+                <Button size="sm" onClick={onRetry} className="bg-red-600 hover:bg-red-700 text-white">
                   Try Again
                 </Button>
               )}

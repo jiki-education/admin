@@ -11,11 +11,11 @@ import NodeOutputPreview from "./shared/NodeOutputPreview";
 import NodeInputHandles from "./shared/NodeInputHandles";
 import NodeOutputHandle from "./shared/NodeOutputHandle";
 import { getNodeStatusStyle } from "./shared/getNodeStatusStyle";
+import { useEffect } from "react";
 
 interface MergeVideosNodeProps {
   data: {
     node: MergeVideosNodeType;
-    onSelect: () => void;
     onExecute: () => void;
   };
   selected: boolean;
@@ -26,9 +26,10 @@ export default function MergeVideosNode({ data, selected }: MergeVideosNodeProps
   const statusStyle = getNodeStatusStyle(node.status);
   const displayName = getNodeDisplayName(node);
 
+  useEffect(() => { console.log("NODE:", node) }, [node])
+
   return (
     <div
-      onClick={data.onSelect}
       className={`
         bg-white rounded-lg shadow-md border cursor-pointer
         transition-all hover:shadow-lg w-[280px]
@@ -37,7 +38,13 @@ export default function MergeVideosNode({ data, selected }: MergeVideosNodeProps
         ${statusStyle.shadow}
       `}
     >
-      <NodeHeader type={node.type} title={node.title} displayName={displayName} status={node.status} onExecute={data.onExecute} />
+      <NodeHeader
+        type={node.type}
+        title={node.title}
+        displayName={displayName}
+        status={node.status}
+        onExecute={data.onExecute}
+      />
       <NodeOutputPreview node={node} />
 
       {/* Handles */}

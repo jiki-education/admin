@@ -1,346 +1,159 @@
 /**
  * Pipeline Editor Client Component
  *
- * Main container that manages state and coordinates between FlowCanvas and EditorPanel.
- * Uses optimistic updates for instant UI feedback without page refreshes.
+ * Main container that coordinates between FlowCanvas and EditorPanel.
+ * Uses Zustand store for centralized state management with optimistic updates.
+ * Includes keyboard shortcuts and advanced UI features.
  */
 
 "use client";
 
-import { useState, useCallback, useMemo, useRef } from "react";
-import type { Node as ReactFlowNode, Edge } from "@xyflow/react";
-import type { Node } from "@/lib/nodes/types";
-import type { VideoProductionPipeline } from "@/lib/api/video-pipelines";
+import { useEffect, useState } from "react";
+import { Toaster } from "react-hot-toast";
+import { ReactFlowProvider } from "@xyflow/react";
 import FlowCanvas from "./FlowCanvas";
 import EditorPanel from "./EditorPanel";
-import { getLayoutedNodes } from "@/lib/layout";
-import { connectNodes, deleteNode, executeNode } from "@/lib/api/video-pipelines";
-import { getOutputHandleColorValue } from "@/lib/nodes/display-helpers";
-import { hasInputHandle } from "@/lib/nodes/metadata";
+import SimpleNodeAdder from "./SimpleNodeAdder";
+import { usePipelineStore } from "@/stores/pipeline";
+import { generateDefaultNodeConfig } from "@/lib/nodes/defaults";
+import type { NodeType } from "@/lib/nodes/types";
+import { v4 as uuidv4 } from "uuid";
 
-interface PipelineEditorProps {
-  pipeline: VideoProductionPipeline;
-  nodes: Node[];
-  onRefresh: () => void;
-  onRelayout: () => void;
-}
+export default function PipelineEditor() {
+  const [nodeAdderOpen, setNodeAdderOpen] = useState(false);
 
-export default function PipelineEditor({ pipeline, nodes: initialNodes, onRefresh, onRelayout }: PipelineEditorProps) {
-  // Local state - source of truth for UI
-  const [nodes, setNodes] = useState<Node[]>(initialNodes);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
+  // Store subscriptions
+  const { isSaving, canUndo, canRedo, undo, redo, forceRelayout, nodes, createNode, pipeline } = usePipelineStore();
 
-  // Store node positions separately to prevent re-layout
-  const [nodePositions, setNodePositions] = useState<Record<string, { x: number; y: number }>>({});
-  const hasInitialLayout = useRef(false);
-
-  // Find the selected node
-  const selectedNode =
-    selectedNodeId != null && selectedNodeId !== "" ? (nodes.find((n) => n.uuid === selectedNodeId) ?? null) : null;
-
-  // Handle node execution
-  const handleExecute = useCallback(
-    async (nodeUuid: string) => {
-      setIsSaving(true);
-      
-      try {
-        // Execute the node
-        await executeNode(pipeline.uuid, nodeUuid);
-        
-        // Refresh the pipeline to get updated node status
-        onRefresh();
-      } catch (error) {
-        // Show user-friendly error message
-        const errorMessage = error instanceof Error ? error.message : "Failed to execute node";
-        alert(`Failed to execute node: ${errorMessage}`);
-      } finally {
-        setIsSaving(false);
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check if we're in an input field
+      const target = event.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.contentEditable === "true") {
+        return;
       }
-    },
-    [pipeline.uuid, onRefresh]
-  );
 
-  // Convert domain nodes to React Flow nodes
-  const reactFlowNodes: ReactFlowNode[] = useMemo(() => {
-    return nodes.map((node) => ({
-      id: node.uuid,
-      type: node.type,
-      position: { x: 0, y: 0 }, // Will be set by layout or preserved position
-      data: {
-        node,
-        onSelect: () => setSelectedNodeId(node.uuid),
-        onExecute: () => handleExecute(node.uuid)
-      },
-      selected: node.uuid === selectedNodeId
-    }));
-  }, [nodes, selectedNodeId, handleExecute]);
+      // Cmd/Ctrl + Z for undo
+      if ((event.metaKey || event.ctrlKey) && event.key === "z" && !event.shiftKey && canUndo) {
+        event.preventDefault();
+        undo();
+      }
 
-  // Convert node inputs to React Flow edges
-  const edges: Edge[] = useMemo(() => {
-    const edgesList: Edge[] = [];
-
-    nodes.forEach((node) => {
-      Object.entries(node.inputs).forEach(([inputKey, sources]) => {
-        // Only create edges for input handles that actually exist for this node type
-        if (!hasInputHandle(node.type, inputKey)) {
-          return;
+      // Cmd/Ctrl + Shift + Z or Cmd/Ctrl + Y for redo
+      if (
+        ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === "Z") ||
+        ((event.metaKey || event.ctrlKey) && event.key === "y")
+      ) {
+        if (canRedo) {
+          event.preventDefault();
+          redo();
         }
+      }
 
-        // Normalize inputs: handle both string (single input) and string[] (multi input)
-        const sourceArray = Array.isArray(sources) ? sources : sources != null ? [sources] : [];
+      // R for force relayout
+      if (event.key === "r" && !event.metaKey && !event.ctrlKey) {
+        event.preventDefault();
+        forceRelayout();
+      }
 
-        sourceArray.forEach((sourceId, index) => {
-          // Find the source node to get its output color
-          const sourceNode = nodes.find((n) => n.uuid === sourceId);
-          const edgeColor = sourceNode != null ? getOutputHandleColorValue(sourceNode) : "#9ca3af";
+      // P for toggle node adder
+      if (event.key === "p" && !event.metaKey && !event.ctrlKey) {
+        event.preventDefault();
+        setNodeAdderOpen(!nodeAdderOpen);
+      }
+    };
 
-          // Determine if line should be dashed (pending/in_progress/failed) or solid (completed)
-          // Check the SOURCE node's status since the edge represents its output
-          const isDashed = sourceNode != null ? sourceNode.status !== "completed" : true;
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [canUndo, canRedo, undo, redo, forceRelayout, nodeAdderOpen]);
 
-          edgesList.push({
-            id: `${sourceId}-${node.uuid}-${inputKey}-${index}`,
-            source: sourceId,
-            target: node.uuid,
-            targetHandle: inputKey,
-            animated: node.status === "in_progress",
-            style: {
-              stroke: edgeColor,
-              strokeWidth: 2,
-              strokeDasharray: isDashed ? "5,5" : "0"
-            }
-          });
-        });
+  // Handle node addition from simple adder
+  const handleAddNode = async (nodeType: NodeType, assetType?: "text" | "image" | "audio" | "video" | "json") => {
+    if (!pipeline?.uuid) return;
+
+    try {
+      // Generate UUID for the new node
+      const nodeUuid = uuidv4();
+
+      // Generate default configuration
+      const nodeConfig = generateDefaultNodeConfig(nodeType, nodes, assetType);
+
+      // Add node at center of canvas (or random position)
+      const position = { x: 300 + Math.random() * 200, y: 200 + Math.random() * 200 };
+
+      // Create the node using the store action
+      await createNode(pipeline.uuid, {
+        uuid: nodeUuid,
+        type: nodeType,
+        title: nodeConfig.title,
+        inputs: nodeConfig.inputs,
+        config: nodeConfig.config,
+        asset: nodeConfig.asset as Record<string, unknown> | undefined,
+        position
       });
-    });
 
-    return edgesList;
-  }, [nodes]);
-
-  // Apply positions to nodes (auto-layout only on first render)
-  const layoutedNodes = useMemo(() => {
-    // If we already have positions for all nodes, use them
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    const allNodesHavePositions = reactFlowNodes.every((node) => nodePositions[node.id] != null);
-
-    if (allNodesHavePositions && hasInitialLayout.current) {
-      // Preserve existing positions
-      return reactFlowNodes.map((node) => ({
-        ...node,
-        position: nodePositions[node.id] ?? { x: 0, y: 0 }
-      }));
+      // Close the node adder after adding
+      setNodeAdderOpen(false);
+    } catch (error) {
+      console.error("Failed to create node from palette:", error);
     }
-
-    // Calculate node dimensions from measured heights (if available)
-    const haveMeasuredDimensions = reactFlowNodes.some((n) => n.measured?.height != null && n.measured.height !== 0);
-    const maxHeight = haveMeasuredDimensions
-      ? Math.max(
-          ...reactFlowNodes.map((n) =>
-            n.measured?.height != null && n.measured.height !== 0 ? n.measured.height : 240
-          ),
-          240
-        )
-      : 240;
-
-    const maxWidth = haveMeasuredDimensions
-      ? Math.max(
-          ...reactFlowNodes.map((n) => (n.measured?.width != null && n.measured.width !== 0 ? n.measured.width : 280)),
-          280
-        )
-      : 280;
-
-    // First render: run auto-layout with Dagre
-    const layouted = getLayoutedNodes(reactFlowNodes, edges, {
-      direction: "LR",
-      nodeWidth: maxWidth,
-      nodeHeight: maxHeight,
-      rankSep: 150,
-      nodeSep: 50 // Spacing between nodes vertically
-    });
-
-    // Save positions for future renders
-    const positions: Record<string, { x: number; y: number }> = {};
-    layouted.forEach((node) => {
-      positions[node.id] = node.position;
-    });
-    setNodePositions(positions);
-    hasInitialLayout.current = true;
-
-    return layouted;
-  }, [reactFlowNodes, edges, nodePositions]);
-
-  // Manual re-layout function - call parent's callback when triggered
-  useCallback(() => {
-    // Force re-layout by clearing positions
-    setNodePositions({});
-    hasInitialLayout.current = false;
-    onRelayout();
-  }, [onRelayout]);
-
-  // Handle node selection
-  const handleNodeSelect = useCallback((nodeId: string | null) => {
-    setSelectedNodeId(nodeId);
-  }, []);
-
-  // Handle connecting nodes with optimistic update
-  const handleConnect = useCallback(
-    async (sourceId: string, targetId: string, targetHandle: string) => {
-      // OPTIMISTIC UPDATE: Update UI immediately
-      const previousNodes = nodes;
-
-      setNodes((prevNodes) => {
-        return prevNodes.map((node) => {
-          if (node.uuid === targetId) {
-            // Get current array (or empty array if doesn't exist)
-            const currentValue = (node.inputs as Record<string, string[]>)[targetHandle] ?? [];
-
-            // Check if already connected
-            if (currentValue.includes(sourceId)) {
-              return node; // Already connected, no change
-            }
-
-            // Append to array
-            const newValue = [...currentValue, sourceId];
-
-            // Update the target node's inputs (preserving discriminated union)
-            return {
-              ...node,
-              inputs: {
-                ...node.inputs,
-                [targetHandle]: newValue
-              }
-            } as Node;
-          }
-          return node;
-        });
-      });
-
-      setIsSaving(true);
-
-      // Call Rails API to persist connection
-      try {
-        await connectNodes(pipeline.uuid, sourceId, targetId, targetHandle);
-      } catch (error) {
-        // ROLLBACK: Restore previous state on error
-        const errorMessage = error instanceof Error ? error.message : "Failed to connect nodes";
-        alert(`Failed to connect nodes: ${errorMessage}`);
-        setNodes(previousNodes);
-      } finally {
-        setIsSaving(false);
-      }
-    },
-    [pipeline.uuid, nodes]
-  );
-
-  // Handle deleting nodes with optimistic update
-  const handleNodesDelete = useCallback(
-    async (nodeIds: string[]) => {
-      // OPTIMISTIC UPDATE: Remove nodes from UI immediately
-      const previousNodes = nodes;
-      const previousPositions = nodePositions;
-
-      setNodes((prevNodes) => {
-        // Remove deleted nodes
-        let updated = prevNodes.filter((node) => !nodeIds.includes(node.uuid));
-
-        // Clean up references in remaining nodes' inputs
-        updated = updated.map((node) => {
-          const cleanedInputs = { ...node.inputs } as Record<string, string[]>;
-          let modified = false;
-
-          Object.entries(cleanedInputs).forEach(([key, value]) => {
-            if (Array.isArray(value)) {
-              const filtered = value.filter((uuid) => !nodeIds.includes(uuid));
-              if (filtered.length !== value.length) {
-                cleanedInputs[key] = filtered;
-                modified = true;
-              }
-            }
-          });
-
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          return modified ? ({ ...node, inputs: cleanedInputs } as Node) : node;
-        });
-
-        return updated;
-      });
-
-      // Remove positions for deleted nodes
-      setNodePositions((prev) => {
-        const updated = { ...prev };
-        nodeIds.forEach((uuid) => delete updated[uuid]);
-        return updated;
-      });
-
-      // Deselect if deleted node was selected
-      if (selectedNodeId != null && selectedNodeId !== "" && nodeIds.includes(selectedNodeId)) {
-        setSelectedNodeId(null);
-      }
-
-      setIsSaving(true);
-
-      // Call Rails API to persist deletion
-      try {
-        for (const nodeUuid of nodeIds) {
-          await deleteNode(pipeline.uuid, nodeUuid);
-        }
-      } catch (error) {
-        // ROLLBACK: Restore previous state on error
-        const errorMessage = error instanceof Error ? error.message : "Failed to delete node";
-        alert(`Failed to delete node: ${errorMessage}`);
-        setNodes(previousNodes);
-        setNodePositions(previousPositions);
-        if (selectedNodeId != null && selectedNodeId !== "" && nodeIds.includes(selectedNodeId)) {
-          setSelectedNodeId(selectedNodeId); // Restore selection
-        }
-      } finally {
-        setIsSaving(false);
-      }
-    },
-    [pipeline.uuid, nodes, nodePositions, selectedNodeId]
-  );
-
-  // Handle delete from editor panel
-  const handleDeleteFromPanel = useCallback(
-    async (nodeId: string) => {
-      await handleNodesDelete([nodeId]);
-    },
-    [handleNodesDelete]
-  );
-
-  // Manual refresh from database - call parent's callback when triggered
-  useCallback(() => {
-    onRefresh();
-  }, [onRefresh]);
+  };
 
   return (
-    <div className="flex-1 flex overflow-hidden relative">
-      {/* Saving indicator */}
-      {isSaving && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium">
-          Saving...
+    <ReactFlowProvider>
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Toast notifications */}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: "#363636",
+              color: "#fff"
+            },
+            success: {
+              duration: 2000
+            },
+            error: {
+              duration: 5000
+            }
+          }}
+        />
+
+        {/* Saving indicator */}
+        {isSaving && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium">
+            Saving...
+          </div>
+        )}
+
+
+
+        {/* Flow Canvas */}
+        <FlowCanvas />
+
+        {/* Add Node Button - positioned at bottom right of canvas, left of the editor panel */}
+        <div className="absolute bottom-4 right-[25rem] z-40">
+          <button
+            onClick={() => setNodeAdderOpen(!nodeAdderOpen)}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg transition-colors"
+            title="Add Node (P)"
+          >
+            +
+          </button>
         </div>
-      )}
 
-      {/* Flow Canvas */}
-      <FlowCanvas
-        nodes={layoutedNodes}
-        edges={edges}
-        selectedNodeId={selectedNodeId}
-        onNodeSelect={handleNodeSelect}
-        onConnect={handleConnect}
-        onNodesDelete={handleNodesDelete}
-      />
+        {/* Editor Panel */}
+        <EditorPanel />
 
-      {/* Editor Panel */}
-      <EditorPanel
-        selectedNode={selectedNode}
-        pipelineUuid={pipeline.uuid}
-        allNodes={nodes}
-        onDelete={handleDeleteFromPanel}
-        onRefresh={onRefresh}
-      />
-    </div>
+        {/* Simple Node Adder */}
+        <SimpleNodeAdder
+          isOpen={nodeAdderOpen}
+          onToggle={() => setNodeAdderOpen(!nodeAdderOpen)}
+          onAddNode={handleAddNode}
+        />
+      </div>
+    </ReactFlowProvider>
   );
 }

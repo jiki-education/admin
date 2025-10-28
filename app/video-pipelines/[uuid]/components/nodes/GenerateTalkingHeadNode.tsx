@@ -15,7 +15,6 @@ import { getNodeStatusStyle } from "./shared/getNodeStatusStyle";
 interface GenerateTalkingHeadNodeProps {
   data: {
     node: GenerateTalkingHeadNodeType;
-    onSelect: () => void;
     onExecute: () => void;
   };
   selected: boolean;
@@ -28,7 +27,6 @@ export default function GenerateTalkingHeadNode({ data, selected }: GenerateTalk
 
   return (
     <div
-      onClick={data.onSelect}
       className={`
         bg-white rounded-lg shadow-md border cursor-pointer
         transition-all hover:shadow-lg w-[280px]
@@ -38,7 +36,13 @@ export default function GenerateTalkingHeadNode({ data, selected }: GenerateTalk
       `}
     >
       {/* Header */}
-      <NodeHeader type={node.type} title={node.title} displayName={displayName} status={node.status} onExecute={data.onExecute} />
+      <NodeHeader
+        type={node.type}
+        title={node.title}
+        displayName={displayName}
+        status={node.status}
+        onExecute={data.onExecute}
+      />
 
       {/* Output Preview */}
       <NodeOutputPreview node={node} />

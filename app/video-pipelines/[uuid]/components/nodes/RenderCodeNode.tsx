@@ -15,7 +15,6 @@ import { getNodeStatusStyle } from "./shared/getNodeStatusStyle";
 interface RenderCodeNodeProps {
   data: {
     node: RenderCodeNodeType;
-    onSelect: () => void;
     onExecute: () => void;
   };
   selected: boolean;
@@ -28,7 +27,6 @@ export default function RenderCodeNode({ data, selected }: RenderCodeNodeProps) 
 
   return (
     <div
-      onClick={data.onSelect}
       className={`
         bg-white rounded-lg shadow-md border cursor-pointer
         transition-all hover:shadow-lg w-[280px]
@@ -37,7 +35,13 @@ export default function RenderCodeNode({ data, selected }: RenderCodeNodeProps) 
         ${statusStyle.shadow}
       `}
     >
-      <NodeHeader type={node.type} title={node.title} displayName={displayName} status={node.status} onExecute={data.onExecute} />
+      <NodeHeader
+        type={node.type}
+        title={node.title}
+        displayName={displayName}
+        status={node.status}
+        onExecute={data.onExecute}
+      />
       <NodeOutputPreview node={node} />
 
       <div className="px-4 py-3 text-xs text-gray-600 space-y-1">

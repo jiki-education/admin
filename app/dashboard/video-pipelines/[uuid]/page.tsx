@@ -1,10 +1,9 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, use, useCallback } from "react";
+import { useEffect, use } from "react";
 import Link from "next/link";
-import type { VideoProductionPipeline, VideoProductionNode } from "@/lib/api/video-pipelines";
-import { getPipeline } from "@/lib/api/video-pipelines";
+import { usePipelineStore } from "@/stores/pipeline";
 
 interface PipelineDetailProps {
   params: Promise<{ uuid: string }>;
@@ -14,39 +13,18 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
   const router = useRouter();
   const resolvedParams = use(params);
 
-  const [pipeline, setPipeline] = useState<VideoProductionPipeline | null>(null);
-  const [nodes, setNodes] = useState<VideoProductionNode[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-
-  const loadPipeline = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await getPipeline(resolvedParams.uuid);
-      setPipeline(response.pipeline);
-      setNodes(response.nodes);
-    } catch (err) {
-      console.error("Failed to load pipeline:", err);
-      setError(err instanceof Error ? err.message : "Failed to load pipeline");
-    } finally {
-      setLoading(false);
-    }
-  }, [resolvedParams.uuid]);
+  const { pipeline, nodes, loading, error, loadPipeline, getProgressPercentage, resetStore } = usePipelineStore();
 
   useEffect(() => {
     if (resolvedParams.uuid) {
-      void loadPipeline();
+      void loadPipeline(resolvedParams.uuid);
     }
-  }, [resolvedParams.uuid, loadPipeline]);
 
-  const getProgressPercentage = (progress: any) => {
-    if (!progress || progress.total === 0) {
-      return 0;
-    }
-    return Math.round((progress.completed / progress.total) * 100);
-  };
+    // Cleanup store when component unmounts
+    return () => {
+      resetStore();
+    };
+  }, [resolvedParams.uuid, loadPipeline, resetStore]);
 
   if (loading) {
     return (
@@ -65,9 +43,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
         <PageBreadcrumb pageTitle="Pipeline Details" />
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="text-center py-12">
-            <p className="text-red-600 dark:text-red-400 mb-4">
-              {error || "Pipeline not found"}
-            </p>
+            <p className="text-red-600 dark:text-red-400 mb-4">{error || "Pipeline not found"}</p>
             <Link
               href="/dashboard/video-pipelines"
               className="inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
@@ -80,7 +56,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
     );
   }
 
-  const progressPercentage = getProgressPercentage(pipeline.metadata.progress);
+  const progressPercentage = getProgressPercentage();
 
   return (
     <div>
@@ -90,9 +66,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
         {/* Pipeline Overview */}
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-              {pipeline.title}
-            </h1>
+            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">{pipeline.title}</h1>
             <Link
               href="/dashboard/video-pipelines"
               className="inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
@@ -109,7 +83,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
             <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg">
               <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Cost</h3>
               <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                ${pipeline.metadata.totalCost?.toFixed(2) || '0.00'}
+                ${pipeline.metadata.totalCost?.toFixed(2) || "0.00"}
               </p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg">
@@ -121,9 +95,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
                     style={{ width: `${progressPercentage}%` }}
                   />
                 </div>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {progressPercentage}%
-                </span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{progressPercentage}%</span>
               </div>
             </div>
           </div>
@@ -172,7 +144,7 @@ export default function PipelineDetail({ params }: PipelineDetailProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Bucket:</span>
-                  <span className="ml-2 text-gray-900 dark:text-white">{pipeline.config.storage?.bucket || 'N/A'}</span>
+                  <span className="ml-2 text-gray-900 dark:text-white">{pipeline.config.storage?.bucket || "N/A"}</span>
                 </div>
                 {pipeline.config.storage?.prefix && (
                   <div>

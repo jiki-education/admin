@@ -43,6 +43,6 @@ function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) 
       </button>
     </div>
   );
-};
+}
 
 export default Pagination;

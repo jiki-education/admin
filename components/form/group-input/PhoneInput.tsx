@@ -136,6 +136,6 @@ function PhoneInput({
       )}
     </div>
   );
-};
+}
 
 export default PhoneInput;

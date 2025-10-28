@@ -27,7 +27,7 @@ export default function CreatePipeline() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim()) {
       setError("Title is required");
       return;
@@ -53,11 +53,11 @@ export default function CreatePipeline() {
 
   const handleInputChange = (field: string, value: string) => {
     if (field === "title") {
-      setFormData(prev => ({ ...prev, title: value }));
+      setFormData((prev) => ({ ...prev, title: value }));
     } else if (field === "version") {
-      setFormData(prev => ({ ...prev, version: value }));
+      setFormData((prev) => ({ ...prev, version: value }));
     } else if (field === "bucket") {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         config: {
           ...prev.config,
@@ -68,7 +68,7 @@ export default function CreatePipeline() {
         }
       }));
     } else if (field === "prefix") {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         config: {
           ...prev.config,
@@ -88,9 +88,7 @@ export default function CreatePipeline() {
       <div className="space-y-6">
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-              Create New Video Pipeline
-            </h1>
+            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Create New Video Pipeline</h1>
             <Link
               href="/dashboard/video-pipelines"
               className="inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
@@ -109,7 +107,7 @@ export default function CreatePipeline() {
             {/* Basic Information */}
             <div className="space-y-4">
               <h2 className="text-lg font-medium text-gray-800 dark:text-white">Basic Information</h2>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Pipeline Title *
@@ -125,9 +123,7 @@ export default function CreatePipeline() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Version
-                </label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Version</label>
                 <input
                   type="text"
                   value={formData.version}
@@ -141,7 +137,7 @@ export default function CreatePipeline() {
             {/* Storage Configuration */}
             <div className="space-y-4">
               <h2 className="text-lg font-medium text-gray-800 dark:text-white">Storage Configuration</h2>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Storage Bucket *

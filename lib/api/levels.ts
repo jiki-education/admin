@@ -1,5 +1,12 @@
 import type { Level, LevelWithProgress, LevelsResponse, UserLevel, UserLevelsResponse } from "@/types/levels";
-import type { AdminLevelFilters, AdminLevelsResponse, AdminLevel, AdminLesson, CreateLevelData, CreateLessonData } from "@/app/dashboard/levels/types";
+import type {
+  AdminLevelFilters,
+  AdminLevelsResponse,
+  AdminLevel,
+  AdminLesson,
+  CreateLevelData,
+  CreateLessonData
+} from "@/app/dashboard/levels/types";
 import { api } from "./client";
 
 export async function fetchLevels(): Promise<Level[]> {
@@ -65,8 +72,14 @@ export async function getLevelLessons(levelId: number): Promise<AdminLesson[]> {
   return response.data.lessons;
 }
 
-export async function updateLesson(levelId: number, lessonId: number, data: Partial<AdminLesson>): Promise<AdminLesson> {
-  const response = await api.patch<{ lesson: AdminLesson }>(`/admin/levels/${levelId}/lessons/${lessonId}`, { lesson: data });
+export async function updateLesson(
+  levelId: number,
+  lessonId: number,
+  data: Partial<AdminLesson>
+): Promise<AdminLesson> {
+  const response = await api.patch<{ lesson: AdminLesson }>(`/admin/levels/${levelId}/lessons/${lessonId}`, {
+    lesson: data
+  });
   return response.data.lesson;
 }
 

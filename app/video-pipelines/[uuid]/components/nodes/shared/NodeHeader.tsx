@@ -30,7 +30,7 @@ export default function NodeHeader({ type, title, displayName, status, onExecute
   const icon = NODE_ICONS[type] || "📦";
 
   return (
-    <div className="px-4 py-2 rounded-t-lg bg-white">
+    <div className="px-4 py-2 rounded-t-lg bg-white drag-handle__custom cursor-move">
       <div className="flex items-center justify-between gap-2">
         <span className="text-xl flex-shrink-0">{icon}</span>
         <div className="flex-1 min-w-0">
@@ -39,7 +39,9 @@ export default function NodeHeader({ type, title, displayName, status, onExecute
           </div>
           <div className="text-xs text-gray-600 truncate">{displayName}</div>
         </div>
-        <StatusBadge status={status} onExecute={onExecute} />
+        <div className="nodrag">
+          <StatusBadge status={status} onExecute={onExecute} />
+        </div>
       </div>
     </div>
   );

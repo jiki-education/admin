@@ -144,12 +144,14 @@ pnpm add -D [package-name]   # Dev dependency
 ### ✅ Completed Integrations (Phase 1)
 
 **User Management:**
+
 - **DELETE /v1/admin/users/:id** - ✅ Fully integrated
   - API function: `deleteUser` in `lib/api/users.ts`
   - UI integration: `app/dashboard/users/page.tsx`
   - Comprehensive unit tests included
 
 **Level Management:**
+
 - **POST /v1/admin/levels** - ✅ Fully integrated
   - API function: `createLevel` in `lib/api/levels.ts`
   - UI integration: `app/dashboard/levels/new/page.tsx`
@@ -159,6 +161,7 @@ pnpm add -D [package-name]   # Dev dependency
 ### ❌ Pending Backend Implementation
 
 **Lesson Management:**
+
 - **POST /v1/admin/levels/:levelId/lessons** - Backend missing
   - Frontend ready but blocked by missing backend endpoint
   - Requires backend team to implement following Level::Create pattern
@@ -200,7 +203,8 @@ Deployment configuration is not yet set up. When adding deployment:
 3. Document any build steps or requirements
 
 # important-instruction-reminders
+
 Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
-NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+NEVER proactively create documentation files (\*.md) or README files. Only create documentation files if explicitly requested by the User.

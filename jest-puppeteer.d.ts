@@ -1,5 +1,5 @@
 // Type definitions for jest-puppeteer globals
-import type { Browser, Page } from 'puppeteer';
+import type { Browser, Page } from "puppeteer";
 
 declare global {
   var page: Page;

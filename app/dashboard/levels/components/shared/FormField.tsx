@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
 interface FormFieldProps {
-  type: 'text' | 'textarea' | 'select' | 'custom';
+  type: "text" | "textarea" | "select" | "custom";
   name: string;
   label: string;
   value?: string;
@@ -20,10 +20,10 @@ export default function FormField({
   type,
   name,
   label,
-  value = '',
+  value = "",
   onChange,
   error,
-  className = '',
+  className = "",
   placeholder,
   required = false,
   rows = 3,
@@ -32,8 +32,8 @@ export default function FormField({
   helpText
 }: FormFieldProps) {
   const baseInputClasses = `w-full p-3 border rounded-lg focus:ring-blue-200 dark:bg-gray-800 dark:text-white ${
-    error 
-      ? "border-red-300 focus:border-red-500 dark:border-red-600" 
+    error
+      ? "border-red-300 focus:border-red-500 dark:border-red-600"
       : "border-gray-300 focus:border-blue-500 dark:border-gray-600 dark:focus:border-blue-400"
   }`;
 
@@ -45,7 +45,7 @@ export default function FormField({
 
   const renderInput = () => {
     switch (type) {
-      case 'text':
+      case "text":
         return (
           <input
             type="text"
@@ -57,8 +57,8 @@ export default function FormField({
             required={required}
           />
         );
-      
-      case 'textarea':
+
+      case "textarea":
         return (
           <textarea
             id={name}
@@ -70,8 +70,8 @@ export default function FormField({
             required={required}
           />
         );
-      
-      case 'select':
+
+      case "select":
         return (
           <select
             id={name}
@@ -87,10 +87,10 @@ export default function FormField({
             ))}
           </select>
         );
-      
-      case 'custom':
+
+      case "custom":
         return children;
-      
+
       default:
         return null;
     }
@@ -102,20 +102,16 @@ export default function FormField({
         {label}
         {required && <span className="text-red-500 font-bold"> *</span>}
       </label>
-      
+
       {renderInput()}
-      
+
       {error && (
         <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-700">
           <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
         </div>
       )}
-      
-      {helpText && (
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          {helpText}
-        </p>
-      )}
+
+      {helpText && <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{helpText}</p>}
     </div>
   );
 }

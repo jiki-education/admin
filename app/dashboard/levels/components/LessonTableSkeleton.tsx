@@ -65,32 +65,32 @@ export default function LessonTableSkeleton({ rows = 5 }: LessonTableSkeletonPro
                   <TableCell className="px-5 py-4 text-start">
                     <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                   </TableCell>
-                  
+
                   {/* Position skeleton */}
                   <TableCell className="px-5 py-4 text-start">
                     <div className="w-8 h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                   </TableCell>
-                  
+
                   {/* Title skeleton */}
                   <TableCell className="px-5 py-4 text-start">
                     <div className="w-32 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                   </TableCell>
-                  
+
                   {/* Type skeleton */}
                   <TableCell className="px-5 py-4 text-start">
                     <div className="w-16 h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                   </TableCell>
-                  
+
                   {/* Slug skeleton */}
                   <TableCell className="px-5 py-4 text-start">
                     <div className="w-24 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                   </TableCell>
-                  
+
                   {/* Description skeleton */}
                   <TableCell className="px-5 py-4 text-start max-w-xs">
                     <div className="w-40 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                   </TableCell>
-                  
+
                   {/* Actions skeleton */}
                   <TableCell className="px-5 py-4 text-start">
                     <div className="flex items-center gap-2">

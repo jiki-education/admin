@@ -8,12 +8,7 @@ interface LevelPaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export default function LevelPagination({
-  currentPage,
-  totalPages,
-  totalCount,
-  onPageChange
-}: LevelPaginationProps) {
+export default function LevelPagination({ currentPage, totalPages, totalCount, onPageChange }: LevelPaginationProps) {
   return (
     <Pagination
       currentPage={currentPage}

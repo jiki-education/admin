@@ -99,7 +99,7 @@ export default function PipelineTable({ pipelines, loading, onDelete }: Pipeline
         <tbody>
           {pipelines.map((pipeline) => {
             const progressPercentage = getProgressPercentage(pipeline.metadata.progress);
-            
+
             return (
               <tr
                 key={pipeline.uuid}
@@ -113,9 +113,7 @@ export default function PipelineTable({ pipelines, loading, onDelete }: Pipeline
                     {pipeline.title}
                   </Link>
                 </td>
-                <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                  {pipeline.version}
-                </td>
+                <td className="px-6 py-4 text-gray-500 dark:text-gray-400">{pipeline.version}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center space-x-2">
                     <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 w-24">
@@ -124,20 +122,16 @@ export default function PipelineTable({ pipelines, loading, onDelete }: Pipeline
                         style={{ width: `${progressPercentage}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-600 dark:text-gray-400 w-10">
-                      {progressPercentage}%
-                    </span>
+                    <span className="text-xs text-gray-600 dark:text-gray-400 w-10">{progressPercentage}%</span>
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {pipeline.metadata.progress?.completed || 0}/{pipeline.metadata.progress?.total || 0} nodes
                   </div>
                 </td>
                 <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                  ${pipeline.metadata.totalCost?.toFixed(2) || '0.00'}
+                  ${pipeline.metadata.totalCost?.toFixed(2) || "0.00"}
                 </td>
-                <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                  {formatDate(pipeline.updated_at)}
-                </td>
+                <td className="px-6 py-4 text-gray-500 dark:text-gray-400">{formatDate(pipeline.updated_at)}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center space-x-2">
                     <Link

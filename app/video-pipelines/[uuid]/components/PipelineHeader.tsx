@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePipelineStore } from "@/stores/usePipelineStore";
 
 interface PipelineHeaderProps {
   pipelineUuid: string;
@@ -9,6 +10,15 @@ interface PipelineHeaderProps {
 }
 
 export default function PipelineHeader({ pipelineUuid, onRefresh, onRelayout }: PipelineHeaderProps) {
+  const { executePipeline, isSaving } = usePipelineStore();
+
+  const handleRunPipeline = async () => {
+    try {
+      await executePipeline(pipelineUuid);
+    } catch (error) {
+      console.error("Failed to execute pipeline:", error);
+    }
+  };
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center shrink-0">
       <Link href="/dashboard/video-pipelines" className="text-gray-700 hover:text-gray-900">
@@ -30,8 +40,17 @@ export default function PipelineHeader({ pipelineUuid, onRefresh, onRelayout }: 
         >
           ⚡ Re-layout
         </button>
-        <button className="px-4 py-1.5 bg-blue-600 text-white rounded shadow-sm hover:bg-blue-700 text-sm font-medium transition-colors">
-          ▶ Run Pipeline
+        <button 
+          onClick={handleRunPipeline}
+          disabled={isSaving}
+          className={`px-4 py-1.5 rounded shadow-sm text-sm font-medium transition-colors ${
+            isSaving 
+              ? "bg-gray-400 text-white cursor-not-allowed" 
+              : "bg-blue-600 text-white hover:bg-blue-700"
+          }`}
+          title="Execute all nodes in dependency order"
+        >
+          {isSaving ? "🔄 Running..." : "▶ Run Pipeline"}
         </button>
       </div>
     </header>

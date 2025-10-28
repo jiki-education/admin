@@ -25,7 +25,7 @@ export default function JSONEditor({
 
   const handleChange = (newValue: string) => {
     setLocalValue(newValue);
-    
+
     // Validate JSON
     let validationError: string | null = null;
     if (newValue.trim()) {
@@ -35,10 +35,10 @@ export default function JSONEditor({
         validationError = err instanceof Error ? err.message : "Invalid JSON format";
       }
     }
-    
+
     setError(validationError);
     onValidation?.(validationError);
-    
+
     // Only call onChange if JSON is valid or empty
     if (!validationError) {
       onChange(newValue);
@@ -63,9 +63,7 @@ export default function JSONEditor({
   return (
     <div className={`space-y-2 ${className}`}>
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          JSON Data
-        </label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">JSON Data</label>
         <button
           type="button"
           onClick={formatJSON}
@@ -74,7 +72,7 @@ export default function JSONEditor({
           Format JSON
         </button>
       </div>
-      
+
       <div className="relative">
         <textarea
           value={localValue}
@@ -82,25 +80,21 @@ export default function JSONEditor({
           placeholder={placeholder}
           rows={12}
           className={`w-full p-3 border rounded-lg font-mono text-sm resize-y min-h-[200px] ${
-            error 
-              ? "border-red-300 focus:border-red-500 focus:ring-red-200 dark:border-red-600 dark:focus:border-red-500" 
+            error
+              ? "border-red-300 focus:border-red-500 focus:ring-red-200 dark:border-red-600 dark:focus:border-red-500"
               : "border-gray-300 focus:border-blue-500 focus:ring-blue-200 dark:border-gray-600 dark:focus:border-blue-400"
           } dark:bg-gray-800 dark:text-white dark:placeholder-gray-400`}
         />
-        
+
         {error && (
           <div className="absolute top-2 right-2">
             <div className="w-3 h-3 bg-red-500 rounded-full" title={error} />
           </div>
         )}
       </div>
-      
-      {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">
-          JSON Error: {error}
-        </p>
-      )}
-      
+
+      {error && <p className="text-sm text-red-600 dark:text-red-400">JSON Error: {error}</p>}
+
       <p className="text-xs text-gray-500 dark:text-gray-400">
         Enter valid JSON data. Use the &quot;Format JSON&quot; button to auto-format your input.
       </p>

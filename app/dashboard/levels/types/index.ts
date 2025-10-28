@@ -34,5 +34,5 @@ export interface AdminLevelsResponse {
 }
 
 // Types for creating new levels and lessons
-export type CreateLevelData = Omit<AdminLevel, 'id' | 'position'>;
-export type CreateLessonData = Omit<AdminLesson, 'id' | 'position'>;
+export type CreateLevelData = Omit<AdminLevel, "id" | "position">;
+export type CreateLessonData = Omit<AdminLesson, "id" | "position">;

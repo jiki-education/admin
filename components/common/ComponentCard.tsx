@@ -24,6 +24,6 @@ function ComponentCard({ title, children, className = "", desc = "" }: Component
       </div>
     </div>
   );
-};
+}
 
 export default ComponentCard;

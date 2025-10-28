@@ -19,19 +19,10 @@ export default function FormActions({
 }: FormActionsProps) {
   return (
     <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-      <Button
-        type="button"
-        variant="outline"
-        onClick={onCancel}
-        disabled={loading}
-      >
+      <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
         {cancelLabel}
       </Button>
-      <Button
-        type="submit"
-        onClick={onSubmit}
-        disabled={disabled || loading}
-      >
+      <Button type="submit" onClick={onSubmit} disabled={disabled || loading}>
         {loading ? "Saving..." : submitLabel}
       </Button>
     </div>
