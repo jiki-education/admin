@@ -36,7 +36,7 @@ export const createNodeActions = (
       nodes: state.nodes.map((node) => {
         if (node.uuid === targetId) {
           // Get current value - could be string, string[], or undefined
-          const currentValue = node.inputs[targetHandle];
+          const currentValue = (node.inputs as Record<string, string | string[] | undefined>)[targetHandle];
 
           let newValue: string | string[];
 
@@ -78,7 +78,7 @@ export const createNodeActions = (
     try {
       await apiConnectNodes(pipelineUuid, sourceId, targetId, targetHandle);
 
-      console.log("Nodes connected successfully via API:", connectionDesc);
+      console.debug("Nodes connected successfully via API:", connectionDesc);
 
       toast.success(connectionDesc, {
         id: `connect-${sourceId}-${targetId}`,
@@ -88,7 +88,7 @@ export const createNodeActions = (
       console.error("Failed to connect nodes via API:", error);
 
       // Rollback optimistic update on error
-      set((state) => ({
+      set((_state) => ({
         nodes: previousNodes,
         isSaving: false
       }));
@@ -121,7 +121,7 @@ export const createNodeActions = (
 
       // Clean up references in remaining nodes' inputs
       updatedNodes = updatedNodes.map((node) => {
-        const cleanedInputs = { ...node.inputs } as Record<string, string[]>;
+        const cleanedInputs = { ...node.inputs } as Record<string, string | string[] | undefined>;
         let modified = false;
 
         Object.entries(cleanedInputs).forEach(([key, value]) => {
@@ -134,6 +134,7 @@ export const createNodeActions = (
           }
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         return modified ? ({ ...node, inputs: cleanedInputs } as Node) : node;
       });
 
@@ -161,10 +162,10 @@ export const createNodeActions = (
         nodeIds.map(nodeId => apiDeleteNode(pipelineUuid, nodeId))
       );
 
-      console.log("Nodes deleted successfully via API:", nodeIds);
+      console.debug("Nodes deleted successfully via API:", nodeIds);
 
       // Force layout recalculation after deletion
-      set((state) => ({
+      set((_state) => ({
         hasInitialLayout: false // This will trigger layout recalculation
       }));
 
@@ -176,7 +177,7 @@ export const createNodeActions = (
       console.error("Failed to delete nodes via API:", error);
 
       // Rollback optimistic update on error
-      set((state) => ({
+      set((_state) => ({
         nodes: previousNodes,
         nodePositions: previousPositions,
         selectedNodeId: selectedNodeId,
@@ -205,7 +206,7 @@ export const createNodeActions = (
       position?: { x: number; y: number };
     }
   ): Promise<void> => {
-    console.log("Store createNode called", { pipelineUuid, nodeData });
+    console.debug("Store createNode called", { pipelineUuid, nodeData });
 
     const { nodes } = get();
     const createDesc = `Create node: ${nodeData.title}`;
@@ -235,8 +236,8 @@ export const createNodeActions = (
       updated_at: new Date().toISOString()
     } as Node;
 
-    console.log("Adding node to state. Current nodes:", get().nodes.length);
-    console.log("New node to add:", newNode);
+    console.debug("Adding node to state. Current nodes:", get().nodes.length);
+    console.debug("New node to add:", newNode);
 
     // Immediately update the state with the new node
     set((state) => ({
@@ -253,7 +254,7 @@ export const createNodeActions = (
       hasInitialLayout: false // Force layout recalculation to include new node
     }));
 
-    console.log("Node added to store immediately. New count:", get().nodes.length);
+    console.debug("Node added to store immediately. New count:", get().nodes.length);
 
     // Use setTimeout to update positions after the layout calculation is complete
     setTimeout(() => {
@@ -261,7 +262,7 @@ export const createNodeActions = (
       const layoutedNodes = currentState.getLayoutedNodes();
       const newNodeLayout = layoutedNodes.find((node) => node.id === nodeData.uuid);
 
-      if (newNodeLayout && !currentState.nodePositions[nodeData.uuid]) {
+      if (newNodeLayout && !(nodeData.uuid in currentState.nodePositions)) {
         // Save the calculated position for the new node
         set((state) => ({
           nodePositions: {
@@ -285,19 +286,24 @@ export const createNodeActions = (
         asset: nodeData.asset
       });
 
-      console.log("Node created successfully via API:", createdNode);
+      console.debug("Node created successfully via API:", createdNode);
 
       // Update the optimistic node with the real backend data
-      set((state) => ({
-        nodes: state.nodes.map((node) =>
+      set((state) => {
+        const updatedNodes = state.nodes.map((node) =>
           node.uuid === nodeData.uuid ? createdNode : node
-        ),
-        nodePositions: createdNode.uuid !== nodeData.uuid ? {
+        );
+        const updatedPositions = createdNode.uuid !== nodeData.uuid ? {
           ...state.nodePositions,
           [createdNode.uuid]: state.nodePositions[nodeData.uuid]
-        } : state.nodePositions,
-        selectedNodeId: createdNode.uuid
-      }));
+        } : state.nodePositions;
+        
+        return {
+          nodes: updatedNodes,
+          nodePositions: updatedPositions,
+          selectedNodeId: createdNode.uuid
+        } as Partial<PipelineState>;
+      });
 
       // Clean up old position if UUID changed
       if (createdNode.uuid !== nodeData.uuid) {
@@ -316,7 +322,7 @@ export const createNodeActions = (
       console.error("Failed to create node via API:", error);
 
       // Rollback optimistic update on error
-      set((state) => ({
+      set((_state) => ({
         nodes: previousNodes,
         nodePositions: previousPositions,
         selectedNodeId: null

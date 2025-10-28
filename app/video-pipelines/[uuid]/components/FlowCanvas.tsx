@@ -20,7 +20,8 @@ import {
   type OnNodesChange,
   type NodeTypes,
   type NodeMouseHandler,
-  type Node as ReactFlowNode
+  type Node as ReactFlowNode,
+  type Edge
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -69,7 +70,7 @@ export default function FlowCanvas() {
 
   // Use React Flow's built-in state management for proper drag functionality
   const [flowNodes, setNodes, onNodesChange] = useNodesState<ReactFlowNode>([]);
-  const [edges, setEdges] = useEdgesState([]);
+  const [edges, setEdges] = useEdgesState<Edge>([]);
 
   // Sync store state with React Flow state
   useEffect(() => {
