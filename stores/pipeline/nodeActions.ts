@@ -63,18 +63,36 @@ export const createNodeActions = (
 
     toast.loading("Connecting nodes...", { id: `connect-${sourceId}-${targetId}` });
 
-    // For now, work locally without backend API calls
-    console.log("Working locally without backend API for connections");
+    try {
+      // Connect nodes via API
+      await apiConnectNodes(pipelineUuid, sourceId, targetId, targetHandle);
 
-    // Force layout recalculation for the new connection
-    set((state) => ({
-      hasInitialLayout: false // This will trigger layout recalculation
-    }));
+      console.log("Nodes connected successfully via API:", connectionDesc);
 
-    toast.success(connectionDesc, {
-      id: `connect-${sourceId}-${targetId}`,
-      duration: 2000
-    });
+      // Force layout recalculation for the new connection
+      set((state) => ({
+        hasInitialLayout: false // This will trigger layout recalculation
+      }));
+
+      toast.success(connectionDesc, {
+        id: `connect-${sourceId}-${targetId}`,
+        duration: 2000
+      });
+    } catch (error) {
+      console.error("Failed to connect nodes via API:", error);
+      
+      // Rollback optimistic update on error
+      set((state) => ({
+        nodes: previousNodes,
+        isSaving: false
+      }));
+
+      toast.error("Failed to connect nodes", {
+        id: `connect-${sourceId}-${targetId}`,
+        duration: 4000
+      });
+      return; // Early return to avoid setting isSaving to false again
+    }
 
     set({ isSaving: false });
   },
