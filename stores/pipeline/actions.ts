@@ -22,14 +22,6 @@ export const createActions = (
         const localOnlyNodes = state.nodes.filter((n) => !serverNodeIds.has(n.uuid));
         const mergedNodes = [...(response.nodes as Node[]), ...localOnlyNodes];
 
-        console.log(
-          "Merging nodes - server:",
-          (response.nodes as Node[]).length,
-          "local only:",
-          localOnlyNodes.length,
-          "merged:",
-          mergedNodes.length
-        );
 
         return {
           pipeline: response.pipeline,
@@ -107,22 +99,80 @@ export const createActions = (
     toast.loading(`Executing node: ${nodeTitle}...`, { id: `execute-${nodeUuid}` });
 
     try {
-      // Execute the node
-      await apiExecuteNode(pipelineUuid, nodeUuid);
+      // Execute the node (starts background job)
+      console.log(`🚀 Executing node ${nodeUuid}...`);
+      const updatedNode = await apiExecuteNode(pipelineUuid, nodeUuid);
+      console.log(`✅ Node execution started:`, updatedNode);
+      console.log(`📊 Initial status:`, updatedNode.status);
 
-      // Refresh the pipeline to get updated node status
-      const response = await getPipeline(pipelineUuid);
-      set({
-        pipeline: response.pipeline,
-        nodes: response.nodes as Node[]
-      });
+      // Validate the response
+      if (!updatedNode || !updatedNode.uuid || !updatedNode.status) {
+        console.error(`❌ Invalid response from executeNode API:`, updatedNode);
+        throw new Error("Invalid response from backend - missing node data");
+      }
 
-      toast.success(`Successfully executed: ${nodeTitle}`, {
+      // OPTIMISTIC UPDATE: Immediately show "in_progress" status for visual feedback
+      const { nodes } = get();
+      const optimisticNode = { ...updatedNode, status: "in_progress" as const };
+      const updatedNodes = nodes.map((n) =>
+        n.uuid === nodeUuid ? optimisticNode as Node : n
+      );
+      set({ nodes: updatedNodes });
+      console.log(`⚡ Optimistic update: ${nodeUuid} status → in_progress`);
+
+      // Change toast to reflect that execution has started
+      toast.success(`Execution started: ${nodeTitle}`, {
         id: `execute-${nodeUuid}`,
-        duration: 3000
+        duration: 2000
       });
+
+      // Start polling for completion
+      console.log(`🔄 Starting polling for node ${nodeUuid} completion...`);
+      const pollInterval = setInterval(async () => {
+        try {
+          const response = await getPipeline(pipelineUuid);
+          const currentNode = response.nodes.find((n: Node) => n.uuid === nodeUuid);
+          
+          if (currentNode && (currentNode.status === 'completed' || currentNode.status === 'failed')) {
+            console.log(`🎯 Node ${nodeUuid} finished with status: ${currentNode.status}`);
+            clearInterval(pollInterval);
+            
+            // Update store with final status
+            set({
+              pipeline: response.pipeline,
+              nodes: response.nodes as Node[]
+            });
+            
+            // Show completion toast
+            if (currentNode.status === 'completed') {
+              toast.success(`Successfully executed: ${nodeTitle}`, {
+                duration: 3000
+              });
+            } else {
+              toast.error(`Execution failed: ${nodeTitle}`, {
+                duration: 5000
+              });
+            }
+          } else {
+            console.log(`⏳ Node ${nodeUuid} still processing... (status: ${currentNode?.status})`);
+          }
+        } catch (error) {
+          console.error(`❌ Polling error for node ${nodeUuid}:`, error);
+          clearInterval(pollInterval);
+          toast.error(`Error checking execution status: ${nodeTitle}`, {
+            duration: 5000
+          });
+        }
+      }, 2000); // Poll every 2 seconds
+
+      // Safety timeout to prevent infinite polling
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        console.log(`⏰ Polling timeout for node ${nodeUuid}`);
+      }, 60000); // Stop polling after 1 minute
     } catch (error) {
       // Show user-friendly error message
+      console.error(`❌ Execute node failed:`, error);
       const errorMessage = error instanceof Error ? error.message : "Failed to execute node";
       toast.error(`Failed to execute node: ${errorMessage}`, {
         id: `execute-${nodeUuid}`,

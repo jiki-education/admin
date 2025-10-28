@@ -11,6 +11,7 @@ import NodeOutputPreview from "./shared/NodeOutputPreview";
 import NodeInputHandles from "./shared/NodeInputHandles";
 import NodeOutputHandle from "./shared/NodeOutputHandle";
 import { getNodeStatusStyle } from "./shared/getNodeStatusStyle";
+import { useEffect } from "react";
 
 interface MergeVideosNodeProps {
   data: {
@@ -24,6 +25,8 @@ export default function MergeVideosNode({ data, selected }: MergeVideosNodeProps
   const { node } = data;
   const statusStyle = getNodeStatusStyle(node.status);
   const displayName = getNodeDisplayName(node);
+
+  useEffect(() => { console.log("NODE:", node) }, [node])
 
   return (
     <div
