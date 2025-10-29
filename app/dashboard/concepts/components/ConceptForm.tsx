@@ -1,5 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
+import toast from "react-hot-toast";
 import Button from "@/components/ui/button/Button";
 import { generateSlug, isValidSlug } from "@/lib/utils/slug";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
@@ -96,6 +97,7 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
     e.preventDefault();
     
     if (!validateForm()) {
+      toast.error("Please fix the form errors before submitting");
       return;
     }
 
@@ -116,8 +118,13 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
       };
 
       await onSave(data);
+      
+      // Success toast will be shown by the parent component after navigation
+      toast.success(mode === "create" ? "Concept created successfully!" : "Concept updated successfully!");
     } catch (error) {
       console.error("Form submission error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to save concept";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

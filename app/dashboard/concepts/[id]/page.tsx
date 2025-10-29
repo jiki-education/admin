@@ -3,6 +3,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
 import { useRouter, useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { marked } from "marked";
 import { getAdminConcept, deleteConcept } from "@/lib/api/concepts";
 import type { AdminConcept } from "../types";
@@ -77,10 +78,13 @@ export default function ConceptDetail() {
     try {
       setDeleting(true);
       await deleteConcept(conceptId);
+      toast.success(`Concept "${concept.title}" deleted successfully!`);
       router.push("/dashboard/concepts");
     } catch (err) {
       console.error("Failed to delete concept:", err);
-      setError(err instanceof Error ? err.message : "Failed to delete concept");
+      const errorMessage = err instanceof Error ? err.message : "Failed to delete concept";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setDeleting(false);
     }
