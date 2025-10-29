@@ -83,7 +83,7 @@ export default function Projects() {
 
           <ProjectFilters filters={filters} onFiltersChange={handleFiltersChange} onClearFilters={handleClearFilters} />
 
-          <ProjectTable projects={projects} loading={loading} />
+          <ProjectTable projects={projects} loading={loading} error={error} onRetry={loadProjects} />
 
           <ProjectPagination
             currentPage={meta.current_page}

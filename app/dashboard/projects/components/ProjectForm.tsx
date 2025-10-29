@@ -51,25 +51,43 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
     // Required fields
     if (!formData.title.trim()) {
       newErrors.title = "Title is required";
+    } else if (formData.title.trim().length < 3) {
+      newErrors.title = "Title must be at least 3 characters long";
+    } else if (formData.title.trim().length > 100) {
+      newErrors.title = "Title must be less than 100 characters";
     }
+
     if (!formData.description.trim()) {
       newErrors.description = "Description is required";
+    } else if (formData.description.trim().length < 10) {
+      newErrors.description = "Description must be at least 10 characters long";
+    } else if (formData.description.trim().length > 500) {
+      newErrors.description = "Description must be less than 500 characters";
     }
+
     if (!formData.exercise_slug.trim()) {
       newErrors.exercise_slug = "Exercise slug is required";
+    } else if (formData.exercise_slug.trim().length < 3) {
+      newErrors.exercise_slug = "Exercise slug must be at least 3 characters long";
     }
+
     if (mode === "edit" && !formData.slug.trim()) {
       newErrors.slug = "Slug is required for updates";
     }
 
     // Slug format validation
     if (formData.slug && !isValidSlug(formData.slug)) {
-      newErrors.slug = "Slug must be a valid URL-friendly format (lowercase letters, numbers, and hyphens only)";
+      newErrors.slug = "Slug must contain only lowercase letters, numbers, and hyphens. Cannot start or end with hyphens.";
     }
 
     // Exercise slug format validation (should follow kebab-case pattern)
     if (formData.exercise_slug && !isValidSlug(formData.exercise_slug)) {
-      newErrors.exercise_slug = "Exercise slug must be a valid URL-friendly format (lowercase letters, numbers, and hyphens only)";
+      newErrors.exercise_slug = "Exercise slug must contain only lowercase letters, numbers, and hyphens. Cannot start or end with hyphens.";
+    }
+
+    // Check for common exercise slug patterns
+    if (formData.exercise_slug && formData.exercise_slug.includes("_")) {
+      newErrors.exercise_slug = "Exercise slug should use hyphens (-) instead of underscores (_)";
     }
 
     setErrors(newErrors);
@@ -119,7 +137,7 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       {/* Required Fields Notice */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
         <p className="text-sm text-blue-700 dark:text-blue-400">
@@ -151,13 +169,17 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
           value={formData.title}
           onChange={handleInputChange}
           placeholder="Enter project title"
+          aria-required="true"
+          aria-invalid={errors.title ? "true" : "false"}
+          aria-describedby={errors.title ? "title-error" : undefined}
+          maxLength={100}
           className={`h-11 w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 ${
             errors.title
               ? "border-red-300 focus:border-red-300 focus:ring-red-500/10 dark:border-red-800"
               : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
           }`}
         />
-        {errors.title && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.title}</p>}
+        {errors.title && <p id="title-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">{errors.title}</p>}
       </div>
 
       {/* Slug */}
@@ -165,25 +187,41 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
         <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Slug {mode === "edit" && <span className="text-red-500">*</span>}
         </label>
-        <input
-          type="text"
-          id="slug"
-          name="slug"
-          value={formData.slug}
-          onChange={handleInputChange}
-          placeholder="project-slug"
-          className={`h-11 w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 font-mono ${
-            errors.slug
-              ? "border-red-300 focus:border-red-300 focus:ring-red-500/10 dark:border-red-800"
-              : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
-          }`}
-        />
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          {mode === "create" 
-            ? "URL-friendly identifier. Auto-generated from title, but you can customize it."
-            : "URL-friendly identifier. Required for updates."
-          }
-        </p>
+        <div className="relative">
+          <input
+            type="text"
+            id="slug"
+            name="slug"
+            value={formData.slug}
+            onChange={handleInputChange}
+            placeholder="project-slug"
+            className={`h-11 w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 font-mono ${
+              errors.slug
+                ? "border-red-300 focus:border-red-300 focus:ring-red-500/10 dark:border-red-800"
+                : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
+            }`}
+          />
+          {mode === "create" && !slugTouched && formData.title && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                Auto-generated
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="mt-1 space-y-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {mode === "create" 
+              ? "URL-friendly identifier. Auto-generated from title, but you can customize it."
+              : "URL-friendly identifier. Required for updates."
+            }
+          </p>
+          {mode === "create" && formData.title && !slugTouched && (
+            <p className="text-xs text-blue-600 dark:text-blue-400">
+              Preview: <code className="bg-blue-50 dark:bg-blue-900/20 px-1 rounded">{generateSlug(formData.title)}</code>
+            </p>
+          )}
+        </div>
         {errors.slug && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.slug}</p>}
       </div>
 
@@ -191,6 +229,13 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Description <span className="text-red-500">*</span>
+          <span className={`ml-2 text-xs ${
+            formData.description.length >= 10 && formData.description.length <= 500
+              ? "text-green-600 dark:text-green-400"
+              : "text-gray-400"
+          }`}>
+            {formData.description.length}/500
+          </span>
         </label>
         <textarea
           id="description"
@@ -199,12 +244,15 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
           onChange={handleInputChange}
           placeholder="Enter a brief description (a couple of sentences)"
           rows={3}
-          className={`w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 ${
+          className={`w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 resize-none ${
             errors.description
               ? "border-red-300 focus:border-red-300 focus:ring-red-500/10 dark:border-red-800"
               : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
           }`}
         />
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Provide a clear, concise description of what this Brain Buster project involves.
+        </p>
         {errors.description && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.description}</p>}
       </div>
 
@@ -213,22 +261,52 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
         <label htmlFor="exercise_slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Exercise Slug <span className="text-red-500">*</span>
         </label>
-        <input
-          type="text"
-          id="exercise_slug"
-          name="exercise_slug"
-          value={formData.exercise_slug}
-          onChange={handleInputChange}
-          placeholder="calculator-project"
-          className={`h-11 w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 font-mono ${
-            errors.exercise_slug
-              ? "border-red-300 focus:border-red-300 focus:ring-red-500/10 dark:border-red-800"
-              : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
-          }`}
-        />
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          The slug of the exercise that this project represents. This should match the exercise slug in the exercise repository.
-        </p>
+        <div className="relative">
+          <input
+            type="text"
+            id="exercise_slug"
+            name="exercise_slug"
+            value={formData.exercise_slug}
+            onChange={handleInputChange}
+            placeholder="calculator-project"
+            className={`h-11 w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 font-mono ${
+              errors.exercise_slug
+                ? "border-red-300 focus:border-red-300 focus:ring-red-500/10 dark:border-red-800"
+                : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
+            }`}
+          />
+          {formData.exercise_slug && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <span className={`text-xs ${
+                formData.exercise_slug.length >= 3 && formData.exercise_slug.length <= 50
+                  ? "text-green-600 dark:text-green-400"
+                  : "text-gray-400"
+              }`}>
+                {formData.exercise_slug.length}/50
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="mt-1 space-y-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            The slug of the exercise that this project represents. This should match the exercise slug in the exercise repository.
+          </p>
+          <div className="flex flex-wrap gap-4 text-xs text-gray-500 dark:text-gray-400">
+            <span className="flex items-center gap-1">
+              <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+              Use lowercase letters, numbers, and hyphens only
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+              Examples: calculator-project, tic-tac-toe, word-search
+            </span>
+          </div>
+          {formData.exercise_slug && formData.exercise_slug.includes("_") && (
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              💡 Tip: Consider using hyphens (-) instead of underscores (_) for better URL compatibility
+            </p>
+          )}
+        </div>
         {errors.exercise_slug && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.exercise_slug}</p>}
       </div>
 
