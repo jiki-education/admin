@@ -29,6 +29,8 @@ const navItems: NavItem[] = [
     name: "Content",
     subItems: [
       { name: "Levels", path: "/dashboard/levels", pro: false },
+      { name: "Concepts", path: "/dashboard/concepts", pro: false },
+      { name: "Projects", path: "/dashboard/projects", pro: false },
       { name: "Video Pipelines", path: "/dashboard/video-pipelines", pro: false }
     ]
   }

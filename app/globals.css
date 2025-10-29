@@ -5,6 +5,7 @@
 @theme {
     --font-*: initial;
     --font-outfit: Outfit, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Inconsolata, "Roboto Mono", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
     --breakpoint-*: initial;
     --breakpoint-2xsm: 375px;
@@ -722,4 +723,99 @@ span.flatpickr-weekday,
         0 1px 2px 0 rgba(16, 24, 40, 0.06);
     opacity: 0.8;
     cursor: grabbing; /* Changes the cursor to indicate dragging */
+}
+
+/* Markdown Preview Styles */
+.markdown-preview {
+    line-height: 1.6;
+}
+
+.markdown-preview h1 {
+    @apply text-2xl font-bold mb-4 mt-6 first:mt-0 text-gray-900 dark:text-gray-100;
+    border-bottom: 1px solid theme('colors.gray.200');
+    padding-bottom: 0.5rem;
+}
+
+.markdown-preview h2 {
+    @apply text-xl font-bold mb-3 mt-5 first:mt-0 text-gray-900 dark:text-gray-100;
+}
+
+.markdown-preview h3 {
+    @apply text-lg font-semibold mb-2 mt-4 first:mt-0 text-gray-900 dark:text-gray-100;
+}
+
+.markdown-preview h4,
+.markdown-preview h5,
+.markdown-preview h6 {
+    @apply font-semibold mb-2 mt-3 first:mt-0 text-gray-900 dark:text-gray-100;
+}
+
+.markdown-preview p {
+    @apply mb-4 text-gray-700 dark:text-gray-300;
+}
+
+.markdown-preview ul,
+.markdown-preview ol {
+    @apply mb-4 pl-6;
+}
+
+.markdown-preview ul {
+    @apply list-disc;
+}
+
+.markdown-preview ol {
+    @apply list-decimal;
+}
+
+.markdown-preview li {
+    @apply mb-1 text-gray-700 dark:text-gray-300;
+}
+
+.markdown-preview blockquote {
+    @apply border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-4 italic text-gray-600 dark:text-gray-400;
+}
+
+.markdown-preview code {
+    @apply bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono text-gray-900 dark:text-gray-100;
+}
+
+.markdown-preview pre {
+    @apply bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto my-4;
+}
+
+.markdown-preview pre code {
+    @apply bg-transparent p-0;
+}
+
+.markdown-preview a {
+    @apply text-brand-500 dark:text-brand-400 hover:underline;
+}
+
+.markdown-preview table {
+    @apply w-full border-collapse border border-gray-300 dark:border-gray-600 my-4;
+}
+
+.markdown-preview th,
+.markdown-preview td {
+    @apply border border-gray-300 dark:border-gray-600 px-3 py-2 text-left;
+}
+
+.markdown-preview th {
+    @apply bg-gray-100 dark:bg-gray-800 font-semibold;
+}
+
+.markdown-preview hr {
+    @apply border-gray-300 dark:border-gray-600 my-6;
+}
+
+.markdown-preview img {
+    @apply max-w-full h-auto rounded-lg my-4;
+}
+
+.markdown-preview strong {
+    @apply font-bold text-gray-900 dark:text-gray-100;
+}
+
+.markdown-preview em {
+    @apply italic;
 }

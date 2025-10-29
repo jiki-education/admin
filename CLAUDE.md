@@ -158,6 +158,18 @@ pnpm add -D [package-name]   # Dev dependency
   - Auto-position assignment, full validation
   - Comprehensive unit tests included
 
+**Concept Management:**
+
+- **GET /v1/admin/concepts** - ✅ Fully integrated (list with pagination/filtering)
+- **GET /v1/admin/concepts/:id** - ✅ Fully integrated (single concept)
+- **POST /v1/admin/concepts** - ✅ Fully integrated (create concept)
+- **PATCH /v1/admin/concepts/:id** - ✅ Fully integrated (update concept)
+- **DELETE /v1/admin/concepts/:id** - ✅ Fully integrated (delete concept)
+  - API functions: Complete CRUD in `lib/api/concepts.ts`
+  - UI integration: Full concept management at `/dashboard/concepts`
+  - Features: Markdown editor, video provider integration, auto-slug generation
+  - Comprehensive unit and E2E tests included
+
 ### ❌ Pending Backend Implementation
 
 **Lesson Management:**
