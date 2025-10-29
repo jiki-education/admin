@@ -12,6 +12,7 @@ interface MarkdownEditorProps {
   required?: boolean;
   rows?: number;
   className?: string;
+  onImageUpload?: (file: File) => Promise<string>;
 }
 
 export default function MarkdownEditor({
@@ -22,10 +23,13 @@ export default function MarkdownEditor({
   label,
   required = false,
   rows = 10,
-  className = ""
+  className = "",
+  onImageUpload
 }: MarkdownEditorProps) {
   const [mode, setMode] = useState<"edit" | "preview">("edit");
   const [htmlContent, setHtmlContent] = useState("");
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleModeSwitch = useCallback(async (newMode: "edit" | "preview") => {
     if (newMode === "preview" && value.trim()) {
@@ -43,6 +47,57 @@ export default function MarkdownEditor({
   const handleTextareaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
   }, [onChange]);
+
+  const handleDrop = useCallback(async (e: React.DragEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    if (!onImageUpload) return;
+
+    const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+
+    if (imageFiles.length === 0) return;
+
+    setIsUploading(true);
+    
+    for (const file of imageFiles) {
+      try {
+        // Insert placeholder while uploading
+        const placeholder = `![Uploading ${file.name}...](uploading)`;
+        const textArea = e.currentTarget;
+        const start = textArea.selectionStart;
+        const end = textArea.selectionEnd;
+        const newValue = value.slice(0, start) + placeholder + value.slice(end);
+        onChange(newValue);
+
+        // Upload the image
+        const imageUrl = await onImageUpload(file);
+        
+        // Replace placeholder with actual image
+        const finalMarkdown = `![${file.name}](${imageUrl})`;
+        const updatedValue = newValue.replace(placeholder, finalMarkdown);
+        onChange(updatedValue);
+      } catch (error) {
+        console.error('Image upload failed:', error);
+        // Remove placeholder on error
+        const failedPlaceholder = `![Uploading ${file.name}...](uploading)`;
+        onChange(value.replace(failedPlaceholder, ''));
+      }
+    }
+    
+    setIsUploading(false);
+  }, [value, onChange, onImageUpload]);
+
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  }, []);
 
   return (
     <div className={className}>
@@ -73,18 +128,41 @@ export default function MarkdownEditor({
 
       <div className="relative">
         {mode === "edit" ? (
-          <textarea
-            id="markdown-editor-textarea"
-            value={value}
-            onChange={handleTextareaChange}
-            placeholder={placeholder}
-            rows={rows}
-            className={`w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 font-mono resize-y ${
-              error
-                ? "border-red-300 focus:border-red-300 focus:ring-red-500/10 dark:border-red-800"
-                : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
-            }`}
-          />
+          <div className="relative">
+            <textarea
+              id="markdown-editor-textarea"
+              value={value}
+              onChange={handleTextareaChange}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              placeholder={placeholder}
+              rows={rows}
+              className={`w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 font-mono resize-y transition-colors ${
+                isDragOver
+                  ? "border-brand-500 bg-brand-50 dark:bg-brand-900/20"
+                  : error
+                  ? "border-red-300 focus:border-red-300 focus:ring-red-500/10 dark:border-red-800"
+                  : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
+              }`}
+            />
+            {isDragOver && (
+              <div className="absolute inset-0 flex items-center justify-center bg-brand-50/90 dark:bg-brand-900/50 rounded-lg border-2 border-dashed border-brand-500 pointer-events-none">
+                <div className="text-center text-brand-600 dark:text-brand-400">
+                  <div className="text-lg font-medium mb-1">Drop images here</div>
+                  <div className="text-sm">Images will be uploaded and inserted as markdown</div>
+                </div>
+              </div>
+            )}
+            {isUploading && (
+              <div className="absolute top-2 right-2 bg-white dark:bg-gray-800 px-2 py-1 rounded border shadow-sm">
+                <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <div className="w-3 h-3 border-2 border-gray-300 border-t-brand-500 rounded-full animate-spin"></div>
+                  Uploading...
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <div
             className={`w-full min-h-[${rows * 1.5}rem] rounded-lg border px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800/50 border-gray-300 dark:border-gray-700 overflow-auto`}
@@ -116,9 +194,13 @@ export default function MarkdownEditor({
               <div><code>**bold text**</code> → <strong>bold text</strong></div>
               <div><code>*italic text*</code> → <em>italic text</em></div>
               <div><code>[link text](url)</code> → <span className="text-blue-600">link text</span></div>
+              <div><code>![alt text](image-url)</code> → 🖼️ Image</div>
               <div><code>`code`</code> → <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">code</code></div>
               <div><code>- List item</code> → • List item</div>
               <div><code>1. Numbered item</code> → 1. Numbered item</div>
+              <div className="pt-1 border-t border-gray-200 dark:border-gray-600 text-brand-600 dark:text-brand-400">
+                💡 <strong>Tip:</strong> Drag & drop images directly into the editor
+              </div>
             </div>
           </details>
         </div>
