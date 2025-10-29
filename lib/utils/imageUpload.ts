@@ -70,6 +70,12 @@ export async function mockUploadImage(file: File): Promise<string> {
   // Simulate upload delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   
-  // Return a placeholder image URL
-  return `https://via.placeholder.com/400x300?text=${encodeURIComponent(file.name)}`;
+  // Return a placeholder image URL (using multiple fallback services)
+  const placeholders = [
+    `https://picsum.photos/400/300?random=${Date.now()}`, // Real photos
+    `https://via.placeholder.com/400x300/0066CC/FFFFFF?text=${encodeURIComponent(file.name.substring(0, 20))}`, // Blue background
+    `https://placehold.co/400x300/png?text=${encodeURIComponent(file.name.substring(0, 15))}` // Alternative service
+  ];
+  
+  return placeholders[0]; // Use picsum for real photos
 }

@@ -34,7 +34,11 @@ export default function MarkdownEditor({
   const handleModeSwitch = useCallback(async (newMode: "edit" | "preview") => {
     if (newMode === "preview" && value.trim()) {
       try {
-        const html = await marked.parse(value);
+        const html = await marked.parse(value, {
+          breaks: true,
+          gfm: true,
+        });
+        console.log("Parsed HTML:", html); // Debug: see what HTML is generated
         setHtmlContent(html);
       } catch (err) {
         console.error("Markdown parsing error:", err);
