@@ -809,7 +809,8 @@ span.flatpickr-weekday,
 }
 
 .markdown-preview img {
-    @apply max-w-full h-auto rounded-lg my-4;
+    @apply max-w-full h-auto rounded-lg my-4 shadow-sm;
+    display: block; /* Ensure images display properly */
 }
 
 .markdown-preview strong {

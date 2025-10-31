@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import Button from "@/components/ui/button/Button";
 import { generateSlug, isValidSlug } from "@/lib/utils/slug";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
+import { mockUploadImage } from "@/lib/utils/imageUpload";
 import type { AdminConcept, VideoProvider } from "../types";
 
 interface ConceptFormProps {
@@ -236,6 +237,7 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
         label="Content (Markdown)"
         value={formData.content_markdown}
         onChange={handleMarkdownChange}
+        onImageUpload={mockUploadImage}
         placeholder="Enter the main content in Markdown format..."
         error={errors.content_markdown}
         required
