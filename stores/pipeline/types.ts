@@ -67,6 +67,7 @@ export interface PipelineState {
   executePipeline: (pipelineUuid: string) => Promise<void>;
   updateNode: (pipelineUuid: string, nodeUuid: string, updates: Partial<Node>) => Promise<void>;
   connectNodes: (pipelineUuid: string, sourceId: string, targetId: string, targetHandle: string) => Promise<void>;
+  disconnectNodes: (pipelineUuid: string, sourceId: string, targetId: string, targetHandle: string) => Promise<void>;
   deleteNodes: (pipelineUuid: string, nodeIds: string[]) => Promise<void>;
   createNode: (
     pipelineUuid: string,

@@ -1,5 +1,39 @@
 @import "tailwindcss";
 
+/* React Flow Edge Selection Styles */
+.react-flow__edge.selected {
+  z-index: 1000 !important;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #3b82f6 !important; /* Blue color for selection */
+  stroke-width: 4px !important;
+  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.6));
+}
+
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
+  cursor: pointer;
+}
+
+.react-flow__edge.edge-selectable {
+  cursor: pointer;
+}
+
+/* Add selection ring around selected edges */
+.react-flow__edge.selected::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 2px solid #3b82f6;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {

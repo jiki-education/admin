@@ -325,6 +325,54 @@ export async function connectNodes(
 }
 
 /**
+ * Disconnect two nodes by removing source from target node's inputs
+ * PATCH /admin/video_production/pipelines/:pipeline_uuid/nodes/:target_uuid
+ */
+export async function disconnectNodes(
+  pipelineUuid: string,
+  sourceNodeUuid: string,
+  targetNodeUuid: string,
+  inputKey: string
+): Promise<void> {
+  // First fetch the target node to get its current inputs
+  const nodeResponse = await api.get<{ node: VideoProductionNode }>(
+    `/admin/video_production/pipelines/${pipelineUuid}/nodes/${targetNodeUuid}`
+  );
+  const node = nodeResponse.data.node;
+
+  // Update the inputs - check if it's an array or single value
+  const currentValue = node.inputs[inputKey];
+  let newInputs: Record<string, unknown>;
+
+  if (Array.isArray(currentValue)) {
+    // Remove from array
+    const filteredArray = currentValue.filter(uuid => uuid !== sourceNodeUuid);
+    if (filteredArray.length === currentValue.length) {
+      // Connection not found
+      return;
+    }
+    newInputs = {
+      ...node.inputs,
+      [inputKey]: filteredArray
+    };
+  } else if (currentValue === sourceNodeUuid) {
+    // Remove single value connection
+    newInputs = {
+      ...node.inputs,
+      [inputKey]: undefined
+    };
+  } else {
+    // Connection not found
+    return;
+  }
+
+  // PATCH the node with updated inputs
+  await api.patch(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${targetNodeUuid}`, {
+    node: { inputs: newInputs }
+  });
+}
+
+/**
  * Delete a node from a pipeline
  * DELETE /admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid
  */

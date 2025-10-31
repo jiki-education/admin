@@ -17,7 +17,9 @@ import {
   useEdgesState,
   type OnConnect,
   type OnNodesDelete,
+  type OnEdgesDelete,
   type OnNodesChange,
+  type OnEdgesChange,
   type NodeTypes,
   type NodeMouseHandler,
   type Node as ReactFlowNode,
@@ -62,6 +64,7 @@ export default function FlowCanvas() {
     getEdges,
     setSelectedNode,
     connectNodes,
+    disconnectNodes,
     deleteNodes,
     updateNodePositions,
     layoutKey,
@@ -70,7 +73,7 @@ export default function FlowCanvas() {
 
   // Use React Flow's built-in state management for proper drag functionality
   const [flowNodes, setNodes, onNodesChange] = useNodesState<ReactFlowNode>([]);
-  const [edges, setEdges] = useEdgesState<Edge>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   // Sync store state with React Flow state
   useEffect(() => {
@@ -138,6 +141,39 @@ export default function FlowCanvas() {
     [pipeline, deleteNodes]
   );
 
+  // Handle edge deletion
+  const handleEdgesDelete: OnEdgesDelete = useCallback(
+    (edgesToDelete) => {
+      if (pipeline) {
+        edgesToDelete.forEach((edge) => {
+          // Use the edge object properties directly instead of parsing the ID
+          const sourceId = edge.source;
+          const targetId = edge.target;
+          const inputKey = edge.targetHandle;
+          
+          // Verify nodes exist in local state
+          const sourceNode = rawNodes.find(n => n.uuid === sourceId);
+          const targetNode = rawNodes.find(n => n.uuid === targetId);
+          
+          if (!sourceNode || !targetNode) {
+            console.error("Node not found in local state - cannot disconnect");
+            return;
+          }
+          
+          if (!inputKey) {
+            console.error("No target handle specified - cannot disconnect");
+            return;
+          }
+          
+          disconnectNodes(pipeline.uuid, sourceId, targetId, inputKey).catch((error) => {
+            console.error("Failed to disconnect edge:", error);
+          });
+        });
+      }
+    },
+    [pipeline, disconnectNodes, rawNodes]
+  );
+
   // Handle node click (select)
   const handleNodeClick: NodeMouseHandler = useCallback(
     (_event, node) => {
@@ -146,10 +182,32 @@ export default function FlowCanvas() {
     [setSelectedNode]
   );
 
+  // Handle edge click (debug and select)
+  const handleEdgeClick = useCallback(
+    (_event: React.MouseEvent, edge: Edge) => {
+      console.log("Edge clicked:", edge.id);
+      // Manually select the edge by updating the edges state
+      setEdges((edges) =>
+        edges.map((e) => ({
+          ...e,
+          selected: e.id === edge.id
+        }))
+      );
+    },
+    [setEdges]
+  );
+
   // Handle canvas click (deselect)
   const handlePaneClick = useCallback(() => {
     setSelectedNode(null);
-  }, [setSelectedNode]);
+    // Also deselect all edges
+    setEdges((edges) =>
+      edges.map((e) => ({
+        ...e,
+        selected: false
+      }))
+    );
+  }, [setSelectedNode, setEdges]);
 
   // Enhanced node change handler that combines React Flow's built-in handling with our custom logic
   const handleNodesChange: OnNodesChange<ReactFlowNode> = useCallback(
@@ -185,8 +243,11 @@ export default function FlowCanvas() {
         nodeTypes={nodeTypes}
         onConnect={handleConnect}
         onNodesChange={handleNodesChange}
+        onEdgesChange={onEdgesChange}
         onNodesDelete={handleNodesDelete}
+        onEdgesDelete={handleEdgesDelete}
         onNodeClick={handleNodeClick}
+        onEdgeClick={handleEdgeClick}
         nodesDraggable
         onPaneClick={handlePaneClick}
         fitView
@@ -203,6 +264,9 @@ export default function FlowCanvas() {
         }}
         deleteKeyCode={["Backspace", "Delete"]}
         connectOnClick={false}
+        elementsSelectable={true}
+        multiSelectionKeyCode="Shift"
+        selectionKeyCode="Shift"
         proOptions={{ hideAttribution: true }}
       >
         <Background color="#aaa" gap={16} />
