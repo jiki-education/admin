@@ -217,7 +217,7 @@ export interface UpdatePipelineData {
 
 /**
  * Get list of pipelines with filtering and pagination
- * GET /v1/admin/video_production/pipelines
+ * GET /admin/video_production/pipelines
  */
 export async function getPipelines(filters?: PipelineFilters): Promise<PipelinesResponse> {
   const params: Record<string, string> = {
@@ -231,8 +231,8 @@ export async function getPipelines(filters?: PipelineFilters): Promise<Pipelines
 
 /**
  * Get single pipeline with nodes
- * GET /v1/admin/video_production/pipelines/:uuid
- * GET /v1/admin/video_production/pipelines/:uuid/nodes
+ * GET /admin/video_production/pipelines/:uuid
+ * GET /admin/video_production/pipelines/:uuid/nodes
  */
 export async function getPipeline(
   uuid: string
@@ -251,7 +251,7 @@ export async function getPipeline(
 
 /**
  * Create a new pipeline
- * POST /v1/admin/video_production/pipelines
+ * POST /admin/video_production/pipelines
  */
 export async function createPipeline(data: CreatePipelineData): Promise<Pipeline> {
   const response = await api.post<Pipeline>("/admin/video_production/pipelines", {
@@ -262,7 +262,7 @@ export async function createPipeline(data: CreatePipelineData): Promise<Pipeline
 
 /**
  * Update a pipeline
- * PATCH /v1/admin/video_production/pipelines/:uuid
+ * PATCH /admin/video_production/pipelines/:uuid
  */
 export async function updatePipeline(uuid: string, data: UpdatePipelineData): Promise<Pipeline> {
   const response = await api.patch<Pipeline>(`/admin/video_production/pipelines/${uuid}`, {
@@ -273,7 +273,7 @@ export async function updatePipeline(uuid: string, data: UpdatePipelineData): Pr
 
 /**
  * Delete a pipeline by uuid
- * DELETE /v1/admin/video_production/pipelines/:uuid
+ * DELETE /admin/video_production/pipelines/:uuid
  */
 export async function deletePipeline(uuid: string): Promise<void> {
   await api.delete(`/admin/video_production/pipelines/${uuid}`);
@@ -281,7 +281,7 @@ export async function deletePipeline(uuid: string): Promise<void> {
 
 /**
  * Connect two nodes by updating target node's inputs
- * PATCH /v1/admin/video_production/pipelines/:pipeline_uuid/nodes/:target_uuid
+ * PATCH /admin/video_production/pipelines/:pipeline_uuid/nodes/:target_uuid
  */
 export async function connectNodes(
   pipelineUuid: string,
@@ -326,7 +326,7 @@ export async function connectNodes(
 
 /**
  * Delete a node from a pipeline
- * DELETE /v1/admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid
+ * DELETE /admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid
  */
 export async function deleteNode(pipelineUuid: string, nodeUuid: string): Promise<void> {
   await api.delete(`/admin/video_production/pipelines/${pipelineUuid}/nodes/${nodeUuid}`);
@@ -334,7 +334,7 @@ export async function deleteNode(pipelineUuid: string, nodeUuid: string): Promis
 
 /**
  * Create a new node in a pipeline
- * POST /v1/admin/video_production/pipelines/:pipeline_uuid/nodes
+ * POST /admin/video_production/pipelines/:pipeline_uuid/nodes
  */
 export async function createNode(
   pipelineUuid: string,
@@ -357,7 +357,7 @@ export async function createNode(
 
 /**
  * Update a node's configuration
- * PATCH /v1/admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid
+ * PATCH /admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid
  */
 export async function updateNode(
   pipelineUuid: string,
@@ -375,7 +375,7 @@ export async function updateNode(
 
 /**
  * Reorder inputs array for a node
- * PATCH /v1/admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid
+ * PATCH /admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid
  */
 export async function reorderNodeInputs(
   pipelineUuid: string,
@@ -403,7 +403,7 @@ export async function reorderNodeInputs(
 
 /**
  * Execute a node in a pipeline
- * POST /v1/admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid/execute
+ * POST /admin/video_production/pipelines/:pipeline_uuid/nodes/:uuid/execute
  */
 export async function executeNode(pipelineUuid: string, nodeUuid: string): Promise<VideoProductionNode> {
   console.log(`Executing node ${nodeUuid} in pipeline ${pipelineUuid}`);

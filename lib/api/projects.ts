@@ -14,7 +14,7 @@ import type {
 
 /**
  * Get list of projects with filtering and pagination
- * GET /v1/admin/projects
+ * GET /admin/projects
  */
 export async function getAdminProjects(filters?: AdminProjectFilters): Promise<AdminProjectsResponse> {
   const params: Record<string, string> = {
@@ -29,7 +29,7 @@ export async function getAdminProjects(filters?: AdminProjectFilters): Promise<A
 
 /**
  * Get a single project by ID
- * GET /v1/admin/projects/:id
+ * GET /admin/projects/:id
  */
 export async function getAdminProject(id: number): Promise<AdminProject> {
   const response = await api.get<{ project: AdminProject }>(`/admin/projects/${id}`);
@@ -38,7 +38,7 @@ export async function getAdminProject(id: number): Promise<AdminProject> {
 
 /**
  * Create a new project
- * POST /v1/admin/projects
+ * POST /admin/projects
  */
 export async function createProject(data: CreateProjectData): Promise<AdminProject> {
   const response = await api.post<{ project: AdminProject }>("/admin/projects", { project: data });
@@ -47,7 +47,7 @@ export async function createProject(data: CreateProjectData): Promise<AdminProje
 
 /**
  * Update an existing project
- * PATCH /v1/admin/projects/:id
+ * PATCH /admin/projects/:id
  */
 export async function updateProject(id: number, data: UpdateProjectData): Promise<AdminProject> {
   const response = await api.patch<{ project: AdminProject }>(`/admin/projects/${id}`, { project: data });
@@ -56,7 +56,7 @@ export async function updateProject(id: number, data: UpdateProjectData): Promis
 
 /**
  * Delete a project by ID
- * DELETE /v1/admin/projects/:id
+ * DELETE /admin/projects/:id
  */
 export async function deleteProject(id: number): Promise<void> {
   await api.delete(`/admin/projects/${id}`);

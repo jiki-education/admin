@@ -14,7 +14,7 @@ import type {
 
 /**
  * Get list of concepts with filtering and pagination
- * GET /v1/admin/concepts
+ * GET /admin/concepts
  */
 export async function getAdminConcepts(filters?: AdminConceptFilters): Promise<AdminConceptsResponse> {
   const params: Record<string, string> = {
@@ -29,7 +29,7 @@ export async function getAdminConcepts(filters?: AdminConceptFilters): Promise<A
 
 /**
  * Get a single concept by ID
- * GET /v1/admin/concepts/:id
+ * GET /admin/concepts/:id
  */
 export async function getAdminConcept(id: number): Promise<AdminConcept> {
   const response = await api.get<{ concept: AdminConcept }>(`/admin/concepts/${id}`);
@@ -38,7 +38,7 @@ export async function getAdminConcept(id: number): Promise<AdminConcept> {
 
 /**
  * Create a new concept
- * POST /v1/admin/concepts
+ * POST /admin/concepts
  */
 export async function createConcept(data: CreateConceptData): Promise<AdminConcept> {
   const response = await api.post<{ concept: AdminConcept }>("/admin/concepts", { concept: data });
@@ -47,7 +47,7 @@ export async function createConcept(data: CreateConceptData): Promise<AdminConce
 
 /**
  * Update an existing concept
- * PATCH /v1/admin/concepts/:id
+ * PATCH /admin/concepts/:id
  */
 export async function updateConcept(id: number, data: UpdateConceptData): Promise<AdminConcept> {
   const response = await api.patch<{ concept: AdminConcept }>(`/admin/concepts/${id}`, { concept: data });
@@ -56,7 +56,7 @@ export async function updateConcept(id: number, data: UpdateConceptData): Promis
 
 /**
  * Delete a concept by ID
- * DELETE /v1/admin/concepts/:id
+ * DELETE /admin/concepts/:id
  */
 export async function deleteConcept(id: number): Promise<void> {
   await api.delete(`/admin/concepts/${id}`);

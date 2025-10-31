@@ -8,7 +8,7 @@ import type { UserFilters, UsersResponse } from "@/app/dashboard/users/types";
 
 /**
  * Get list of users with filtering and pagination
- * GET /v1/admin/users
+ * GET /admin/users
  */
 export async function getUsers(filters?: UserFilters): Promise<UsersResponse> {
   const params: Record<string, string> = {
@@ -26,7 +26,7 @@ export async function getUsers(filters?: UserFilters): Promise<UsersResponse> {
 
 /**
  * Delete a user by ID
- * DELETE /v1/admin/users/:id
+ * DELETE /admin/users/:id
  */
 export async function deleteUser(userId: number): Promise<void> {
   await api.delete(`/admin/users/${userId}`);

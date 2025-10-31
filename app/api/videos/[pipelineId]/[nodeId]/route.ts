@@ -32,7 +32,7 @@ export async function GET(
     }
 
     // Build Rails API URL for video output (no user_id needed with auth)
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/v1/admin/video_production/pipelines/${pipelineId}/nodes/${nodeId}/output`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/admin/video_production/pipelines/${pipelineId}/nodes/${nodeId}/output`;
 
     // Forward request to Rails API with auth headers
     const response = await fetch(apiUrl, {
