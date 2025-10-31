@@ -74,6 +74,16 @@ export const createGetters = (get: () => PipelineState) => ({
               stroke: edgeColor,
               strokeWidth: 2,
               strokeDasharray: isDashed ? "5,5" : "0"
+            },
+            // Enhanced selection and hover styles
+            selectable: true,
+            focusable: true,
+            className: "edge-selectable",
+            // React Flow will automatically apply selection styles, but we can enhance them
+            data: {
+              sourceNodeTitle: sourceNode?.title || sourceId,
+              targetNodeTitle: node.title || node.uuid,
+              inputKey
             }
           });
         });
@@ -90,10 +100,21 @@ export const createGetters = (get: () => PipelineState) => ({
 
     // Check if we have any saved positions at all
     const hasSavedPositions = Object.keys(nodePositions).length > 0;
+    
+    // Check if all current nodes have saved positions (no new nodes)
+    const allNodesHavePositions = reactFlowNodes.every(node => nodePositions[node.id] != null);
 
-    // If we have saved positions, use a hybrid approach
+    // If we have saved positions for all nodes, use them directly without layout calculation
+    if (hasSavedPositions && allNodesHavePositions) {
+      return reactFlowNodes.map((node) => ({
+        ...node,
+        position: nodePositions[node.id]!
+      }));
+    }
+
+    // If we have some saved positions but not all (new nodes exist), use hybrid approach
     if (hasSavedPositions) {
-      // Always run layout to get positions for all nodes (including new ones)
+      // Run layout to get positions for new nodes only
       const layoutedNodes = getLayoutedNodes(reactFlowNodes, edges, {
         direction: layoutConfig.direction,
         nodeWidth: layoutConfig.nodeWidth,

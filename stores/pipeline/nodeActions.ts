@@ -2,6 +2,7 @@ import toast from "react-hot-toast";
 import type { PipelineState } from "./types";
 import {
   connectNodes as apiConnectNodes,
+  disconnectNodes as apiDisconnectNodes,
   deleteNode as apiDeleteNode,
   createNode as apiCreateNode,
 } from "@/lib/api/video-pipelines";
@@ -103,6 +104,90 @@ export const createNodeActions = (
     set({ isSaving: false });
   },
 
+  disconnectNodes: async (
+    pipelineUuid: string,
+    sourceId: string,
+    targetId: string,
+    targetHandle: string
+  ): Promise<void> => {
+    const { nodes } = get();
+    const sourceNode = nodes.find((n) => n.uuid === sourceId);
+    const targetNode = nodes.find((n) => n.uuid === targetId);
+    const disconnectionDesc = `Disconnect ${sourceNode?.title || sourceId} → ${targetNode?.title || targetId}`;
+
+    // Save to history before disconnection
+    get().saveToHistory("connect", disconnectionDesc);
+
+    // OPTIMISTIC UPDATE: Update UI immediately
+    const previousNodes = nodes;
+
+    set((state) => ({
+      nodes: state.nodes.map((node) => {
+        if (node.uuid === targetId) {
+          // Get current value - could be string, string[], or undefined
+          const currentValue = (node.inputs as Record<string, string | string[] | undefined>)[targetHandle];
+
+          let newValue: string | string[] | undefined;
+
+          if (Array.isArray(currentValue)) {
+            // Input is an array - remove the source
+            const filteredArray = currentValue.filter((uuid) => uuid !== sourceId);
+            if (filteredArray.length === currentValue.length) {
+              return node; // Connection not found, no change
+            }
+            newValue = filteredArray;
+          } else if (typeof currentValue === 'string' && currentValue === sourceId) {
+            // Input is a single string matching source - remove it
+            newValue = undefined;
+          } else {
+            // Connection not found, no change
+            return node;
+          }
+
+          // Update the target node's inputs (preserving discriminated union)
+          return {
+            ...node,
+            inputs: {
+              ...node.inputs,
+              [targetHandle]: newValue
+            }
+          } as Node;
+        }
+        return node;
+      }),
+      isSaving: true
+    }));
+
+    toast.loading("Disconnecting nodes...", { id: `disconnect-${sourceId}-${targetId}` });
+
+    try {
+      await apiDisconnectNodes(pipelineUuid, sourceId, targetId, targetHandle);
+
+      console.debug("Nodes disconnected successfully via API:", disconnectionDesc);
+
+      toast.success(disconnectionDesc, {
+        id: `disconnect-${sourceId}-${targetId}`,
+        duration: 2000
+      });
+    } catch (error) {
+      console.error("Failed to disconnect nodes via API:", error);
+
+      // Rollback optimistic update on error
+      set((_state) => ({
+        nodes: previousNodes,
+        isSaving: false
+      }));
+
+      toast.error("Failed to disconnect nodes", {
+        id: `disconnect-${sourceId}-${targetId}`,
+        duration: 4000
+      });
+      return;
+    }
+
+    set({ isSaving: false });
+  },
+
   deleteNodes: async (pipelineUuid: string, nodeIds: string[]): Promise<void> => {
     const { nodes, nodePositions, selectedNodeId } = get();
     const nodeNames = nodeIds.map((id) => nodes.find((n) => n.uuid === id)?.title || id).join(", ");
@@ -126,9 +211,16 @@ export const createNodeActions = (
 
         Object.entries(cleanedInputs).forEach(([key, value]) => {
           if (Array.isArray(value)) {
+            // Handle array inputs - filter out deleted node UUIDs
             const filtered = value.filter((uuid) => !nodeIds.includes(uuid));
             if (filtered.length !== value.length) {
-              cleanedInputs[key] = filtered;
+              cleanedInputs[key] = filtered.length > 0 ? filtered : undefined;
+              modified = true;
+            }
+          } else if (typeof value === 'string') {
+            // Handle single string inputs - remove if it matches a deleted node
+            if (nodeIds.includes(value)) {
+              cleanedInputs[key] = undefined;
               modified = true;
             }
           }
@@ -163,11 +255,6 @@ export const createNodeActions = (
       );
 
       console.debug("Nodes deleted successfully via API:", nodeIds);
-
-      // Force layout recalculation after deletion
-      set((_state) => ({
-        hasInitialLayout: false // This will trigger layout recalculation
-      }));
 
       toast.success(deleteDesc, {
         id: `delete-${nodeIds.join("-")}`,
