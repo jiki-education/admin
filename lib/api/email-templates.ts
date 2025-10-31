@@ -26,7 +26,7 @@ interface EmailTemplateTypesResponse {
 
 /**
  * Get list of email templates with filtering
- * GET /v1/admin/email_templates
+ * GET /admin/email_templates
  */
 export async function getEmailTemplates(filters?: EmailTemplateFilters): Promise<EmailTemplatesResponse> {
   const params: Record<string, string> = {
@@ -43,7 +43,7 @@ export async function getEmailTemplates(filters?: EmailTemplateFilters): Promise
 
 /**
  * Get available email template types
- * GET /v1/admin/email_templates/types
+ * GET /admin/email_templates/types
  */
 export async function getEmailTemplateTypes(): Promise<EmailTemplateType[]> {
   const response = await api.get<EmailTemplateTypesResponse>("/admin/email_templates/types");
@@ -57,7 +57,7 @@ export async function getEmailTemplateTypes(): Promise<EmailTemplateType[]> {
 
 /**
  * Get single email template by ID
- * GET /v1/admin/email_templates/:id
+ * GET /admin/email_templates/:id
  */
 export async function getEmailTemplate(id: number): Promise<EmailTemplate> {
   const response = await api.get<{ email_template: EmailTemplate }>(`/admin/email_templates/${id}`);
@@ -66,7 +66,7 @@ export async function getEmailTemplate(id: number): Promise<EmailTemplate> {
 
 /**
  * Create new email template
- * POST /v1/admin/email_templates
+ * POST /admin/email_templates
  */
 export async function createEmailTemplate(template: Omit<EmailTemplate, "id">): Promise<EmailTemplate> {
   const response = await api.post<{ email_template: EmailTemplate }>("/admin/email_templates", {
@@ -77,7 +77,7 @@ export async function createEmailTemplate(template: Omit<EmailTemplate, "id">): 
 
 /**
  * Update existing email template
- * PATCH /v1/admin/email_templates/:id
+ * PATCH /admin/email_templates/:id
  */
 export async function updateEmailTemplate(id: number, template: Partial<EmailTemplate>): Promise<EmailTemplate> {
   const response = await api.patch<{ email_template: EmailTemplate }>(`/admin/email_templates/${id}`, {
@@ -88,7 +88,7 @@ export async function updateEmailTemplate(id: number, template: Partial<EmailTem
 
 /**
  * Delete email template
- * DELETE /v1/admin/email_templates/:id
+ * DELETE /admin/email_templates/:id
  */
 export async function deleteEmailTemplate(id: number): Promise<void> {
   await api.delete(`/admin/email_templates/${id}`);
@@ -96,7 +96,7 @@ export async function deleteEmailTemplate(id: number): Promise<void> {
 
 /**
  * Get email templates summary grouped by type and slug
- * GET /v1/admin/email_templates/summary
+ * GET /admin/email_templates/summary
  */
 export async function getEmailTemplatesSummary(): Promise<EmailTemplateSummaryResponse> {
   const response = await api.get<EmailTemplateSummaryResponse>("/admin/email_templates/summary");
