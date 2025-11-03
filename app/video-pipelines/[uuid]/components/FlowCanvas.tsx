@@ -16,10 +16,9 @@ import {
   useNodesState,
   useEdgesState,
   type OnConnect,
-  type OnNodesDelete,
-  type OnEdgesDelete,
   type OnNodesChange,
   type OnEdgesChange,
+  type OnEdgesDelete,
   type NodeTypes,
   type NodeMouseHandler,
   type Node as ReactFlowNode,
@@ -63,6 +62,7 @@ export default function FlowCanvas() {
     getLayoutedNodes,
     getEdges,
     setSelectedNode,
+    selectedNodeId,
     connectNodes,
     disconnectNodes,
     deleteNodes,
@@ -130,18 +130,7 @@ export default function FlowCanvas() {
     [pipeline, connectNodes, flowNodes, edges]
   );
 
-  // Handle node deletion
-  const handleNodesDelete: OnNodesDelete = useCallback(
-    (nodesToDelete) => {
-      if (pipeline) {
-        const nodeIds = nodesToDelete.map((node) => node.id);
-        deleteNodes(pipeline.uuid, nodeIds).catch((error) => console.error(error));
-      }
-    },
-    [pipeline, deleteNodes]
-  );
-
-  // Handle edge deletion
+  // Handle edge deletion - keep API communication for manual edge deletion
   const handleEdgesDelete: OnEdgesDelete = useCallback(
     (edgesToDelete) => {
       if (pipeline) {
@@ -209,6 +198,55 @@ export default function FlowCanvas() {
     );
   }, [setSelectedNode, setEdges]);
 
+  // Handle keyboard shortcuts - handle both nodes and edges
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if ((event.key === "Backspace" || event.key === "Delete") && !event.repeat) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Check for selected edges first
+        const selectedEdges = edges.filter((edge) => edge.selected);
+        if (selectedEdges.length > 0 && pipeline) {
+          // Handle edge deletion (no confirmation needed for edges)
+          selectedEdges.forEach((edge) => {
+            const sourceId = edge.source;
+            const targetId = edge.target;
+            const inputKey = edge.targetHandle;
+            
+            // Verify nodes exist in local state
+            const sourceNode = rawNodes.find(n => n.uuid === sourceId);
+            const targetNode = rawNodes.find(n => n.uuid === targetId);
+            
+            if (sourceNode && targetNode && inputKey) {
+              disconnectNodes(pipeline.uuid, sourceId, targetId, inputKey).catch((error) => {
+                console.error("Failed to disconnect edge:", error);
+              });
+            }
+          });
+          return;
+        }
+
+        // Check for selected node (same as Delete Node button)
+        if (selectedNodeId && pipeline) {
+          const selectedNode = rawNodes.find((n) => n.uuid === selectedNodeId);
+          const nodeName = selectedNode?.title || selectedNodeId;
+          
+          if (window.confirm(`Are you sure you want to delete node "${nodeName}"?`)) {
+            deleteNodes(pipeline.uuid, [selectedNodeId]).catch((error) => console.error(error));
+          }
+        }
+      }
+    },
+    [selectedNodeId, pipeline, rawNodes, deleteNodes, edges, disconnectNodes]
+  );
+
+  // Add keyboard event listener
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
   // Enhanced node change handler that combines React Flow's built-in handling with our custom logic
   const handleNodesChange: OnNodesChange<ReactFlowNode> = useCallback(
     (changes) => {
@@ -244,7 +282,6 @@ export default function FlowCanvas() {
         onConnect={handleConnect}
         onNodesChange={handleNodesChange}
         onEdgesChange={onEdgesChange}
-        onNodesDelete={handleNodesDelete}
         onEdgesDelete={handleEdgesDelete}
         onNodeClick={handleNodeClick}
         onEdgeClick={handleEdgeClick}
@@ -262,7 +299,7 @@ export default function FlowCanvas() {
           type: "default",
           animated: false
         }}
-        deleteKeyCode={["Backspace", "Delete"]}
+        deleteKeyCode={null}
         connectOnClick={false}
         elementsSelectable={true}
         multiSelectionKeyCode="Shift"
