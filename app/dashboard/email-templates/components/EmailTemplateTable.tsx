@@ -7,10 +7,12 @@ import type { EmailTemplate } from "../types";
 interface EmailTemplateTableProps {
   templates: EmailTemplate[];
   onDelete: (template: EmailTemplate) => void;
+  onTranslate: (template: EmailTemplate) => void;
   loading?: boolean;
+  translatingTemplateId?: number | null;
 }
 
-export default function EmailTemplateTable({ templates, onDelete, loading = false }: EmailTemplateTableProps) {
+export default function EmailTemplateTable({ templates, onDelete, onTranslate, loading = false, translatingTemplateId }: EmailTemplateTableProps) {
   const router = useRouter();
 
   const handleEdit = (template: EmailTemplate) => {
@@ -110,6 +112,17 @@ export default function EmailTemplateTable({ templates, onDelete, loading = fals
                       <Button size="sm" variant="outline" onClick={() => handleEdit(template)}>
                         Edit
                       </Button>
+                      {template.locale === 'en' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => onTranslate(template)}
+                          disabled={translatingTemplateId === template.id}
+                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
+                        >
+                          {translatingTemplateId === template.id ? "Translating..." : "Translate"}
+                        </Button>
+                      )}
                       <Button
                         size="sm"
                         variant="outline"
