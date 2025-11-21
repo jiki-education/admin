@@ -8,7 +8,8 @@ import type {
   EmailTemplate,
   EmailTemplateFilters,
   EmailTemplateType,
-  EmailTemplateSummaryResponse
+  EmailTemplateSummaryResponse,
+  TranslateEmailTemplateResponse
 } from "@/app/dashboard/email-templates/types";
 
 interface EmailTemplatesResponse {
@@ -100,5 +101,14 @@ export async function deleteEmailTemplate(id: number): Promise<void> {
  */
 export async function getEmailTemplatesSummary(): Promise<EmailTemplateSummaryResponse> {
   const response = await api.get<EmailTemplateSummaryResponse>("/admin/email_templates/summary");
+  return response.data;
+}
+
+/**
+ * Trigger translation for email template to all supported locales
+ * POST /admin/email_templates/:id/translate
+ */
+export async function translateEmailTemplate(id: number): Promise<TranslateEmailTemplateResponse> {
+  const response = await api.post<TranslateEmailTemplateResponse>(`/admin/email_templates/${id}/translate`);
   return response.data;
 }

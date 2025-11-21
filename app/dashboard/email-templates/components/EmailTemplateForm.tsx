@@ -19,6 +19,7 @@ interface EmailTemplateFormProps {
   templateTypes: EmailTemplateType[];
   loading?: boolean;
   isPage?: boolean;
+  onBack?: () => void;
 }
 
 interface FormData {
@@ -54,7 +55,8 @@ export default function EmailTemplateForm({
   template,
   templateTypes,
   loading = false,
-  isPage = false
+  isPage = false,
+  onBack
 }: EmailTemplateFormProps) {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<Partial<FormData>>({});
@@ -372,7 +374,7 @@ export default function EmailTemplateForm({
 
       {/* Form Actions */}
       <div className="mt-8 flex items-center justify-end gap-3">
-        <Button size="sm" variant="outline" onClick={onClose} disabled={isSubmitting}>
+        <Button size="sm" variant="outline" onClick={isPage && onBack ? onBack : onClose} disabled={isSubmitting}>
           {isPage ? "Back" : "Cancel"}
         </Button>
         <button

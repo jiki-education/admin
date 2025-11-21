@@ -36,3 +36,8 @@ export interface EmailTemplateSummaryResponse {
   email_templates: EmailTemplateSummaryItem[];
   locales: LocaleConfiguration;
 }
+
+export interface TranslateEmailTemplateResponse {
+  email_template: EmailTemplate;
+  queued_locales: string[];
+}
