@@ -127,6 +127,7 @@ export default function EditEmailTemplate() {
             templateTypes={templateTypes}
             loading={saving}
             isPage={true}
+            onBack={handleBack}
           />
         </div>
       </div>

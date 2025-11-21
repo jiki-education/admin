@@ -33,63 +33,63 @@ describe("Navigation Tests", () => {
     expect(currentUrl).toContain("/signup");
   });
 
-  it("should load the dashboard page", async () => {
+  it("should redirect to signin when accessing dashboard without auth", async () => {
     await page.goto(`${baseUrl}/dashboard`);
 
-    // Wait for the page to load (reduced timeout)
-    await page.waitForSelector("body", { timeout: 5000 });
+    // Wait for redirect
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Check that we can access the page (no errors)
     const body = await page.$("body");
     expect(body).toBeTruthy();
 
-    // Verify we can access the page (behavior may vary)
+    // Verify redirect to signin
     const currentUrl = page.url();
-    expect(currentUrl).toContain("localhost:3064");
+    expect(currentUrl).toContain("/signin");
   });
 
-  it("should load the users management page", async () => {
+  it("should redirect to signin when accessing users without auth", async () => {
     await page.goto(`${baseUrl}/dashboard/users`);
 
-    // Wait for the page to load (reduced timeout)
-    await page.waitForSelector("body", { timeout: 5000 });
+    // Wait for redirect
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Check that we can access the page (no errors)
     const body = await page.$("body");
     expect(body).toBeTruthy();
 
-    // Verify we can access the page (behavior may vary)
+    // Verify redirect to signin
     const currentUrl = page.url();
-    expect(currentUrl).toContain("localhost:3064");
+    expect(currentUrl).toContain("/signin");
   });
 
-  it("should load the levels management page", async () => {
+  it("should redirect to signin when accessing levels without auth", async () => {
     await page.goto(`${baseUrl}/dashboard/levels`);
 
-    // Wait for the page to load (reduced timeout)
-    await page.waitForSelector("body", { timeout: 5000 });
+    // Wait for redirect
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Check that we can access the page (no errors)
     const body = await page.$("body");
     expect(body).toBeTruthy();
 
-    // Verify we can access the page (behavior may vary)
+    // Verify redirect to signin
     const currentUrl = page.url();
-    expect(currentUrl).toContain("localhost:3064");
+    expect(currentUrl).toContain("/signin");
   });
 
-  it("should load the email templates page", async () => {
+  it("should redirect to signin when accessing email templates without auth", async () => {
     await page.goto(`${baseUrl}/dashboard/email-templates`);
 
-    // Wait for the page to load (reduced timeout)
-    await page.waitForSelector("body", { timeout: 5000 });
+    // Wait for redirect
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Check that we can access the page (no errors)
     const body = await page.$("body");
     expect(body).toBeTruthy();
 
-    // Verify we can access the page (may redirect to signin depending on auth state)
+    // Verify redirect to signin
     const currentUrl = page.url();
-    expect(currentUrl).toContain("localhost:3064");
+    expect(currentUrl).toContain("/signin");
   });
 });
