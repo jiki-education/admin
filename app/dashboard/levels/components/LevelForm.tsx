@@ -92,7 +92,6 @@ export default function LevelForm({ initialData, onSave, onCancel, loading = fal
 
       <FormActions
         onCancel={onCancel}
-        onSubmit={handleSubmit}
         submitLabel={mode === "create" ? "Create Level" : "Save Changes"}
         loading={saving || loading}
         disabled={!isFormValid()}

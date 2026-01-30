@@ -66,7 +66,7 @@ describe("Navigation Buttons", () => {
 
   test("Add New Level button navigates to correct route", async () => {
     const { getAdminLevels } = await import("@/lib/api/levels");
-    getAdminLevels.mockResolvedValue({
+    (getAdminLevels as jest.Mock).mockResolvedValue({
       results: [],
       meta: { current_page: 1, total_pages: 1, total_count: 0 }
     });
@@ -85,8 +85,8 @@ describe("Navigation Buttons", () => {
     const { useParams } = await import("next/navigation");
     const { getLevelLessons } = await import("@/lib/api/levels");
 
-    useParams.mockReturnValue({ id: "123" });
-    getLevelLessons.mockResolvedValue([]);
+    (useParams as jest.Mock).mockReturnValue({ id: "123" });
+    (getLevelLessons as jest.Mock).mockResolvedValue([]);
 
     render(<LevelDetail />);
 
@@ -100,7 +100,7 @@ describe("Navigation Buttons", () => {
 
   test("navigation buttons are properly positioned in UI layout", async () => {
     const { getAdminLevels } = await import("@/lib/api/levels");
-    getAdminLevels.mockResolvedValue({
+    (getAdminLevels as jest.Mock).mockResolvedValue({
       results: [],
       meta: { current_page: 1, total_pages: 1, total_count: 0 }
     });
@@ -119,7 +119,7 @@ describe("Navigation Buttons", () => {
 
   test("buttons are accessible with proper ARIA labels", async () => {
     const { getAdminLevels } = await import("@/lib/api/levels");
-    getAdminLevels.mockResolvedValue({
+    (getAdminLevels as jest.Mock).mockResolvedValue({
       results: [],
       meta: { current_page: 1, total_pages: 1, total_count: 0 }
     });

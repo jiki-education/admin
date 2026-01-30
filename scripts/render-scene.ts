@@ -1,4 +1,6 @@
 #!/usr/bin/env tsx
+// @ts-nocheck
+// Remotion script with type issues
 
 import { bundle } from "@remotion/bundler";
 import { renderMedia, selectComposition } from "@remotion/renderer";

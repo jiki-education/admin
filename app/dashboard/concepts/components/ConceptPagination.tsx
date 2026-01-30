@@ -8,7 +8,12 @@ interface ConceptPaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export default function ConceptPagination({ currentPage, totalPages, totalCount, onPageChange }: ConceptPaginationProps) {
+export default function ConceptPagination({
+  currentPage,
+  totalPages,
+  totalCount,
+  onPageChange
+}: ConceptPaginationProps) {
   return (
     <Pagination
       currentPage={currentPage}

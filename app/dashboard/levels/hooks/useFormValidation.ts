@@ -39,7 +39,9 @@ export function useFormValidation({ initialData, fields, validationRules }: UseF
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (!initialData || Object.keys(initialData).length === 0) return;
+    if (!initialData || Object.keys(initialData).length === 0) {
+      return;
+    }
 
     const newFormData: Record<string, any> = {};
     fields.forEach((field) => {

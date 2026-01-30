@@ -113,12 +113,7 @@ export default function EditConcept() {
             </div>
           )}
 
-          <ConceptForm 
-            mode="edit" 
-            initialData={concept} 
-            onSave={handleSaveConcept} 
-            onCancel={handleCancel} 
-          />
+          <ConceptForm mode="edit" initialData={concept} onSave={handleSaveConcept} onCancel={handleCancel} />
         </div>
       </div>
     </div>

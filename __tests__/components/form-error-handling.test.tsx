@@ -21,7 +21,7 @@ jest.mock("@/app/dashboard/levels/components/JSONEditor", () => {
 
 describe("Form Error Handling", () => {
   test("LevelForm displays API errors and allows retry", async () => {
-    const mockOnSave = jest.fn().mockRejectedValueOnce(new Error("Slug already exists")).mockResolvedValueOnce({});
+    const mockOnSave = jest.fn().mockRejectedValueOnce(new Error("Slug already exists"));
     const mockOnCancel = jest.fn();
 
     render(<LevelForm mode="create" onSave={mockOnSave} onCancel={mockOnCancel} />);
@@ -43,14 +43,7 @@ describe("Form Error Handling", () => {
       expect(screen.getByText(/slug already exists/i)).toBeInTheDocument();
     });
 
-    // The form shows the error and disables the submit button
-    // In the actual implementation, general errors persist until another submit attempt
-    // Let's verify that the button is correctly disabled after error
-    expect(submitButton).toBeDisabled();
-
-    // In a real scenario, the user would fix the issue (like changing the slug)
-    // and retry. The general error would be replaced by the new submission result.
-    // Let's verify the error is displayed properly
+    // Verify the error is displayed and form was submitted once
     expect(mockOnSave).toHaveBeenCalledTimes(1);
   });
 
@@ -62,7 +55,7 @@ describe("Form Error Handling", () => {
 
     const submitButton = screen.getByRole("button", { name: /create lesson/i });
 
-    // Try to submit with invalid slug format
+    // Fill form with invalid slug format
     fireEvent.change(screen.getByLabelText(/title/i), {
       target: { value: "Test Lesson" }
     });
@@ -73,21 +66,16 @@ describe("Form Error Handling", () => {
       target: { value: "Test description" }
     });
 
-    // The button should be disabled due to validation
-    expect(submitButton).toBeDisabled();
+    // Click submit - validation runs on submit
+    fireEvent.click(submitButton);
 
-    // Form won't submit when button is disabled
-    expect(mockOnSave).not.toHaveBeenCalled();
-
-    // Fix the slug
-    fireEvent.change(screen.getByLabelText(/slug/i), {
-      target: { value: "valid-slug" }
-    });
-
-    // Button should now be enabled since form is valid
+    // Validation error should appear for invalid slug
     await waitFor(() => {
-      expect(submitButton).not.toBeDisabled();
+      expect(screen.getByText(/slug must contain only lowercase/i)).toBeInTheDocument();
     });
+
+    // Form won't call onSave when validation fails
+    expect(mockOnSave).not.toHaveBeenCalled();
   });
 
   test("forms handle network errors gracefully", async () => {

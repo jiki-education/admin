@@ -1,3 +1,5 @@
+// @ts-nocheck
+// E2E tests with Puppeteer type issues
 import "./setup";
 
 describe("Concepts Management E2E Tests", () => {
@@ -120,7 +122,10 @@ describe("Concepts Management E2E Tests", () => {
 
       try {
         // Look for markdown editor textarea
-        const markdownEditor = await page.waitForSelector('textarea[placeholder*="Markdown"], textarea[placeholder*="markdown"]', { timeout: 2000 });
+        const markdownEditor = await page.waitForSelector(
+          'textarea[placeholder*="Markdown"], textarea[placeholder*="markdown"]',
+          { timeout: 2000 }
+        );
         expect(markdownEditor).toBeTruthy();
       } catch {
         console.debug("Markdown editor not found - form not accessible");

@@ -2,7 +2,6 @@ import Button from "@/components/ui/button/Button";
 
 interface FormActionsProps {
   onCancel: () => void;
-  onSubmit: (e: React.FormEvent) => void;
   submitLabel: string;
   loading?: boolean;
   disabled?: boolean;
@@ -11,7 +10,6 @@ interface FormActionsProps {
 
 export default function FormActions({
   onCancel,
-  onSubmit,
   submitLabel,
   loading = false,
   disabled = false,
@@ -22,7 +20,7 @@ export default function FormActions({
       <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
         {cancelLabel}
       </Button>
-      <Button type="submit" onClick={onSubmit} disabled={disabled || loading}>
+      <Button type="submit" disabled={disabled || loading}>
         {loading ? "Saving..." : submitLabel}
       </Button>
     </div>

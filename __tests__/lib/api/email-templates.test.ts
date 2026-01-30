@@ -22,7 +22,7 @@ describe("Email Templates API Client", () => {
       const mockResponse: TranslateEmailTemplateResponse = {
         email_template: {
           id: 123,
-          type: "level_completion", 
+          type: "level_completion",
           slug: "level-1",
           locale: "en",
           subject: "Congratulations!",
