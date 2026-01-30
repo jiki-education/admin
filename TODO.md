@@ -15,45 +15,7 @@
   - ✅ Lesson creation form and flow fully functional
   - ✅ Unit tests and E2E tests passing
 
-### Video Pipeline Editor Migration
-
-- [ ] **Install required dependencies**
-  ```bash
-  pnpm add @xyflow/react dagre @dnd-kit/core @dnd-kit/modifiers @dnd-kit/sortable @dnd-kit/utilities
-  pnpm add -D @types/dagre
-  ```
-- [ ] **Copy pipeline editor from ../video-production**
-  - Create `app/video-pipelines/[uuid]/components/` directory structure
-  - Copy all React Flow editor components
-  - Copy all 8 node types and shared components
-  - Copy supporting libraries (layout.ts, nodes/)
-- [ ] **Implement missing API functions in lib/api/video-pipelines.ts**
-  - `getNodes(pipelineUuid)` - List nodes for a pipeline
-  - `getNode(pipelineUuid, nodeUuid)` - Get single node details
-  - `createNode(pipelineUuid, nodeData)` - Create new node in pipeline
-  - `updateNode(pipelineUuid, nodeUuid, updates)` - Update node configuration
-  - `deleteNode(pipelineUuid, nodeUuid)` - Delete a node from pipeline
-  - `connectNodes()` - Connect two nodes by updating inputs
-  - `reorderNodeInputs()` - Reorder inputs array
-- [ ] **Update all import paths and type definitions**
-  - Replace video-production types with admin types
-  - Update API client integration
-  - Ensure proper route parameters (id -> uuid)
-- [ ] **Test complete pipeline editor integration**
-  - Verify all node types render correctly
-  - Test node connections and deletions
-  - Verify API interactions work properly
-
 ## Advanced Features (Future Implementation)
-
-### Video Pipeline Enhancements
-
-- [ ] **Edit pipeline functionality**
-- [ ] **Advanced filtering/search for pipelines**
-- [ ] **Visual pipeline node editor improvements**
-- [ ] **Real-time progress updates**
-- [ ] **Pipeline duplication**
-- [ ] **Bulk operations**
 
 ### Remotion Code Editor Integration
 
@@ -137,14 +99,6 @@
 - ✅ **User deletion integration** - DELETE /v1/admin/users/:id fully integrated
 - ✅ **Level creation integration** - POST /v1/admin/levels fully integrated
 
-### Video Pipeline Dashboard
-
-- ✅ **API client layer** - Complete TypeScript client with all CRUD operations
-- ✅ **Navigation integration** - Added to AppSidebar under Content section
-- ✅ **Core pages** - List, detail, and create pages implemented
-- ✅ **Table component** - PipelineTable with actions, pagination, progress bars
-- ✅ **Testing** - Both unit tests (API client) and E2E tests (full workflow)
-
 ### User Management Features
 
 - ✅ **Admin status toggle filter** - Added admin filter to UserFilters component
@@ -159,7 +113,5 @@
 
 ## Notes
 
-- **Priority**: Focus on video pipeline editor migration as it's the most complex remaining task
 - **Backend coordination**: Lesson creation and code scene management require backend team involvement
 - **Testing**: All new features need comprehensive unit and E2E test coverage
-- **Video Pipeline Backend**: Comprehensive backend system is ready with 8 node types and full CRUD API (see VIDEO_PIPELINE_ADMIN_INTEGRATION.md for complete API documentation)
