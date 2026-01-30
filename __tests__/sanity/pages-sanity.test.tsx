@@ -57,7 +57,7 @@ jest.mock("@/components/auth/SignupForm", () => {
   };
 });
 
-jest.mock("@/components/auth/SigninForm", () => {
+jest.mock("@/components/auth/SignInForm", () => {
   return function MockSignInForm() {
     return React.createElement("div", { "data-testid": "signin-form" }, "Sign In Form");
   };
