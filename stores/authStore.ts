@@ -112,7 +112,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   },
 
   // Check authentication status
-  // Handles network errors and rate limiting with retry logic matching the API client
+  // Handles network errors and rate limiting with limited retry logic
   checkAuth: async () => {
     const currentState = get();
 
@@ -123,11 +123,10 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
 
     set({ isLoading: true });
 
-    // Retry configuration matching API client
+    // Retry configuration - limited retries for initial auth check
     const INITIAL_RETRY_DELAY_MS = 50;
-    const MAX_RETRY_DELAY_MS = 5000;
-    const SHOW_MODAL_AFTER_MS = 1000;
-    const startTime = Date.now();
+    const MAX_RETRY_DELAY_MS = 2000;
+    const MAX_NETWORK_RETRIES = 3; // Give up after 3 network failures
     let attempt = 0;
 
     while (true) {
@@ -147,23 +146,27 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
             method: "DELETE",
             credentials: "include"
           });
-          get().setNoUser("Authentication check failed");
+          get().setNoUser(null);
           return;
         }
 
-        // Rate limit error - show modal, wait specified time, retry
+        // Rate limit error - wait specified time, retry (with limit)
         if (error instanceof RateLimitError) {
-          setCriticalError(error);
+          if (attempt >= MAX_NETWORK_RETRIES) {
+            get().setNoUser(null);
+            return;
+          }
           await new Promise((resolve) => setTimeout(resolve, error.retryAfterSeconds * 1000));
-          attempt = 0; // Reset attempt counter
+          attempt++;
           continue;
         }
 
-        // Network error - show modal and retry with backoff
+        // Network error - retry with backoff (with limit)
         if (error instanceof NetworkError) {
-          const elapsedTime = Date.now() - startTime;
-          if (elapsedTime >= SHOW_MODAL_AFTER_MS) {
-            setCriticalError(new NetworkError("Connection lost"));
+          if (attempt >= MAX_NETWORK_RETRIES) {
+            // Give up - likely no backend available
+            get().setNoUser(null);
+            return;
           }
           const delay = Math.min(INITIAL_RETRY_DELAY_MS * Math.pow(2, attempt), MAX_RETRY_DELAY_MS);
           await new Promise((resolve) => setTimeout(resolve, delay));
