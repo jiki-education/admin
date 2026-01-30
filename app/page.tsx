@@ -1,13 +1,10 @@
 "use client";
 
 import { useRedirectIfAuthenticated } from "@/lib/auth/hooks";
-import { useState } from "react";
 import SignInForm from "@/components/auth/SignInForm";
-import SignUpForm from "@/components/auth/SignupForm";
 
 export default function HomePage() {
   const { isLoading } = useRedirectIfAuthenticated();
-  const [showSignUp, setShowSignUp] = useState(false);
 
   // Show loading while checking authentication
   if (isLoading) {
@@ -21,7 +18,7 @@ export default function HomePage() {
     );
   }
 
-  // Show authentication forms for non-authenticated users
+  // Show sign in form for non-authenticated users
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <div className="max-w-md w-full space-y-8">
@@ -31,32 +28,7 @@ export default function HomePage() {
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-          <div className="mb-6">
-            <div className="flex space-x-1 rounded-lg bg-gray-100 dark:bg-gray-700 p-1">
-              <button
-                onClick={() => setShowSignUp(false)}
-                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                  !showSignUp
-                    ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                }`}
-              >
-                Sign In
-              </button>
-              <button
-                onClick={() => setShowSignUp(true)}
-                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                  showSignUp
-                    ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                }`}
-              >
-                Sign Up
-              </button>
-            </div>
-          </div>
-
-          {showSignUp ? <SignUpForm /> : <SignInForm />}
+          <SignInForm />
         </div>
       </div>
     </div>

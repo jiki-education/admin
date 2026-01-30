@@ -1,24 +1,37 @@
 /**
  * Authentication Store
- * Zustand store for managing authentication state
+ * Global state management for authentication using Zustand
  */
 
-import { login as apiLogin, logout as apiLogout, signup as apiSignup, validateToken } from "@/lib/auth/service";
-import type { AuthState, LoginCredentials, SignupData, User } from "@/types/auth";
+import * as authService from "@/lib/auth/service";
+import { getApiUrl } from "@/lib/api/config";
+import type { LoginCredentials, PasswordReset, User } from "@/types/auth";
+import { AuthenticationError, NetworkError, RateLimitError } from "@/lib/api/client";
+import { setCriticalError, clearCriticalError } from "@/lib/api/errorHandlerStore";
 import { create } from "zustand";
 
-interface AuthStore extends AuthState {
+interface AuthStore {
+  // State
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+  hasCheckedAuth: boolean;
+
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>;
-  signup: (userData: SignupData) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: () => Promise<{ success: boolean; error?: "network" }>;
   checkAuth: () => Promise<void>;
-  setUser: (user: User | null) => void;
-  setError: (error: string | null) => void;
+  refreshUser: () => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
+  resetPassword: (data: PasswordReset) => Promise<void>;
   clearError: () => void;
+  setLoading: (loading: boolean) => void;
+  setUser: (user: User) => void;
+  setNoUser: (error?: string | null) => void;
 }
 
-export const useAuthStore = create<AuthStore>((set, _get) => ({
+export const useAuthStore = create<AuthStore>()((set, get) => ({
   // Initial state
   user: null,
   isAuthenticated: false,
@@ -26,158 +39,188 @@ export const useAuthStore = create<AuthStore>((set, _get) => ({
   error: null,
   hasCheckedAuth: false,
 
-  // Actions
-  login: async (credentials: LoginCredentials) => {
+  // Login action - calls Rails directly
+  login: async (credentials) => {
+    set({ isLoading: true });
     try {
-      set({ isLoading: true, error: null });
-
-      const apiUser = await apiLogin(credentials);
-
-      // Store email in sessionStorage for session restoration
-      const { setUserEmail } = await import("@/lib/auth/storage");
-      setUserEmail(apiUser.email);
-
-      // Use email from API response, but only store email
-      const user: User = { email: apiUser.email };
-
-      set({
-        user,
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-        hasCheckedAuth: true
-      });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Login failed";
-      set({
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: errorMessage,
-        hasCheckedAuth: true
-      });
-      throw error;
-    }
-  },
-
-  signup: async (userData: SignupData) => {
-    try {
-      set({ isLoading: true, error: null });
-
-      const apiUser = await apiSignup(userData);
-
-      // Store email in sessionStorage for session restoration
-      const { setUserEmail } = await import("@/lib/auth/storage");
-      setUserEmail(apiUser.email);
-
-      // Use email from API response, but only store email
-      const user: User = { email: apiUser.email };
-
-      set({
-        user,
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-        hasCheckedAuth: true
-      });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Signup failed";
-      set({
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: errorMessage,
-        hasCheckedAuth: true
-      });
-      throw error;
-    }
-  },
-
-  logout: async () => {
-    try {
-      set({ isLoading: true, error: null });
-
-      await apiLogout();
-
-      set({
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: null,
-        hasCheckedAuth: true
-      });
-    } catch (error) {
-      // Even if logout API fails, clear local state
-      set({
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: null,
-        hasCheckedAuth: true
+      const response = await fetch(getApiUrl("/auth/login"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ user: credentials })
       });
 
-      console.error("Logout error:", error);
-    }
-  },
-
-  checkAuth: async () => {
-    try {
-      set({ isLoading: true, error: null });
-
-      const isValid = await validateToken();
-
-      if (isValid) {
-        // Token is valid, get user email from sessionStorage
-        try {
-          const { getUserEmail } = await import("@/lib/auth/storage");
-          const email = getUserEmail();
-
-          if (email) {
-            const user: User = { email };
-            set({
-              user,
-              isAuthenticated: true,
-              isLoading: false,
-              error: null,
-              hasCheckedAuth: true
-            });
-            return;
-          }
-        } catch (userError) {
-          console.error("Failed to get user email from storage:", userError);
+      if (!response.ok) {
+        const errorData = await response.json();
+        const message = errorData.error?.message || "Login failed";
+        // Throw AuthenticationError for 401 so forms can detect invalid credentials
+        if (response.status === 401) {
+          throw new AuthenticationError(message, errorData);
         }
+        throw new Error(message);
       }
 
-      // Token invalid or no user data found
-      set({
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: null,
-        hasCheckedAuth: true
-      });
-    } catch (error) {
-      set({
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: null,
-        hasCheckedAuth: true
-      });
+      const data = await response.json();
+      if (!data.user) {
+        throw new Error("Invalid response from server");
+      }
 
-      console.error("Auth check error:", error);
+      get().setUser(data.user);
+    } catch (error) {
+      get().setNoUser();
+      throw error;
     }
   },
 
-  setUser: (user: User | null) => {
-    set({ user, isAuthenticated: !!user });
+  // Logout action - calls Rails directly
+  logout: async () => {
+    set({ isLoading: true });
+    try {
+      await fetch(getApiUrl("/auth/logout"), {
+        method: "DELETE",
+        credentials: "include"
+      });
+      get().setNoUser(null);
+      return { success: true };
+    } catch {
+      // Network error - couldn't reach server, keep user logged in locally
+      set({ isLoading: false });
+      return { success: false, error: "network" };
+    }
   },
 
-  setError: (error: string | null) => {
-    set({ error });
+  // Helper methods
+  setUser: (user: User) => {
+    set({
+      user,
+      isAuthenticated: true,
+      isLoading: false,
+      hasCheckedAuth: true,
+      error: null
+    });
+  },
+  setNoUser: (error?: string | null) => {
+    set({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      hasCheckedAuth: true
+    });
+    if (error !== undefined) {
+      set({ error: error });
+    }
   },
 
+  // Check authentication status
+  // Handles network errors and rate limiting with retry logic matching the API client
+  checkAuth: async () => {
+    const currentState = get();
+
+    // Skip if already checked or currently checking
+    if (currentState.hasCheckedAuth || currentState.isLoading) {
+      return;
+    }
+
+    set({ isLoading: true });
+
+    // Retry configuration matching API client
+    const INITIAL_RETRY_DELAY_MS = 50;
+    const MAX_RETRY_DELAY_MS = 5000;
+    const SHOW_MODAL_AFTER_MS = 1000;
+    const startTime = Date.now();
+    let attempt = 0;
+
+    while (true) {
+      try {
+        // Fetch fresh user data from server without retries
+        // useRetries: false prevents infinite hangs on auth errors
+        const user = await authService.getCurrentUser(false);
+        clearCriticalError();
+        get().setUser(user);
+        return;
+      } catch (error) {
+        // Auth error - session invalid, clear cookie and set logged out
+        if (error instanceof AuthenticationError) {
+          // Clear the session cookie by calling logout endpoint
+          // Don't catch errors - let network errors bubble up to global error handler
+          await fetch(getApiUrl("/auth/logout"), {
+            method: "DELETE",
+            credentials: "include"
+          });
+          get().setNoUser("Authentication check failed");
+          return;
+        }
+
+        // Rate limit error - show modal, wait specified time, retry
+        if (error instanceof RateLimitError) {
+          setCriticalError(error);
+          await new Promise((resolve) => setTimeout(resolve, error.retryAfterSeconds * 1000));
+          attempt = 0; // Reset attempt counter
+          continue;
+        }
+
+        // Network error - show modal and retry with backoff
+        if (error instanceof NetworkError) {
+          const elapsedTime = Date.now() - startTime;
+          if (elapsedTime >= SHOW_MODAL_AFTER_MS) {
+            setCriticalError(new NetworkError("Connection lost"));
+          }
+          const delay = Math.min(INITIAL_RETRY_DELAY_MS * Math.pow(2, attempt), MAX_RETRY_DELAY_MS);
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          attempt++;
+          continue;
+        }
+
+        // Other error - give up
+        get().setNoUser();
+        return;
+      }
+    }
+  },
+
+  // Refresh user data from server
+  refreshUser: async () => {
+    try {
+      const user = await authService.getCurrentUser();
+      set({ user });
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Request password reset
+  requestPasswordReset: async (email) => {
+    set({ isLoading: true, error: null });
+    try {
+      await authService.requestPasswordReset({ email });
+      set({ isLoading: false });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to send reset email";
+      set({ isLoading: false, error: message });
+      throw error;
+    }
+  },
+
+  // Complete password reset
+  resetPassword: async (data) => {
+    set({ isLoading: true, error: null });
+    try {
+      await authService.resetPassword(data);
+      set({ isLoading: false });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to reset password";
+      set({ isLoading: false, error: message });
+      throw error;
+    }
+  },
+
+  // Clear error
   clearError: () => {
     set({ error: null });
+  },
+
+  // Set loading state
+  setLoading: (loading) => {
+    set({ isLoading: loading });
   }
 }));

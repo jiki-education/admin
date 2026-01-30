@@ -1,10 +1,20 @@
 /**
  * Authentication Types
- * Type definitions for authentication data structures
+ * Type definitions for authentication system
  */
 
+import type { MembershipTier } from "@/lib/pricing";
+import type { SubscriptionStatus, SubscriptionDetails } from "./subscription";
+
 export interface User {
+  handle: string;
   email: string;
+  name: string | null;
+  membership_type: MembershipTier;
+  subscription_status: SubscriptionStatus;
+  subscription: SubscriptionDetails | null;
+  provider: string;
+  email_confirmed: boolean;
 }
 
 export interface LoginCredentials {
@@ -12,28 +22,36 @@ export interface LoginCredentials {
   password: string;
 }
 
-export interface SignupData {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  token?: string;
-  jwt?: string;
-  access_token?: string;
-}
-
 export interface PasswordResetRequest {
   email: string;
 }
 
 export interface PasswordReset {
-  token: string;
+  reset_password_token: string;
   password: string;
-  passwordConfirmation: string;
+  password_confirmation: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  message?: string;
+}
+
+export interface ApiError {
+  error: {
+    type: string;
+    message: string;
+    errors?: Record<string, string[]>;
+  };
+}
+
+export interface RailsAuthResponse {
+  user?: User;
+  message?: string;
+  error?: {
+    type: string;
+    message: string;
+  };
 }
 
 export interface AuthState {
