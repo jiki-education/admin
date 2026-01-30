@@ -53,7 +53,9 @@ export default function FormErrorSummary({ errors, fieldLabels = {} }: FormError
               </li>
             )}
             {Object.entries(errors).map(([field, error]) => {
-              if (field === "general") return null;
+              if (field === "general") {
+                return null;
+              }
 
               const fieldLabel = getFieldLabel(field);
               const cleanError = formatErrorMessage(field, error);

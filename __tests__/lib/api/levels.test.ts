@@ -35,7 +35,7 @@ describe("Levels API Client", () => {
       }
     };
 
-    mockApi.post.mockResolvedValue({ ...mockResponse, status: 201, headers: {} });
+    mockApi.post.mockResolvedValue({ ...mockResponse, status: 201, headers: new Headers() });
 
     const result = await createLevel(levelData);
 
@@ -76,7 +76,7 @@ describe("Levels API Client", () => {
       }
     };
 
-    mockApi.post.mockResolvedValue({ ...mockResponse, status: 201, headers: {} });
+    mockApi.post.mockResolvedValue({ ...mockResponse, status: 201, headers: new Headers() });
 
     const result = await createLesson(levelId, lessonData);
 

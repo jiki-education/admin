@@ -12,7 +12,13 @@ interface EmailTemplateTableProps {
   translatingTemplateId?: number | null;
 }
 
-export default function EmailTemplateTable({ templates, onDelete, onTranslate, loading = false, translatingTemplateId }: EmailTemplateTableProps) {
+export default function EmailTemplateTable({
+  templates,
+  onDelete,
+  onTranslate,
+  loading = false,
+  translatingTemplateId
+}: EmailTemplateTableProps) {
   const router = useRouter();
 
   const handleEdit = (template: EmailTemplate) => {
@@ -112,7 +118,7 @@ export default function EmailTemplateTable({ templates, onDelete, onTranslate, l
                       <Button size="sm" variant="outline" onClick={() => handleEdit(template)}>
                         Edit
                       </Button>
-                      {template.locale === 'en' && (
+                      {template.locale === "en" && (
                         <Button
                           size="sm"
                           variant="outline"

@@ -113,12 +113,7 @@ export default function EditProject() {
             </div>
           )}
 
-          <ProjectForm 
-            mode="edit" 
-            initialData={project} 
-            onSave={handleSaveProject} 
-            onCancel={handleCancel} 
-          />
+          <ProjectForm mode="edit" initialData={project} onSave={handleSaveProject} onCancel={handleCancel} />
         </div>
       </div>
     </div>

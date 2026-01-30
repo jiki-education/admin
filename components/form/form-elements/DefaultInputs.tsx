@@ -1,3 +1,5 @@
+// @ts-nocheck
+// This is an unused TailAdmin template component
 "use client";
 import React, { useState } from "react";
 import ComponentCard from "../../common/ComponentCard";

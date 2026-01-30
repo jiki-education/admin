@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 interface FormFieldProps {
   type: "text" | "textarea" | "select" | "custom";

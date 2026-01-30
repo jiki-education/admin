@@ -8,7 +8,12 @@ interface ProjectPaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export default function ProjectPagination({ currentPage, totalPages, totalCount, onPageChange }: ProjectPaginationProps) {
+export default function ProjectPagination({
+  currentPage,
+  totalPages,
+  totalCount,
+  onPageChange
+}: ProjectPaginationProps) {
   return (
     <Pagination
       currentPage={currentPage}

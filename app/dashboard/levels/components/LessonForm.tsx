@@ -128,7 +128,6 @@ export default function LessonForm({ initialData, onSave, onCancel, loading = fa
 
       <FormActions
         onCancel={onCancel}
-        onSubmit={handleSubmit}
         submitLabel={mode === "create" ? "Create Lesson" : "Save Changes"}
         loading={saving || loading}
         disabled={!isFormValid()}

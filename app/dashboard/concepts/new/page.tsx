@@ -43,7 +43,8 @@ export default function NewConcept() {
             <div>
               <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Create New Concept</h1>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Add a new programming concept to the platform. This will include instructional content and optional videos.
+                Add a new programming concept to the platform. This will include instructional content and optional
+                videos.
               </p>
             </div>
           </div>

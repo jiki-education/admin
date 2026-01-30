@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 // Simplified audio component that doesn't require runtime audio generation
 // Audio will be added during the actual video production pipeline

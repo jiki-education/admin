@@ -22,17 +22,17 @@ The `.context/` directory contains detailed documentation for this codebase. **R
 
 You can read these files at **any point during your work** - even in the middle of implementing a plan if appropriate.
 
-| File                       | When to Read                                                    |
-| -------------------------- | --------------------------------------------------------------- |
-| `code-standards.md`        | **Always read first** - coding style and file organization      |
-| `commands.md`              | **Always read** - running dev server, tests, builds, linting    |
-| `testing-quick-start.md`   | Writing or editing tests                                        |
-| `e2e-testing-strategy.md`  | Working on E2E tests with Puppeteer                             |
-| `api.md`                   | Working with API client or backend integration                  |
-| `auth.md`                  | Authentication, login, protected routes                         |
-| `levels-and-lessons.md`    | Level and lesson management features                            |
-| `levels-frontend-guide.md` | Frontend implementation for levels                              |
-| `package-management.md`    | Adding dependencies, pnpm usage                                 |
+| File                       | When to Read                                                 |
+| -------------------------- | ------------------------------------------------------------ |
+| `code-standards.md`        | **Always read first** - coding style and file organization   |
+| `commands.md`              | **Always read** - running dev server, tests, builds, linting |
+| `testing-quick-start.md`   | Writing or editing tests                                     |
+| `e2e-testing-strategy.md`  | Working on E2E tests with Puppeteer                          |
+| `api.md`                   | Working with API client or backend integration               |
+| `auth.md`                  | Authentication, login, protected routes                      |
+| `levels-and-lessons.md`    | Level and lesson management features                         |
+| `levels-frontend-guide.md` | Frontend implementation for levels                           |
+| `package-management.md`    | Adding dependencies, pnpm usage                              |
 
 ## Quick Start
 

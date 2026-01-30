@@ -31,7 +31,7 @@ export default function ConceptDetail() {
       setError(null);
       const conceptData = await getAdminConcept(conceptId);
       setConcept(conceptData);
-      
+
       // Parse markdown content to HTML
       if (conceptData.content_markdown) {
         try {
@@ -130,9 +130,9 @@ export default function ConceptDetail() {
               <Button variant="outline" onClick={handleEdit}>
                 Edit
               </Button>
-              <Button 
-                variant="outline" 
-                onClick={handleDelete} 
+              <Button
+                variant="outline"
+                onClick={handleDelete}
                 disabled={deleting}
                 className="bg-red-50 text-red-700 border-red-300 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/50"
               >

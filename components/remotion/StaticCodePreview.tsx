@@ -26,7 +26,9 @@ export function StaticCodePreview({ config, width = 640, height = 360, className
 
   // Auto-cycle through actions for preview
   useEffect(() => {
-    if (typeActions.length === 0) return;
+    if (typeActions.length === 0) {
+      return;
+    }
 
     const interval = setInterval(() => {
       setCurrentActionIndex((prev) => (prev + 1) % typeActions.length);
@@ -37,10 +39,14 @@ export function StaticCodePreview({ config, width = 640, height = 360, className
 
   // Simulate typing animation for current action
   useEffect(() => {
-    if (typeActions.length === 0) return;
+    if (typeActions.length === 0) {
+      return;
+    }
 
     const currentAction = typeActions[currentActionIndex];
-    if (!currentAction || currentAction.type !== "type") return;
+    if (!currentAction || currentAction.type !== "type") {
+      return;
+    }
 
     setIsAnimating(true);
     setVisibleCode("");
@@ -73,7 +79,9 @@ export function StaticCodePreview({ config, width = 640, height = 360, className
   }
 
   const currentAction = typeActions[currentActionIndex];
-  if (!currentAction || currentAction.type !== "type") return null;
+  if (!currentAction || currentAction.type !== "type") {
+    return null;
+  }
 
   return (
     <div className={`relative bg-gray-900 rounded-lg overflow-hidden ${className}`} style={{ width, height }}>

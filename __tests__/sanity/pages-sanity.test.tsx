@@ -3,12 +3,12 @@
  * Ensures all pages can be imported and rendered without errors
  */
 
-import { render, screen, act } from "@testing-library/react";
+import { render, act } from "@testing-library/react";
 
 // Mock API functions - use fast resolving promises to prevent timing issues
-const fastResolve = (value: any) => {
+function fastResolve(value: unknown) {
   return jest.fn().mockImplementation(() => Promise.resolve(value));
-};
+}
 
 jest.mock("@/lib/api/levels", () => ({
   getLevels: fastResolve({ results: [], meta: { current_page: 1, total_pages: 1, total_count: 0 } }),
@@ -66,20 +66,8 @@ jest.mock("@/components/auth/SigninForm", () => {
 // Add React import for the mocks
 import React from "react";
 
-// Helper function to render components with proper act() wrapping
-const renderWithAct = async (component: React.ReactElement) => {
-  let result: any;
-  await act(async () => {
-    result = render(component);
-    // Allow multiple ticks for all useEffect hooks and async operations to complete
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  });
-  return result;
-};
-
 // Helper function to test component rendering without throwing
-const expectRenderWithoutError = async (Component: React.ComponentType) => {
+async function expectRenderWithoutError(Component: React.ComponentType) {
   let error: Error | null = null;
   try {
     await act(async () => {
@@ -91,7 +79,7 @@ const expectRenderWithoutError = async (Component: React.ComponentType) => {
     error = e as Error;
   }
   expect(error).toBeNull();
-};
+}
 
 describe("Pages Sanity Check", () => {
   describe("Public Pages", () => {
@@ -177,7 +165,7 @@ describe("Pages Sanity Check", () => {
       const results = await Promise.all(corePageImports);
 
       // Each import should have a default export (the page component)
-      results.forEach((module, index) => {
+      results.forEach((module) => {
         expect(module.default).toBeDefined();
         expect(typeof module.default).toBe("function");
       });

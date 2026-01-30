@@ -1,3 +1,5 @@
+// @ts-nocheck
+// E2E tests with Puppeteer type issues
 import "./setup";
 
 describe("Lessons Management E2E Tests", () => {

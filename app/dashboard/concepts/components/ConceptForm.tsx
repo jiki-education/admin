@@ -30,35 +30,41 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [slugTouched, setSlugTouched] = useState(mode === "edit" || Boolean(initialData?.slug));
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value ?? "" }));
-    
-    // Auto-generate slug from title if slug hasn't been manually edited
-    if (name === "title" && !slugTouched && mode === "create") {
-      const autoSlug = generateSlug(value);
-      setFormData(prev => ({ ...prev, slug: autoSlug }));
-    }
-    
-    // Mark slug as manually edited if user types in slug field
-    if (name === "slug") {
-      setSlugTouched(true);
-    }
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
-    }
-  }, [errors, slugTouched, mode]);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value ?? "" }));
 
-  const handleMarkdownChange = useCallback((value: string) => {
-    setFormData(prev => ({ ...prev, content_markdown: value }));
-    
-    // Clear error when user starts typing
-    if (errors.content_markdown) {
-      setErrors(prev => ({ ...prev, content_markdown: "" }));
-    }
-  }, [errors.content_markdown]);
+      // Auto-generate slug from title if slug hasn't been manually edited
+      if (name === "title" && !slugTouched && mode === "create") {
+        const autoSlug = generateSlug(value);
+        setFormData((prev) => ({ ...prev, slug: autoSlug }));
+      }
+
+      // Mark slug as manually edited if user types in slug field
+      if (name === "slug") {
+        setSlugTouched(true);
+      }
+
+      // Clear error when user starts typing
+      if (errors[name]) {
+        setErrors((prev) => ({ ...prev, [name]: "" }));
+      }
+    },
+    [errors, slugTouched, mode]
+  );
+
+  const handleMarkdownChange = useCallback(
+    (value: string) => {
+      setFormData((prev) => ({ ...prev, content_markdown: value }));
+
+      // Clear error when user starts typing
+      if (errors.content_markdown) {
+        setErrors((prev) => ({ ...prev, content_markdown: "" }));
+      }
+    },
+    [errors.content_markdown]
+  );
 
   const validateForm = useCallback(() => {
     const newErrors: Record<string, string> = {};
@@ -94,42 +100,45 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
     return Object.keys(newErrors).length === 0;
   }, [formData, mode]);
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      toast.error("Please fix the form errors before submitting");
-      return;
-    }
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    try {
-      setLoading(true);
-      
-      // Prepare data based on mode
-      const data = {
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        content_markdown: formData.content_markdown.trim(),
-        ...(mode === "edit" && { slug: formData.slug.trim() }),
-        ...(mode === "create" && formData.slug.trim() && { slug: formData.slug.trim() }),
-        standard_video_provider: formData.standard_video_provider ?? null,
-        standard_video_id: formData.standard_video_id.trim() || null,
-        premium_video_provider: formData.premium_video_provider ?? null,
-        premium_video_id: formData.premium_video_id.trim() || null
-      };
+      if (!validateForm()) {
+        toast.error("Please fix the form errors before submitting");
+        return;
+      }
 
-      await onSave(data);
-      
-      // Success toast will be shown by the parent component after navigation
-      toast.success(mode === "create" ? "Concept created successfully!" : "Concept updated successfully!");
-    } catch (error) {
-      console.error("Form submission error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to save concept";
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [formData, mode, onSave, validateForm]);
+      try {
+        setLoading(true);
+
+        // Prepare data based on mode
+        const data = {
+          title: formData.title.trim(),
+          description: formData.description.trim(),
+          content_markdown: formData.content_markdown.trim(),
+          ...(mode === "edit" && { slug: formData.slug.trim() }),
+          ...(mode === "create" && formData.slug.trim() && { slug: formData.slug.trim() }),
+          standard_video_provider: formData.standard_video_provider ?? null,
+          standard_video_id: formData.standard_video_id.trim() || null,
+          premium_video_provider: formData.premium_video_provider ?? null,
+          premium_video_id: formData.premium_video_id.trim() || null
+        };
+
+        await onSave(data);
+
+        // Success toast will be shown by the parent component after navigation
+        toast.success(mode === "create" ? "Concept created successfully!" : "Concept updated successfully!");
+      } catch (error) {
+        console.error("Form submission error:", error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to save concept";
+        toast.error(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [formData, mode, onSave, validateForm]
+  );
 
   const isFormValid = () => {
     return (
@@ -203,10 +212,9 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
           }`}
         />
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          {mode === "create" 
+          {mode === "create"
             ? "URL-friendly identifier. Auto-generated from title, but you can customize it."
-            : "URL-friendly identifier. Required for updates."
-          }
+            : "URL-friendly identifier. Required for updates."}
         </p>
         {errors.slug && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.slug}</p>}
       </div>
@@ -247,11 +255,11 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
       {/* Video Sections */}
       <div className="space-y-6">
         <h3 className="text-lg font-medium text-gray-900 dark:text-white">Video Settings</h3>
-        
+
         {/* Standard Video */}
         <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg space-y-4">
           <h4 className="font-medium text-gray-900 dark:text-white">Standard Video</h4>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Provider</label>
             <select
@@ -281,7 +289,9 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
                     : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
                 }`}
               />
-              {errors.standard_video_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.standard_video_id}</p>}
+              {errors.standard_video_id && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.standard_video_id}</p>
+              )}
             </div>
           )}
         </div>
@@ -289,7 +299,7 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
         {/* Premium Video */}
         <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg space-y-4">
           <h4 className="font-medium text-gray-900 dark:text-white">Premium Video</h4>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Provider</label>
             <select
@@ -319,7 +329,9 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
                     : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
                 }`}
               />
-              {errors.premium_video_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.premium_video_id}</p>}
+              {errors.premium_video_id && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.premium_video_id}</p>
+              )}
             </div>
           )}
         </div>
@@ -330,11 +342,8 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
         <Button variant="outline" onClick={onCancel} disabled={loading}>
           Cancel
         </Button>
-        <Button 
-          type="submit" 
-          disabled={!isFormValid() || loading}
-        >
-          {loading ? "Saving..." : (mode === "create" ? "Create Concept" : "Save Changes")}
+        <Button type="submit" disabled={!isFormValid() || loading}>
+          {loading ? "Saving..." : mode === "create" ? "Create Concept" : "Save Changes"}
         </Button>
       </div>
     </form>

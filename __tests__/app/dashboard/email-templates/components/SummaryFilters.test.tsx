@@ -178,9 +178,9 @@ describe("SummaryFilters", () => {
       />
     );
 
-    const typeSelect = screen.getByLabelText("Template Type");
-    const statusSelect = screen.getByLabelText("Locale Status");
-    const searchInput = screen.getByLabelText("Search Template Slug");
+    const typeSelect = screen.getByLabelText("Template Type") as HTMLSelectElement;
+    const statusSelect = screen.getByLabelText("Locale Status") as HTMLSelectElement;
+    const searchInput = screen.getByLabelText("Search Template Slug") as HTMLInputElement;
 
     expect(typeSelect.value).toBe("welcome");
     expect(statusSelect.value).toBe("missing");

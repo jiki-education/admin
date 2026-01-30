@@ -24,26 +24,29 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [slugTouched, setSlugTouched] = useState(mode === "edit" || Boolean(initialData?.slug));
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value ?? "" }));
-    
-    // Auto-generate slug from title if slug hasn't been manually edited
-    if (name === "title" && !slugTouched && mode === "create") {
-      const autoSlug = generateSlug(value);
-      setFormData(prev => ({ ...prev, slug: autoSlug }));
-    }
-    
-    // Mark slug as manually edited if user types in slug field
-    if (name === "slug") {
-      setSlugTouched(true);
-    }
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
-    }
-  }, [errors, slugTouched, mode]);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value ?? "" }));
+
+      // Auto-generate slug from title if slug hasn't been manually edited
+      if (name === "title" && !slugTouched && mode === "create") {
+        const autoSlug = generateSlug(value);
+        setFormData((prev) => ({ ...prev, slug: autoSlug }));
+      }
+
+      // Mark slug as manually edited if user types in slug field
+      if (name === "slug") {
+        setSlugTouched(true);
+      }
+
+      // Clear error when user starts typing
+      if (errors[name]) {
+        setErrors((prev) => ({ ...prev, [name]: "" }));
+      }
+    },
+    [errors, slugTouched, mode]
+  );
 
   const validateForm = useCallback(() => {
     const newErrors: Record<string, string> = {};
@@ -77,12 +80,14 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
 
     // Slug format validation
     if (formData.slug && !isValidSlug(formData.slug)) {
-      newErrors.slug = "Slug must contain only lowercase letters, numbers, and hyphens. Cannot start or end with hyphens.";
+      newErrors.slug =
+        "Slug must contain only lowercase letters, numbers, and hyphens. Cannot start or end with hyphens.";
     }
 
     // Exercise slug format validation (should follow kebab-case pattern)
     if (formData.exercise_slug && !isValidSlug(formData.exercise_slug)) {
-      newErrors.exercise_slug = "Exercise slug must contain only lowercase letters, numbers, and hyphens. Cannot start or end with hyphens.";
+      newErrors.exercise_slug =
+        "Exercise slug must contain only lowercase letters, numbers, and hyphens. Cannot start or end with hyphens.";
     }
 
     // Check for common exercise slug patterns
@@ -94,38 +99,41 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
     return Object.keys(newErrors).length === 0;
   }, [formData, mode]);
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      toast.error("Please fix the form errors before submitting");
-      return;
-    }
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    try {
-      setLoading(true);
-      
-      // Prepare data based on mode
-      const data = {
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        exercise_slug: formData.exercise_slug.trim(),
-        ...(mode === "edit" && { slug: formData.slug.trim() }),
-        ...(mode === "create" && formData.slug.trim() && { slug: formData.slug.trim() })
-      };
+      if (!validateForm()) {
+        toast.error("Please fix the form errors before submitting");
+        return;
+      }
 
-      await onSave(data);
-      
-      // Success toast will be shown by the parent component after navigation
-      toast.success(mode === "create" ? "Project created successfully!" : "Project updated successfully!");
-    } catch (error) {
-      console.error("Form submission error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to save project";
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [formData, mode, onSave, validateForm]);
+      try {
+        setLoading(true);
+
+        // Prepare data based on mode
+        const data = {
+          title: formData.title.trim(),
+          description: formData.description.trim(),
+          exercise_slug: formData.exercise_slug.trim(),
+          ...(mode === "edit" && { slug: formData.slug.trim() }),
+          ...(mode === "create" && formData.slug.trim() && { slug: formData.slug.trim() })
+        };
+
+        await onSave(data);
+
+        // Success toast will be shown by the parent component after navigation
+        toast.success(mode === "create" ? "Project created successfully!" : "Project updated successfully!");
+      } catch (error) {
+        console.error("Form submission error:", error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to save project";
+        toast.error(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [formData, mode, onSave, validateForm]
+  );
 
   const isFormValid = () => {
     return (
@@ -179,7 +187,11 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
               : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
           }`}
         />
-        {errors.title && <p id="title-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">{errors.title}</p>}
+        {errors.title && (
+          <p id="title-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            {errors.title}
+          </p>
+        )}
       </div>
 
       {/* Slug */}
@@ -211,14 +223,14 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
         </div>
         <div className="mt-1 space-y-1">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {mode === "create" 
+            {mode === "create"
               ? "URL-friendly identifier. Auto-generated from title, but you can customize it."
-              : "URL-friendly identifier. Required for updates."
-            }
+              : "URL-friendly identifier. Required for updates."}
           </p>
           {mode === "create" && formData.title && !slugTouched && (
             <p className="text-xs text-blue-600 dark:text-blue-400">
-              Preview: <code className="bg-blue-50 dark:bg-blue-900/20 px-1 rounded">{generateSlug(formData.title)}</code>
+              Preview:{" "}
+              <code className="bg-blue-50 dark:bg-blue-900/20 px-1 rounded">{generateSlug(formData.title)}</code>
             </p>
           )}
         </div>
@@ -229,11 +241,13 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Description <span className="text-red-500">*</span>
-          <span className={`ml-2 text-xs ${
-            formData.description.length >= 10 && formData.description.length <= 500
-              ? "text-green-600 dark:text-green-400"
-              : "text-gray-400"
-          }`}>
+          <span
+            className={`ml-2 text-xs ${
+              formData.description.length >= 10 && formData.description.length <= 500
+                ? "text-green-600 dark:text-green-400"
+                : "text-gray-400"
+            }`}
+          >
             {formData.description.length}/500
           </span>
         </label>
@@ -277,11 +291,13 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
           />
           {formData.exercise_slug && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <span className={`text-xs ${
-                formData.exercise_slug.length >= 3 && formData.exercise_slug.length <= 50
-                  ? "text-green-600 dark:text-green-400"
-                  : "text-gray-400"
-              }`}>
+              <span
+                className={`text-xs ${
+                  formData.exercise_slug.length >= 3 && formData.exercise_slug.length <= 50
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-gray-400"
+                }`}
+              >
                 {formData.exercise_slug.length}/50
               </span>
             </div>
@@ -289,7 +305,8 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
         </div>
         <div className="mt-1 space-y-1">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            The slug of the exercise that this project represents. This should match the exercise slug in the exercise repository.
+            The slug of the exercise that this project represents. This should match the exercise slug in the exercise
+            repository.
           </p>
           <div className="flex flex-wrap gap-4 text-xs text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1">
@@ -315,11 +332,8 @@ export default function ProjectForm({ initialData, onSave, onCancel, mode }: Pro
         <Button variant="outline" onClick={onCancel} disabled={loading}>
           Cancel
         </Button>
-        <Button 
-          type="submit" 
-          disabled={!isFormValid() || loading}
-        >
-          {loading ? "Saving..." : (mode === "create" ? "Create Project" : "Save Changes")}
+        <Button type="submit" disabled={!isFormValid() || loading}>
+          {loading ? "Saving..." : mode === "create" ? "Create Project" : "Save Changes"}
         </Button>
       </div>
     </form>

@@ -45,7 +45,7 @@ describe("Users API Client", () => {
         }
       };
 
-      mockApi.get.mockResolvedValue({ ...mockResponse, status: 200, headers: {} });
+      mockApi.get.mockResolvedValue({ ...mockResponse, status: 200, headers: new Headers() });
 
       const result = await getUsers(filters);
 
@@ -69,7 +69,7 @@ describe("Users API Client", () => {
         }
       };
 
-      mockApi.get.mockResolvedValue({ ...mockResponse, status: 200, headers: {} });
+      mockApi.get.mockResolvedValue({ ...mockResponse, status: 200, headers: new Headers() });
 
       await getUsers();
 
@@ -90,7 +90,7 @@ describe("Users API Client", () => {
         }
       };
 
-      mockApi.get.mockResolvedValue({ ...mockResponse, status: 200, headers: {} });
+      mockApi.get.mockResolvedValue({ ...mockResponse, status: 200, headers: new Headers() });
 
       await getUsers(filters);
 
@@ -113,7 +113,7 @@ describe("Users API Client", () => {
         }
       };
 
-      mockApi.get.mockResolvedValue({ ...mockResponse, status: 200, headers: {} });
+      mockApi.get.mockResolvedValue({ ...mockResponse, status: 200, headers: new Headers() });
 
       await getUsers(filters);
 
@@ -129,7 +129,7 @@ describe("Users API Client", () => {
     test("sends correct DELETE request to user endpoint", async () => {
       const userId = 123;
 
-      mockApi.delete.mockResolvedValue({ data: null, status: 204, headers: {} });
+      mockApi.delete.mockResolvedValue({ data: null, status: 204, headers: new Headers() });
 
       await deleteUser(userId);
 
@@ -150,7 +150,7 @@ describe("Users API Client", () => {
     test("returns void on successful deletion", async () => {
       const userId = 456;
 
-      mockApi.delete.mockResolvedValue({ data: null, status: 204, headers: {} });
+      mockApi.delete.mockResolvedValue({ data: null, status: 204, headers: new Headers() });
 
       await deleteUser(userId);
 

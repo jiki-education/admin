@@ -43,7 +43,8 @@ export default function NewProject() {
             <div>
               <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Create New Project</h1>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Add a new Brain Buster project to the platform. Projects are async exercises that get unlocked when main lesson exercises are completed.
+                Add a new Brain Buster project to the platform. Projects are async exercises that get unlocked when main
+                lesson exercises are completed.
               </p>
             </div>
           </div>

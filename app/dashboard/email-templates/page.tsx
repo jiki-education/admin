@@ -54,7 +54,7 @@ export default function EmailTemplates() {
   // Selected template for delete
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
   const [operationLoading, setOperationLoading] = useState(false);
-  
+
   // Track which template is being translated
   const [translatingTemplateId, setTranslatingTemplateId] = useState<number | null>(null);
 
@@ -184,92 +184,106 @@ export default function EmailTemplates() {
     }
   }, [selectedTemplate, loadTemplates]);
 
-  const handleTranslateTemplate = useCallback(async (template: EmailTemplate) => {
-    setOperationLoading(true);
-    setTranslatingTemplateId(template.id);
-    try {
-      const response = await translateEmailTemplate(template.id);
-      const localeNames = response.queued_locales.map(locale => {
-        switch (locale) {
-          case 'hu': return 'Hungarian';
-          case 'fr': return 'French';
-          default: return locale.toUpperCase();
-        }
-      }).join(' and ');
-      
-      const templateName = template.subject || template.slug || `ID ${template.id}`;
-      
-      // Log detailed info for debugging
-      console.log('Translation Response:', response);
-      console.log('Expected locales:', response.queued_locales);
-      console.log('Original template:', template);
-      
-      toast.success(
-        `Translation queued successfully! The template "${templateName}" will be translated to ${localeNames}. Expected locales: ${response.queued_locales.join(", ")}. Translations may take a few moments to appear.`,
-        { duration: 8000 }
-      );
-      
-      // Immediately refresh to show any changes
-      await loadTemplates();
-      
-      // Set up a delayed refresh to check for completed translations
-      const originalSlug = template.slug;
-      const expectedLocales = response.queued_locales;
-      
-      setTimeout(async () => {
-        try {
-          const response = await getEmailTemplates(filters);
-          const currentTemplates = response.results;
-          
-          // Check which translations actually appeared
-          const newTemplates = currentTemplates.filter(t => 
-            t.slug === originalSlug && expectedLocales.includes(t.locale)
-          );
-          
-          const foundLocales = newTemplates.map(t => t.locale);
-          const missingLocales = expectedLocales.filter(locale => !foundLocales.includes(locale));
-          
-          console.log('Translation check results:');
-          console.log('Expected locales:', expectedLocales);
-          console.log('Found locales:', foundLocales);
-          console.log('Missing locales:', missingLocales);
-          console.log('All current templates with this slug:', currentTemplates.filter(t => t.slug === originalSlug));
-          
-          if (missingLocales.length === 0) {
-            toast.success(`All translations completed! Found: ${foundLocales.join(", ")}`, { duration: 3000 });
-          } else {
-            toast.error(`Some translations missing! Found: ${foundLocales.join(", ") || "none"}, Missing: ${missingLocales.join(", ")}`, { duration: 8000 });
+  const handleTranslateTemplate = useCallback(
+    async (template: EmailTemplate) => {
+      setOperationLoading(true);
+      setTranslatingTemplateId(template.id);
+      try {
+        const response = await translateEmailTemplate(template.id);
+        const localeNames = response.queued_locales
+          .map((locale) => {
+            switch (locale) {
+              case "hu":
+                return "Hungarian";
+              case "fr":
+                return "French";
+              default:
+                return locale.toUpperCase();
+            }
+          })
+          .join(" and ");
+
+        const templateName = template.subject || template.slug || `ID ${template.id}`;
+
+        // Log detailed info for debugging
+        console.log("Translation Response:", response);
+        console.log("Expected locales:", response.queued_locales);
+        console.log("Original template:", template);
+
+        toast.success(
+          `Translation queued successfully! The template "${templateName}" will be translated to ${localeNames}. Expected locales: ${response.queued_locales.join(", ")}. Translations may take a few moments to appear.`,
+          { duration: 8000 }
+        );
+
+        // Immediately refresh to show any changes
+        await loadTemplates();
+
+        // Set up a delayed refresh to check for completed translations
+        const originalSlug = template.slug;
+        const expectedLocales = response.queued_locales;
+
+        setTimeout(async () => {
+          try {
+            const response = await getEmailTemplates(filters);
+            const currentTemplates = response.results;
+
+            // Check which translations actually appeared
+            const newTemplates = currentTemplates.filter(
+              (t) => t.slug === originalSlug && expectedLocales.includes(t.locale)
+            );
+
+            const foundLocales = newTemplates.map((t) => t.locale);
+            const missingLocales = expectedLocales.filter((locale) => !foundLocales.includes(locale));
+
+            console.log("Translation check results:");
+            console.log("Expected locales:", expectedLocales);
+            console.log("Found locales:", foundLocales);
+            console.log("Missing locales:", missingLocales);
+            console.log(
+              "All current templates with this slug:",
+              currentTemplates.filter((t) => t.slug === originalSlug)
+            );
+
+            if (missingLocales.length === 0) {
+              toast.success(`All translations completed! Found: ${foundLocales.join(", ")}`, { duration: 3000 });
+            } else {
+              toast.error(
+                `Some translations missing! Found: ${foundLocales.join(", ") || "none"}, Missing: ${missingLocales.join(", ")}`,
+                { duration: 8000 }
+              );
+            }
+
+            // Refresh the UI with the new data
+            await loadTemplates();
+          } catch (error) {
+            console.error("Failed to refresh templates:", error);
+            toast.error("Failed to check translation status", { duration: 3000 });
           }
-          
-          // Refresh the UI with the new data
-          await loadTemplates();
-        } catch (error) {
-          console.error("Failed to refresh templates:", error);
-          toast.error("Failed to check translation status", { duration: 3000 });
-        }
-      }, 5000); // Refresh again after 5 seconds
-    } catch (error) {
-      console.error("Failed to translate template:", error);
-      
-      // Handle specific error cases
-      if (error instanceof Error) {
-        if (error.message.includes("English") || error.message.includes("en")) {
-          toast.error("Only English templates can be translated. Please select an English template and try again.");
-        } else if (error.message.includes("not found") || error.message.includes("404")) {
-          toast.error("Template not found. It may have been deleted. Please refresh the page and try again.");
-        } else if (error.message.includes("network") || error.message.includes("fetch")) {
-          toast.error("Network error. Please check your connection and try again.");
+        }, 5000); // Refresh again after 5 seconds
+      } catch (error) {
+        console.error("Failed to translate template:", error);
+
+        // Handle specific error cases
+        if (error instanceof Error) {
+          if (error.message.includes("English") || error.message.includes("en")) {
+            toast.error("Only English templates can be translated. Please select an English template and try again.");
+          } else if (error.message.includes("not found") || error.message.includes("404")) {
+            toast.error("Template not found. It may have been deleted. Please refresh the page and try again.");
+          } else if (error.message.includes("network") || error.message.includes("fetch")) {
+            toast.error("Network error. Please check your connection and try again.");
+          } else {
+            toast.error(`Translation failed: ${error.message}`);
+          }
         } else {
-          toast.error(`Translation failed: ${error.message}`);
+          toast.error("An unexpected error occurred while starting translation. Please try again.");
         }
-      } else {
-        toast.error("An unexpected error occurred while starting translation. Please try again.");
+      } finally {
+        setOperationLoading(false);
+        setTranslatingTemplateId(null);
       }
-    } finally {
-      setOperationLoading(false);
-      setTranslatingTemplateId(null);
-    }
-  }, [loadTemplates, filters]);
+    },
+    [loadTemplates, filters]
+  );
 
   const handleSummaryFiltersChange = useCallback((newFilters: SummaryFiltersType) => {
     setSummaryFilters(newFilters);
@@ -317,10 +331,10 @@ export default function EmailTemplates() {
                 onClearFilters={handleClearFilters}
               />
 
-              <EmailTemplateTable 
-                templates={templates} 
-                onDelete={handleDeleteTemplate} 
-                onTranslate={handleTranslateTemplate} 
+              <EmailTemplateTable
+                templates={templates}
+                onDelete={handleDeleteTemplate}
+                onTranslate={handleTranslateTemplate}
                 loading={loading}
                 translatingTemplateId={translatingTemplateId}
               />

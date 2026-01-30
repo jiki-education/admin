@@ -120,9 +120,9 @@ export default function ProjectDetail() {
               <Button variant="outline" onClick={handleEdit}>
                 Edit
               </Button>
-              <Button 
-                variant="outline" 
-                onClick={handleDeleteClick} 
+              <Button
+                variant="outline"
+                onClick={handleDeleteClick}
                 disabled={deleting}
                 className="bg-red-50 text-red-700 border-red-300 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/50"
               >
@@ -182,8 +182,18 @@ export default function ProjectDetail() {
         <div className="p-6">
           <div className="flex items-center gap-4 mb-4">
             <div className="flex-shrink-0 w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-              <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              <svg
+                className="w-5 h-5 text-red-600 dark:text-red-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
               </svg>
             </div>
             <div>
@@ -195,7 +205,7 @@ export default function ProjectDetail() {
           <div className="mb-6">
             <p className="text-sm text-gray-700 dark:text-gray-300">
               Are you sure you want to delete the project{" "}
-              <span className="font-medium text-gray-900 dark:text-white">"{project?.title}"</span>?
+              <span className="font-medium text-gray-900 dark:text-white">&quot;{project?.title}&quot;</span>?
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
               This will permanently remove the project and all associated data.
@@ -203,14 +213,10 @@ export default function ProjectDetail() {
           </div>
 
           <div className="flex justify-end gap-3">
-            <Button 
-              variant="outline" 
-              onClick={handleDeleteCancel}
-              disabled={deleting}
-            >
+            <Button variant="outline" onClick={handleDeleteCancel} disabled={deleting}>
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleDeleteConfirm}
               disabled={deleting}
               className="bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-600 dark:hover:bg-red-700"
