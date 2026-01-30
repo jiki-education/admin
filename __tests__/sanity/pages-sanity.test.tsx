@@ -41,15 +41,6 @@ jest.mock("@/lib/api/email-templates", () => ({
   getEmailTemplatesSummary: fastResolve({ results: [], meta: { current_page: 1, total_pages: 1, total_count: 0 } })
 }));
 
-jest.mock("@/lib/api/video-pipelines", () => ({
-  getPipelines: fastResolve({ results: [], meta: { current_page: 1, total_pages: 1, total_count: 0 } }),
-  getPipeline: fastResolve({
-    pipeline: { uuid: "test-uuid", title: "Test Pipeline", version: "1.0", config: {}, metadata: {} },
-    nodes: []
-  }),
-  createPipeline: fastResolve({})
-}));
-
 // Mock hooks
 jest.mock("@/hooks/useModal", () => ({
   useModal: () => ({
@@ -69,17 +60,6 @@ jest.mock("@/components/auth/SignupForm", () => {
 jest.mock("@/components/auth/SigninForm", () => {
   return function MockSignInForm() {
     return React.createElement("div", { "data-testid": "signin-form" }, "Sign In Form");
-  };
-});
-
-// Mock complex components that might have integration issues
-jest.mock("@/lib/nodes/types", () => ({
-  toEditorNode: jest.fn().mockReturnValue({})
-}));
-
-jest.mock("@/app/video-pipelines/[uuid]/components/PipelineLayout", () => {
-  return function MockPipelineLayout() {
-    return React.createElement("div", { "data-testid": "pipeline-layout" }, "Pipeline Layout");
   };
 });
 
@@ -180,28 +160,6 @@ describe("Pages Sanity Check", () => {
     });
   });
 
-  describe("Video Pipelines Pages", () => {
-    test("Video Pipelines list page renders without errors", async () => {
-      const VideoPipelinesPage = (await import("@/app/dashboard/video-pipelines/page")).default;
-      await expectRenderWithoutError(VideoPipelinesPage);
-    });
-
-    test("New Video Pipeline page renders without errors", async () => {
-      const NewVideoPipelinePage = (await import("@/app/dashboard/video-pipelines/new/page")).default;
-      await expectRenderWithoutError(NewVideoPipelinePage);
-    });
-
-    test("Dashboard Video Pipeline detail page renders without errors", async () => {
-      // This test requires dynamic params, skip for basic sanity check
-      expect(true).toBe(true); // Placeholder - this page requires complex routing
-    });
-
-    test("Video Pipeline editor page renders without errors", async () => {
-      // This test requires React 19 use() hook, skip for basic sanity check
-      expect(true).toBe(true); // Placeholder - this page uses advanced React features
-    });
-  });
-
   describe("Import Validation", () => {
     test("Core page components can be imported without throwing", async () => {
       const corePageImports = [
@@ -212,9 +170,7 @@ describe("Pages Sanity Check", () => {
         import("@/app/dashboard/users/page"),
         import("@/app/dashboard/email-templates/page"),
         import("@/app/dashboard/levels/page"),
-        import("@/app/dashboard/levels/new/page"),
-        import("@/app/dashboard/video-pipelines/page"),
-        import("@/app/dashboard/video-pipelines/new/page")
+        import("@/app/dashboard/levels/new/page")
       ];
 
       // Core imports should resolve without throwing
