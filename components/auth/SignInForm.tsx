@@ -1,6 +1,5 @@
 "use client";
 import { useAuthStore } from "@/stores/authStore";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -23,10 +22,6 @@ export default function SignInForm() {
     }
   };
 
-  const handleMockLogin = () => {
-    router.push("/dashboard");
-  };
-
   return (
     <div className="flex flex-col flex-1 w-full">
       <div className="flex flex-col justify-center flex-1 w-full mx-auto">
@@ -38,19 +33,6 @@ export default function SignInForm() {
             <p className="text-sm text-gray-500 dark:text-gray-400">Enter your email and password to sign in!</p>
           </div>
           <div>
-            {/* Mock Login Button for Development */}
-            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg dark:bg-yellow-900/20 dark:border-yellow-800">
-              <p className="text-sm text-yellow-800 dark:text-yellow-400 mb-2">
-                Development Mode: No backend server detected
-              </p>
-              <button
-                onClick={handleMockLogin}
-                className="w-full inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-2 text-sm bg-yellow-500 text-white shadow-theme-xs hover:bg-yellow-600"
-              >
-                Mock Login (Development)
-              </button>
-            </div>
-
             <form onSubmit={handleSubmit}>
               <div className="space-y-5">
                 {error && (
@@ -97,15 +79,6 @@ export default function SignInForm() {
                 </div>
               </div>
             </form>
-
-            <div className="mt-5">
-              <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" className="text-brand-500 hover:text-brand-600 dark:text-brand-400">
-                  Sign Up
-                </Link>
-              </p>
-            </div>
           </div>
         </div>
       </div>

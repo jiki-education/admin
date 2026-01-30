@@ -51,12 +51,6 @@ jest.mock("@/hooks/useModal", () => ({
 }));
 
 // Mock auth components
-jest.mock("@/components/auth/SignupForm", () => {
-  return function MockSignUpForm() {
-    return React.createElement("div", { "data-testid": "signup-form" }, "Sign Up Form");
-  };
-});
-
 jest.mock("@/components/auth/SignInForm", () => {
   return function MockSignInForm() {
     return React.createElement("div", { "data-testid": "signin-form" }, "Sign In Form");
@@ -91,11 +85,6 @@ describe("Pages Sanity Check", () => {
     test("Sign In page renders without errors", async () => {
       const SignInPage = (await import("@/app/signin/page")).default;
       await expectRenderWithoutError(SignInPage);
-    });
-
-    test("Sign Up page renders without errors", async () => {
-      const SignUpPage = (await import("@/app/signup/page")).default;
-      await expectRenderWithoutError(SignUpPage);
     });
   });
 
@@ -153,7 +142,6 @@ describe("Pages Sanity Check", () => {
       const corePageImports = [
         import("@/app/page"),
         import("@/app/signin/page"),
-        import("@/app/signup/page"),
         import("@/app/dashboard/page"),
         import("@/app/dashboard/users/page"),
         import("@/app/dashboard/email-templates/page"),
