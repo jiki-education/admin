@@ -61,3 +61,19 @@ export interface AuthState {
   error: string | null;
   hasCheckedAuth: boolean;
 }
+
+// 2FA response types
+export interface TwoFactorRequiredResponse {
+  status: "2fa_required";
+}
+
+export interface TwoFactorSetupRequiredResponse {
+  status: "2fa_setup_required";
+  provisioning_uri: string;
+}
+
+export interface LoginSuccessResponse {
+  user: User;
+}
+
+export type LoginResponse = LoginSuccessResponse | TwoFactorRequiredResponse | TwoFactorSetupRequiredResponse;

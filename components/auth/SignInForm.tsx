@@ -16,7 +16,15 @@ export default function SignInForm() {
 
     try {
       await login({ email, password });
-      router.push("/dashboard");
+
+      const { twoFactorPending } = useAuthStore.getState();
+      if (twoFactorPending === "verify") {
+        router.push("/verify-2fa");
+      } else if (twoFactorPending === "setup") {
+        router.push("/setup-2fa");
+      } else {
+        router.push("/dashboard");
+      }
     } catch {
       // Error is already handled by the store
     }

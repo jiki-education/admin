@@ -17,6 +17,8 @@ interface AuthStore {
   isLoading: boolean;
   error: string | null;
   hasCheckedAuth: boolean;
+  twoFactorPending: "verify" | "setup" | null;
+  provisioningUri: string | null;
 
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -25,6 +27,9 @@ interface AuthStore {
   refreshUser: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
   resetPassword: (data: PasswordReset) => Promise<void>;
+  verify2FA: (otpCode: string) => Promise<void>;
+  setup2FA: (otpCode: string) => Promise<void>;
+  clear2FAState: () => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
   setUser: (user: User) => void;
@@ -38,10 +43,12 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   isLoading: false,
   error: null,
   hasCheckedAuth: false,
+  twoFactorPending: null,
+  provisioningUri: null,
 
   // Login action - calls Rails directly
   login: async (credentials) => {
-    set({ isLoading: true });
+    set({ isLoading: true, twoFactorPending: null, provisioningUri: null });
     try {
       const response = await fetch(getApiUrl("/auth/login"), {
         method: "POST",
@@ -61,6 +68,23 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
       }
 
       const data = await response.json();
+
+      // Check for 2FA responses
+      if (data.status === "2fa_required") {
+        set({ isLoading: false, twoFactorPending: "verify" });
+        return;
+      }
+
+      if (data.status === "2fa_setup_required") {
+        set({
+          isLoading: false,
+          twoFactorPending: "setup",
+          provisioningUri: data.provisioning_uri
+        });
+        return;
+      }
+
+      // Normal login success - user object returned
       if (!data.user) {
         throw new Error("Invalid response from server");
       }
@@ -215,6 +239,63 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
       set({ isLoading: false, error: message });
       throw error;
     }
+  },
+
+  // Verify 2FA code
+  verify2FA: async (otpCode) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(getApiUrl("/auth/verify-2fa"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ otp_code: otpCode })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || "Verification failed");
+      }
+
+      const data = await response.json();
+      get().setUser(data.user);
+      set({ twoFactorPending: null, provisioningUri: null });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Verification failed";
+      set({ isLoading: false, error: message });
+      throw error;
+    }
+  },
+
+  // Setup 2FA with initial code
+  setup2FA: async (otpCode) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(getApiUrl("/auth/setup-2fa"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ otp_code: otpCode })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || "Setup failed");
+      }
+
+      const data = await response.json();
+      get().setUser(data.user);
+      set({ twoFactorPending: null, provisioningUri: null });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Setup failed";
+      set({ isLoading: false, error: message });
+      throw error;
+    }
+  },
+
+  // Clear 2FA state
+  clear2FAState: () => {
+    set({ twoFactorPending: null, provisioningUri: null, error: null });
   },
 
   // Clear error
