@@ -2,21 +2,38 @@
 import { useAuthStore } from "@/stores/authStore";
 import React, { useState } from "react";
 
-export default function CredentialsForm() {
+interface CredentialsFormProps {
+  onSuccess: () => void;
+  on2FARequired: () => void;
+  on2FASetupRequired: (provisioningUri: string) => void;
+}
+
+export default function CredentialsForm({
+  onSuccess,
+  on2FARequired,
+  on2FASetupRequired
+}: CredentialsFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const [error, setError] = useState<string | null>(null);
+  const { login, isLoading } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearError();
+    setError(null);
 
     try {
-      await login({ email, password });
-      // After login, SignInForm will check twoFactorPending and render appropriate form
-      // or redirect to dashboard if no 2FA needed
-    } catch {
-      // Error is already handled by the store
+      const result = await login({ email, password });
+
+      if (result.status === "success") {
+        onSuccess();
+      } else if (result.status === "2fa_required") {
+        on2FARequired();
+      } else if (result.status === "2fa_setup_required") {
+        on2FASetupRequired(result.provisioningUri);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
     }
   };
 

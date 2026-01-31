@@ -3,13 +3,12 @@ import "@testing-library/jest-dom";
 import TwoFactorVerifyForm from "@/components/auth/TwoFactorVerifyForm";
 
 const mockVerify2FA = jest.fn();
-const mockClear2FAState = jest.fn();
 const mockOnSuccess = jest.fn();
+const mockOnCancel = jest.fn();
 
 jest.mock("@/stores/authStore", () => ({
   useAuthStore: () => ({
-    verify2FA: mockVerify2FA,
-    clear2FAState: mockClear2FAState
+    verify2FA: mockVerify2FA
   })
 }));
 
@@ -19,21 +18,21 @@ describe("TwoFactorVerifyForm", () => {
   });
 
   test("renders heading and description", () => {
-    render(<TwoFactorVerifyForm onSuccess={mockOnSuccess} />);
+    render(<TwoFactorVerifyForm onSuccess={mockOnSuccess} onCancel={mockOnCancel} />);
 
     expect(screen.getByText("Two-Factor Authentication")).toBeInTheDocument();
     expect(screen.getByText(/enter the 6-digit code/i)).toBeInTheDocument();
   });
 
   test("renders OTP input and verify button", () => {
-    render(<TwoFactorVerifyForm onSuccess={mockOnSuccess} />);
+    render(<TwoFactorVerifyForm onSuccess={mockOnSuccess} onCancel={mockOnCancel} />);
 
     expect(screen.getAllByRole("textbox")).toHaveLength(6);
     expect(screen.getByRole("button", { name: /verify/i })).toBeInTheDocument();
   });
 
   test("verify button is disabled when code is incomplete", () => {
-    render(<TwoFactorVerifyForm onSuccess={mockOnSuccess} />);
+    render(<TwoFactorVerifyForm onSuccess={mockOnSuccess} onCancel={mockOnCancel} />);
 
     const verifyButton = screen.getByRole("button", { name: /verify/i });
     expect(verifyButton).toBeDisabled();
@@ -41,7 +40,7 @@ describe("TwoFactorVerifyForm", () => {
 
   test("calls verify2FA and onSuccess on success", async () => {
     mockVerify2FA.mockResolvedValueOnce(undefined);
-    render(<TwoFactorVerifyForm onSuccess={mockOnSuccess} />);
+    render(<TwoFactorVerifyForm onSuccess={mockOnSuccess} onCancel={mockOnCancel} />);
 
     const inputs = screen.getAllByRole("textbox");
     inputs.forEach((input, i) => {
@@ -62,7 +61,7 @@ describe("TwoFactorVerifyForm", () => {
 
   test("displays error message on verification failure", async () => {
     mockVerify2FA.mockRejectedValueOnce(new Error("Invalid code"));
-    render(<TwoFactorVerifyForm onSuccess={mockOnSuccess} />);
+    render(<TwoFactorVerifyForm onSuccess={mockOnSuccess} onCancel={mockOnCancel} />);
 
     const inputs = screen.getAllByRole("textbox");
     inputs.forEach((input, i) => {
@@ -77,12 +76,12 @@ describe("TwoFactorVerifyForm", () => {
     });
   });
 
-  test("cancel button clears 2FA state", () => {
-    render(<TwoFactorVerifyForm onSuccess={mockOnSuccess} />);
+  test("cancel button calls onCancel", () => {
+    render(<TwoFactorVerifyForm onSuccess={mockOnSuccess} onCancel={mockOnCancel} />);
 
     const cancelButton = screen.getByRole("button", { name: /cancel/i });
     fireEvent.click(cancelButton);
 
-    expect(mockClear2FAState).toHaveBeenCalled();
+    expect(mockOnCancel).toHaveBeenCalled();
   });
 });

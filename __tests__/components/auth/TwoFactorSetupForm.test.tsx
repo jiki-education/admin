@@ -3,14 +3,13 @@ import "@testing-library/jest-dom";
 import TwoFactorSetupForm from "@/components/auth/TwoFactorSetupForm";
 
 const mockSetup2FA = jest.fn();
-const mockClear2FAState = jest.fn();
 const mockOnSuccess = jest.fn();
+const mockOnCancel = jest.fn();
+const testProvisioningUri = "otpauth://totp/Jiki:test@example.com?secret=ABC123&issuer=Jiki";
 
 jest.mock("@/stores/authStore", () => ({
   useAuthStore: () => ({
-    setup2FA: mockSetup2FA,
-    provisioningUri: "otpauth://totp/Jiki:test@example.com?secret=ABC123&issuer=Jiki",
-    clear2FAState: mockClear2FAState
+    setup2FA: mockSetup2FA
   })
 }));
 
@@ -24,29 +23,53 @@ describe("TwoFactorSetupForm", () => {
   });
 
   test("renders heading and description", () => {
-    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
+    render(
+      <TwoFactorSetupForm
+        provisioningUri={testProvisioningUri}
+        onSuccess={mockOnSuccess}
+        onCancel={mockOnCancel}
+      />
+    );
 
     expect(screen.getByText("Set Up Two-Factor Authentication")).toBeInTheDocument();
     expect(screen.getByText(/scan the qr code/i)).toBeInTheDocument();
   });
 
   test("renders QR code with provisioning URI", () => {
-    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
+    render(
+      <TwoFactorSetupForm
+        provisioningUri={testProvisioningUri}
+        onSuccess={mockOnSuccess}
+        onCancel={mockOnCancel}
+      />
+    );
 
     const qrCode = screen.getByTestId("qr-code");
     expect(qrCode).toBeInTheDocument();
-    expect(qrCode).toHaveAttribute("data-value", "otpauth://totp/Jiki:test@example.com?secret=ABC123&issuer=Jiki");
+    expect(qrCode).toHaveAttribute("data-value", testProvisioningUri);
   });
 
   test("renders OTP input and setup button", () => {
-    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
+    render(
+      <TwoFactorSetupForm
+        provisioningUri={testProvisioningUri}
+        onSuccess={mockOnSuccess}
+        onCancel={mockOnCancel}
+      />
+    );
 
     expect(screen.getAllByRole("textbox")).toHaveLength(6);
     expect(screen.getByRole("button", { name: /complete setup/i })).toBeInTheDocument();
   });
 
   test("setup button is disabled when code is incomplete", () => {
-    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
+    render(
+      <TwoFactorSetupForm
+        provisioningUri={testProvisioningUri}
+        onSuccess={mockOnSuccess}
+        onCancel={mockOnCancel}
+      />
+    );
 
     const setupButton = screen.getByRole("button", { name: /complete setup/i });
     expect(setupButton).toBeDisabled();
@@ -54,7 +77,13 @@ describe("TwoFactorSetupForm", () => {
 
   test("calls setup2FA and onSuccess on success", async () => {
     mockSetup2FA.mockResolvedValueOnce(undefined);
-    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
+    render(
+      <TwoFactorSetupForm
+        provisioningUri={testProvisioningUri}
+        onSuccess={mockOnSuccess}
+        onCancel={mockOnCancel}
+      />
+    );
 
     const inputs = screen.getAllByRole("textbox");
     inputs.forEach((input, i) => {
@@ -75,7 +104,13 @@ describe("TwoFactorSetupForm", () => {
 
   test("displays error message on setup failure", async () => {
     mockSetup2FA.mockRejectedValueOnce(new Error("Invalid code"));
-    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
+    render(
+      <TwoFactorSetupForm
+        provisioningUri={testProvisioningUri}
+        onSuccess={mockOnSuccess}
+        onCancel={mockOnCancel}
+      />
+    );
 
     const inputs = screen.getAllByRole("textbox");
     inputs.forEach((input, i) => {
@@ -90,12 +125,18 @@ describe("TwoFactorSetupForm", () => {
     });
   });
 
-  test("cancel button clears 2FA state", () => {
-    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
+  test("cancel button calls onCancel", () => {
+    render(
+      <TwoFactorSetupForm
+        provisioningUri={testProvisioningUri}
+        onSuccess={mockOnSuccess}
+        onCancel={mockOnCancel}
+      />
+    );
 
     const cancelButton = screen.getByRole("button", { name: /cancel/i });
     fireEvent.click(cancelButton);
 
-    expect(mockClear2FAState).toHaveBeenCalled();
+    expect(mockOnCancel).toHaveBeenCalled();
   });
 });

@@ -21,28 +21,26 @@ describe("Auth Store - 2FA functionality", () => {
       isAuthenticated: false,
       isLoading: false,
       error: null,
-      hasCheckedAuth: false,
-      twoFactorPending: null,
-      provisioningUri: null
+      hasCheckedAuth: false
     });
   });
 
   describe("login with 2FA", () => {
-    test("sets twoFactorPending to 'verify' when 2fa_required response", async () => {
+    test("returns 2fa_required status when 2FA verification needed", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({ status: "2fa_required" })
       });
 
-      await useAuthStore.getState().login({ email: "test@example.com", password: "password" });
+      const result = await useAuthStore.getState().login({ email: "test@example.com", password: "password" });
 
+      expect(result).toEqual({ status: "2fa_required" });
       const state = useAuthStore.getState();
-      expect(state.twoFactorPending).toBe("verify");
       expect(state.isLoading).toBe(false);
       expect(state.isAuthenticated).toBe(false);
     });
 
-    test("sets twoFactorPending to 'setup' and stores provisioning_uri when 2fa_setup_required", async () => {
+    test("returns 2fa_setup_required with provisioningUri when 2FA setup needed", async () => {
       const provisioningUri = "otpauth://totp/Jiki:test@example.com?secret=ABC123";
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -53,28 +51,27 @@ describe("Auth Store - 2FA functionality", () => {
           })
       });
 
-      await useAuthStore.getState().login({ email: "test@example.com", password: "password" });
+      const result = await useAuthStore.getState().login({ email: "test@example.com", password: "password" });
 
+      expect(result).toEqual({ status: "2fa_setup_required", provisioningUri });
       const state = useAuthStore.getState();
-      expect(state.twoFactorPending).toBe("setup");
-      expect(state.provisioningUri).toBe(provisioningUri);
       expect(state.isLoading).toBe(false);
       expect(state.isAuthenticated).toBe(false);
     });
 
-    test("sets user and isAuthenticated when normal login success", async () => {
+    test("returns success and sets user when normal login success", async () => {
       const user = { handle: "test", email: "test@example.com", name: "Test User" };
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({ user })
       });
 
-      await useAuthStore.getState().login({ email: "test@example.com", password: "password" });
+      const result = await useAuthStore.getState().login({ email: "test@example.com", password: "password" });
 
+      expect(result).toEqual({ status: "success" });
       const state = useAuthStore.getState();
       expect(state.user).toEqual(user);
       expect(state.isAuthenticated).toBe(true);
-      expect(state.twoFactorPending).toBeNull();
     });
   });
 
@@ -98,9 +95,8 @@ describe("Auth Store - 2FA functionality", () => {
       );
     });
 
-    test("sets user and clears 2FA state on success", async () => {
+    test("sets user and isAuthenticated on success", async () => {
       const user = { handle: "test", email: "test@example.com", name: "Test User" };
-      useAuthStore.setState({ twoFactorPending: "verify" });
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -112,7 +108,6 @@ describe("Auth Store - 2FA functionality", () => {
       const state = useAuthStore.getState();
       expect(state.user).toEqual(user);
       expect(state.isAuthenticated).toBe(true);
-      expect(state.twoFactorPending).toBeNull();
     });
 
     test("throws error and sets error message on failure", async () => {
@@ -149,12 +144,8 @@ describe("Auth Store - 2FA functionality", () => {
       );
     });
 
-    test("sets user and clears 2FA state on success", async () => {
+    test("sets user and isAuthenticated on success", async () => {
       const user = { handle: "test", email: "test@example.com", name: "Test User" };
-      useAuthStore.setState({
-        twoFactorPending: "setup",
-        provisioningUri: "otpauth://..."
-      });
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -166,8 +157,6 @@ describe("Auth Store - 2FA functionality", () => {
       const state = useAuthStore.getState();
       expect(state.user).toEqual(user);
       expect(state.isAuthenticated).toBe(true);
-      expect(state.twoFactorPending).toBeNull();
-      expect(state.provisioningUri).toBeNull();
     });
 
     test("throws error and sets error message on failure", async () => {
@@ -180,23 +169,6 @@ describe("Auth Store - 2FA functionality", () => {
 
       const state = useAuthStore.getState();
       expect(state.error).toBe("Setup failed");
-    });
-  });
-
-  describe("clear2FAState", () => {
-    test("clears twoFactorPending, provisioningUri, and error", () => {
-      useAuthStore.setState({
-        twoFactorPending: "setup",
-        provisioningUri: "otpauth://...",
-        error: "Some error"
-      });
-
-      useAuthStore.getState().clear2FAState();
-
-      const state = useAuthStore.getState();
-      expect(state.twoFactorPending).toBeNull();
-      expect(state.provisioningUri).toBeNull();
-      expect(state.error).toBeNull();
     });
   });
 });

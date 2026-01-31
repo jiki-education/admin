@@ -10,6 +10,11 @@ import { AuthenticationError, NetworkError, RateLimitError } from "@/lib/api/cli
 import { setCriticalError, clearCriticalError } from "@/lib/api/errorHandlerStore";
 import { create } from "zustand";
 
+export type LoginResult =
+  | { status: "success" }
+  | { status: "2fa_required" }
+  | { status: "2fa_setup_required"; provisioningUri: string };
+
 interface AuthStore {
   // State
   user: User | null;
@@ -17,11 +22,9 @@ interface AuthStore {
   isLoading: boolean;
   error: string | null;
   hasCheckedAuth: boolean;
-  twoFactorPending: "verify" | "setup" | null;
-  provisioningUri: string | null;
 
   // Actions
-  login: (credentials: LoginCredentials) => Promise<void>;
+  login: (credentials: LoginCredentials) => Promise<LoginResult>;
   logout: () => Promise<{ success: boolean; error?: "network" }>;
   checkAuth: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -29,7 +32,6 @@ interface AuthStore {
   resetPassword: (data: PasswordReset) => Promise<void>;
   verify2FA: (otpCode: string) => Promise<void>;
   setup2FA: (otpCode: string) => Promise<void>;
-  clear2FAState: () => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
   setUser: (user: User) => void;
@@ -43,12 +45,10 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   isLoading: false,
   error: null,
   hasCheckedAuth: false,
-  twoFactorPending: null,
-  provisioningUri: null,
 
-  // Login action - calls Rails directly
-  login: async (credentials) => {
-    set({ isLoading: true, twoFactorPending: null, provisioningUri: null });
+  // Login action - calls Rails directly, returns result for caller to handle
+  login: async (credentials): Promise<LoginResult> => {
+    set({ isLoading: true });
     try {
       const response = await fetch(getApiUrl("/auth/login"), {
         method: "POST",
@@ -69,19 +69,15 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
 
       const data = await response.json();
 
-      // Check for 2FA responses
+      // Check for 2FA responses - return to caller to handle
       if (data.status === "2fa_required") {
-        set({ isLoading: false, twoFactorPending: "verify" });
-        return;
+        set({ isLoading: false });
+        return { status: "2fa_required" };
       }
 
       if (data.status === "2fa_setup_required") {
-        set({
-          isLoading: false,
-          twoFactorPending: "setup",
-          provisioningUri: data.provisioning_uri
-        });
-        return;
+        set({ isLoading: false });
+        return { status: "2fa_setup_required", provisioningUri: data.provisioning_uri };
       }
 
       // Normal login success - user object returned
@@ -90,6 +86,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
       }
 
       get().setUser(data.user);
+      return { status: "success" };
     } catch (error) {
       get().setNoUser();
       throw error;
@@ -259,7 +256,6 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
 
       const data = await response.json();
       get().setUser(data.user);
-      set({ twoFactorPending: null, provisioningUri: null });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Verification failed";
       set({ isLoading: false, error: message });
@@ -285,17 +281,11 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
 
       const data = await response.json();
       get().setUser(data.user);
-      set({ twoFactorPending: null, provisioningUri: null });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Setup failed";
       set({ isLoading: false, error: message });
       throw error;
     }
-  },
-
-  // Clear 2FA state
-  clear2FAState: () => {
-    set({ twoFactorPending: null, provisioningUri: null, error: null });
   },
 
   // Clear error

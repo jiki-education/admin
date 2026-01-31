@@ -5,13 +5,14 @@ import OTPInput from "@/components/auth/OTPInput";
 
 interface TwoFactorVerifyFormProps {
   onSuccess: () => void;
+  onCancel: () => void;
 }
 
-export default function TwoFactorVerifyForm({ onSuccess }: TwoFactorVerifyFormProps) {
+export default function TwoFactorVerifyForm({ onSuccess, onCancel }: TwoFactorVerifyFormProps) {
   const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { verify2FA, clear2FAState } = useAuthStore();
+  const { verify2FA } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,10 +28,6 @@ export default function TwoFactorVerifyForm({ onSuccess }: TwoFactorVerifyFormPr
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleCancel = () => {
-    clear2FAState();
   };
 
   return (
@@ -64,7 +61,7 @@ export default function TwoFactorVerifyForm({ onSuccess }: TwoFactorVerifyFormPr
 
           <button
             type="button"
-            onClick={handleCancel}
+            onClick={onCancel}
             className="w-full text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
           >
             Cancel and sign in again
