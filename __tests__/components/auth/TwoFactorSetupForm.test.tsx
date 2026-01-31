@@ -1,14 +1,10 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import TwoFactorSetupForm from "@/app/setup-2fa/components/TwoFactorSetupForm";
+import TwoFactorSetupForm from "@/components/auth/TwoFactorSetupForm";
 
-const mockPush = jest.fn();
 const mockSetup2FA = jest.fn();
 const mockClear2FAState = jest.fn();
-
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: mockPush })
-}));
+const mockOnSuccess = jest.fn();
 
 jest.mock("@/stores/authStore", () => ({
   useAuthStore: () => ({
@@ -28,14 +24,14 @@ describe("TwoFactorSetupForm", () => {
   });
 
   test("renders heading and description", () => {
-    render(<TwoFactorSetupForm />);
+    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
 
     expect(screen.getByText("Set Up Two-Factor Authentication")).toBeInTheDocument();
     expect(screen.getByText(/scan the qr code/i)).toBeInTheDocument();
   });
 
   test("renders QR code with provisioning URI", () => {
-    render(<TwoFactorSetupForm />);
+    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
 
     const qrCode = screen.getByTestId("qr-code");
     expect(qrCode).toBeInTheDocument();
@@ -43,22 +39,22 @@ describe("TwoFactorSetupForm", () => {
   });
 
   test("renders OTP input and setup button", () => {
-    render(<TwoFactorSetupForm />);
+    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
 
     expect(screen.getAllByRole("textbox")).toHaveLength(6);
     expect(screen.getByRole("button", { name: /complete setup/i })).toBeInTheDocument();
   });
 
   test("setup button is disabled when code is incomplete", () => {
-    render(<TwoFactorSetupForm />);
+    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
 
     const setupButton = screen.getByRole("button", { name: /complete setup/i });
     expect(setupButton).toBeDisabled();
   });
 
-  test("calls setup2FA and redirects on success", async () => {
+  test("calls setup2FA and onSuccess on success", async () => {
     mockSetup2FA.mockResolvedValueOnce(undefined);
-    render(<TwoFactorSetupForm />);
+    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
 
     const inputs = screen.getAllByRole("textbox");
     inputs.forEach((input, i) => {
@@ -73,13 +69,13 @@ describe("TwoFactorSetupForm", () => {
     });
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith("/dashboard");
+      expect(mockOnSuccess).toHaveBeenCalled();
     });
   });
 
   test("displays error message on setup failure", async () => {
     mockSetup2FA.mockRejectedValueOnce(new Error("Invalid code"));
-    render(<TwoFactorSetupForm />);
+    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
 
     const inputs = screen.getAllByRole("textbox");
     inputs.forEach((input, i) => {
@@ -94,13 +90,12 @@ describe("TwoFactorSetupForm", () => {
     });
   });
 
-  test("cancel button clears state and redirects to signin", () => {
-    render(<TwoFactorSetupForm />);
+  test("cancel button clears 2FA state", () => {
+    render(<TwoFactorSetupForm onSuccess={mockOnSuccess} />);
 
     const cancelButton = screen.getByRole("button", { name: /cancel/i });
     fireEvent.click(cancelButton);
 
     expect(mockClear2FAState).toHaveBeenCalled();
-    expect(mockPush).toHaveBeenCalledWith("/signin");
   });
 });

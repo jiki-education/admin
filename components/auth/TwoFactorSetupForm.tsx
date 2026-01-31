@@ -1,15 +1,18 @@
 "use client";
 import { useAuthStore } from "@/stores/authStore";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import OTPInput from "@/components/auth/OTPInput";
+import QRCodeDisplay from "@/components/auth/QRCodeDisplay";
 
-export default function TwoFactorVerifyForm() {
+interface TwoFactorSetupFormProps {
+  onSuccess: () => void;
+}
+
+export default function TwoFactorSetupForm({ onSuccess }: TwoFactorSetupFormProps) {
   const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
-  const { verify2FA, clear2FAState } = useAuthStore();
+  const { setup2FA, provisioningUri, clear2FAState } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,10 +20,10 @@ export default function TwoFactorVerifyForm() {
     setIsSubmitting(true);
 
     try {
-      await verify2FA(otpCode);
-      router.push("/dashboard");
+      await setup2FA(otpCode);
+      onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Verification failed");
+      setError(err instanceof Error ? err.message : "Setup failed");
       setOtpCode("");
     } finally {
       setIsSubmitting(false);
@@ -29,19 +32,22 @@ export default function TwoFactorVerifyForm() {
 
   const handleCancel = () => {
     clear2FAState();
-    router.push("/signin");
   };
 
   return (
     <div className="flex flex-col flex-1 w-full">
       <div className="mb-5 sm:mb-8">
         <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-          Two-Factor Authentication
+          Set Up Two-Factor Authentication
         </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Enter the 6-digit code from your authenticator app</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Scan the QR code with your authenticator app, then enter the code to verify
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      {provisioningUri && <QRCodeDisplay uri={provisioningUri} />}
+
+      <form onSubmit={handleSubmit} className="mt-6">
         <div className="space-y-5">
           {error && (
             <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
@@ -56,7 +62,7 @@ export default function TwoFactorVerifyForm() {
             disabled={isSubmitting || otpCode.length !== 6}
             className="w-full inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-3 text-sm bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isSubmitting ? "Verifying..." : "Verify"}
+            {isSubmitting ? "Setting up..." : "Complete Setup"}
           </button>
 
           <button
