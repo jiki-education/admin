@@ -1,7 +1,7 @@
 import "./setup";
 
 describe("Basic App Functionality", () => {
-  const baseUrl = process.env.TEST_URL || "http://localhost:3064";
+  const baseUrl = process.env.TEST_URL || "http://local.jiki.io:3021";
 
   it("should load the home page", async () => {
     await page.goto(`${baseUrl}/`);

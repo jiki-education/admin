@@ -1,7 +1,7 @@
 import "./setup";
 
 describe("Route Discovery Validation", () => {
-  const baseUrl = process.env.TEST_URL || "http://localhost:3064";
+  const baseUrl = process.env.TEST_URL || "http://local.jiki.io:3082";
 
   // Expected routes based on the E2E expansion plan
   const expectedRoutes = [

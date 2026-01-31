@@ -1,7 +1,7 @@
 import "./setup";
 
 describe("App Structure and Integration Tests", () => {
-  const baseUrl = process.env.TEST_URL || "http://localhost:3064";
+  const baseUrl = process.env.TEST_URL || "http://local.jiki.io:3082";
 
   beforeEach(async () => {
     await page.setViewport({ width: 1200, height: 800 });

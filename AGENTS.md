@@ -39,8 +39,8 @@ You can read these files at **any point during your work** - even in the middle 
 ### Development
 
 ```bash
-./bin/dev         # Runs on http://localhost:3062
-./bin/dev-claude  # Runs on http://localhost:3072 (for parallel development)
+./bin/dev         # Runs on http://local.jiki.io:3062
+./bin/dev-claude  # Runs on http://local.jiki.io:3072 (for parallel development)
 ```
 
 ### Build, TypeScript & Lint

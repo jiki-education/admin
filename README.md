@@ -29,7 +29,7 @@ Start the development server:
 ./bin/dev
 ```
 
-The app will be available at http://localhost:3062
+The app will be available at http://local.jiki.io:3062
 
 For Claude Code development (alternative port):
 
