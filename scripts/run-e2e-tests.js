@@ -10,8 +10,7 @@ const fs = require("fs");
 const path = require("path");
 
 const PORT = 3082;
-// Use localhost in CI since local.jiki.io won't resolve
-const SERVER_URL = process.env.CI ? `http://localhost:${PORT}` : `http://local.jiki.io:${PORT}`;
+const SERVER_URL = `http://local.jiki.io:${PORT}`;
 
 /**
  * Recursively find all page.tsx/page.ts files in a directory
