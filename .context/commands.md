@@ -3,8 +3,8 @@
 ## Development Server
 
 ```bash
-./bin/dev         # Start dev server on http://localhost:3062
-./bin/dev-claude  # Start dev server on http://localhost:3072 (alternative port)
+./bin/dev         # Start dev server on http://local.jiki.io:3062
+./bin/dev-claude  # Start dev server on http://local.jiki.io:3072 (alternative port)
 ```
 
 Both scripts install dependencies automatically before starting.

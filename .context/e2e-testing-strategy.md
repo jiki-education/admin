@@ -95,7 +95,7 @@ tests/e2e/
 import "./setup";
 
 describe("Feature Name", () => {
-  const baseUrl = process.env.TEST_URL || "http://localhost:3064";
+  const baseUrl = process.env.TEST_URL || "http://local.jiki.io:3082";
 
   beforeEach(async () => {
     await page.goto(`${baseUrl}/`);

@@ -1,7 +1,7 @@
 import "./setup";
 
 describe("Email Templates - Basic", () => {
-  const baseUrl = process.env.TEST_URL || "http://localhost:3064";
+  const baseUrl = process.env.TEST_URL || "http://local.jiki.io:3082";
 
   it("should load the home page", async () => {
     await page.goto(`${baseUrl}/`);
@@ -85,6 +85,6 @@ describe("Email Templates - Basic", () => {
     await page.goto(`${baseUrl}/dashboard/email-templates`);
     await new Promise((resolve) => setTimeout(resolve, 2000));
     const currentUrl = page.url();
-    expect(currentUrl).toContain("localhost");
+    expect(currentUrl).toContain("local.jiki.io");
   });
 });

@@ -3,7 +3,7 @@
 import "./setup";
 
 describe("Levels Management E2E Tests", () => {
-  const baseUrl = process.env.TEST_URL || "http://localhost:3064";
+  const baseUrl = process.env.TEST_URL || "http://local.jiki.io:3082";
 
   beforeEach(async () => {
     // Reset page state before each test

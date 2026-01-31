@@ -10,7 +10,7 @@ const fs = require("fs");
 const path = require("path");
 
 const PORT = 3082;
-const SERVER_URL = `http://localhost:${PORT}`;
+const SERVER_URL = `http://local.jiki.io:${PORT}`;
 
 /**
  * Recursively find all page.tsx/page.ts files in a directory

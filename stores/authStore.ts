@@ -10,6 +10,11 @@ import { AuthenticationError, NetworkError, RateLimitError } from "@/lib/api/cli
 import { setCriticalError, clearCriticalError } from "@/lib/api/errorHandlerStore";
 import { create } from "zustand";
 
+export type LoginResult =
+  | { status: "success" }
+  | { status: "2fa_required" }
+  | { status: "2fa_setup_required"; provisioningUri: string };
+
 interface AuthStore {
   // State
   user: User | null;
@@ -19,12 +24,14 @@ interface AuthStore {
   hasCheckedAuth: boolean;
 
   // Actions
-  login: (credentials: LoginCredentials) => Promise<void>;
+  login: (credentials: LoginCredentials) => Promise<LoginResult>;
   logout: () => Promise<{ success: boolean; error?: "network" }>;
   checkAuth: () => Promise<void>;
   refreshUser: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
   resetPassword: (data: PasswordReset) => Promise<void>;
+  verify2FA: (otpCode: string) => Promise<void>;
+  setup2FA: (otpCode: string) => Promise<void>;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
   setUser: (user: User) => void;
@@ -39,8 +46,8 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   error: null,
   hasCheckedAuth: false,
 
-  // Login action - calls Rails directly
-  login: async (credentials) => {
+  // Login action - calls Rails directly, returns result for caller to handle
+  login: async (credentials): Promise<LoginResult> => {
     set({ isLoading: true });
     try {
       const response = await fetch(getApiUrl("/auth/login"), {
@@ -61,11 +68,25 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
       }
 
       const data = await response.json();
+
+      // Check for 2FA responses - return to caller to handle
+      if (data.status === "2fa_required") {
+        set({ isLoading: false });
+        return { status: "2fa_required" };
+      }
+
+      if (data.status === "2fa_setup_required") {
+        set({ isLoading: false });
+        return { status: "2fa_setup_required", provisioningUri: data.provisioning_uri };
+      }
+
+      // Normal login success - user object returned
       if (!data.user) {
         throw new Error("Invalid response from server");
       }
 
       get().setUser(data.user);
+      return { status: "success" };
     } catch (error) {
       get().setNoUser();
       throw error;
@@ -212,6 +233,56 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
       set({ isLoading: false });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to reset password";
+      set({ isLoading: false, error: message });
+      throw error;
+    }
+  },
+
+  // Verify 2FA code
+  verify2FA: async (otpCode) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(getApiUrl("/auth/verify-2fa"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ otp_code: otpCode })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || "Verification failed");
+      }
+
+      const data = await response.json();
+      get().setUser(data.user);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Verification failed";
+      set({ isLoading: false, error: message });
+      throw error;
+    }
+  },
+
+  // Setup 2FA with initial code
+  setup2FA: async (otpCode) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(getApiUrl("/auth/setup-2fa"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ otp_code: otpCode })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || "Setup failed");
+      }
+
+      const data = await response.json();
+      get().setUser(data.user);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Setup failed";
       set({ isLoading: false, error: message });
       throw error;
     }
