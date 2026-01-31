@@ -31,13 +31,7 @@ export default function SignInForm() {
   };
 
   if (step === "setup" && provisioningUri) {
-    return (
-      <TwoFactorSetupForm
-        provisioningUri={provisioningUri}
-        onSuccess={handleSuccess}
-        onCancel={handleCancel}
-      />
-    );
+    return <TwoFactorSetupForm provisioningUri={provisioningUri} onSuccess={handleSuccess} onCancel={handleCancel} />;
   }
 
   if (step === "verify") {

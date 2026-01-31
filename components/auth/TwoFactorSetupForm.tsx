@@ -10,11 +10,7 @@ interface TwoFactorSetupFormProps {
   onCancel: () => void;
 }
 
-export default function TwoFactorSetupForm({
-  provisioningUri,
-  onSuccess,
-  onCancel
-}: TwoFactorSetupFormProps) {
+export default function TwoFactorSetupForm({ provisioningUri, onSuccess, onCancel }: TwoFactorSetupFormProps) {
   const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);

@@ -36,9 +36,7 @@ export default function TwoFactorVerifyForm({ onSuccess, onCancel }: TwoFactorVe
         <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
           Two-Factor Authentication
         </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Enter the 6-digit code from your authenticator app
-        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Enter the 6-digit code from your authenticator app</p>
       </div>
 
       <form onSubmit={handleSubmit}>

@@ -24,11 +24,7 @@ describe("TwoFactorSetupForm", () => {
 
   test("renders heading and description", () => {
     render(
-      <TwoFactorSetupForm
-        provisioningUri={testProvisioningUri}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <TwoFactorSetupForm provisioningUri={testProvisioningUri} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     expect(screen.getByText("Set Up Two-Factor Authentication")).toBeInTheDocument();
@@ -37,11 +33,7 @@ describe("TwoFactorSetupForm", () => {
 
   test("renders QR code with provisioning URI", () => {
     render(
-      <TwoFactorSetupForm
-        provisioningUri={testProvisioningUri}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <TwoFactorSetupForm provisioningUri={testProvisioningUri} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     const qrCode = screen.getByTestId("qr-code");
@@ -51,11 +43,7 @@ describe("TwoFactorSetupForm", () => {
 
   test("renders OTP input and setup button", () => {
     render(
-      <TwoFactorSetupForm
-        provisioningUri={testProvisioningUri}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <TwoFactorSetupForm provisioningUri={testProvisioningUri} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     expect(screen.getAllByRole("textbox")).toHaveLength(6);
@@ -64,11 +52,7 @@ describe("TwoFactorSetupForm", () => {
 
   test("setup button is disabled when code is incomplete", () => {
     render(
-      <TwoFactorSetupForm
-        provisioningUri={testProvisioningUri}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <TwoFactorSetupForm provisioningUri={testProvisioningUri} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     const setupButton = screen.getByRole("button", { name: /complete setup/i });
@@ -78,11 +62,7 @@ describe("TwoFactorSetupForm", () => {
   test("calls setup2FA and onSuccess on success", async () => {
     mockSetup2FA.mockResolvedValueOnce(undefined);
     render(
-      <TwoFactorSetupForm
-        provisioningUri={testProvisioningUri}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <TwoFactorSetupForm provisioningUri={testProvisioningUri} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     const inputs = screen.getAllByRole("textbox");
@@ -105,11 +85,7 @@ describe("TwoFactorSetupForm", () => {
   test("displays error message on setup failure", async () => {
     mockSetup2FA.mockRejectedValueOnce(new Error("Invalid code"));
     render(
-      <TwoFactorSetupForm
-        provisioningUri={testProvisioningUri}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <TwoFactorSetupForm provisioningUri={testProvisioningUri} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     const inputs = screen.getAllByRole("textbox");
@@ -127,11 +103,7 @@ describe("TwoFactorSetupForm", () => {
 
   test("cancel button calls onCancel", () => {
     render(
-      <TwoFactorSetupForm
-        provisioningUri={testProvisioningUri}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <TwoFactorSetupForm provisioningUri={testProvisioningUri} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     const cancelButton = screen.getByRole("button", { name: /cancel/i });

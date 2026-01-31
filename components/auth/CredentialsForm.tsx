@@ -8,11 +8,7 @@ interface CredentialsFormProps {
   on2FASetupRequired: (provisioningUri: string) => void;
 }
 
-export default function CredentialsForm({
-  onSuccess,
-  on2FARequired,
-  on2FASetupRequired
-}: CredentialsFormProps) {
+export default function CredentialsForm({ onSuccess, on2FARequired, on2FASetupRequired }: CredentialsFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -45,9 +41,7 @@ export default function CredentialsForm({
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
               Sign In
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your email and password to sign in!
-            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Enter your email and password to sign in!</p>
           </div>
           <div>
             <form onSubmit={handleSubmit}>
