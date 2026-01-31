@@ -2,8 +2,8 @@
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import OTPInput from "@/components/auth/OTPInput";
-import QRCodeDisplay from "./QRCodeDisplay";
 
 export default function TwoFactorSetupForm() {
   const [otpCode, setOtpCode] = useState("");
@@ -44,7 +44,14 @@ export default function TwoFactorSetupForm() {
         </p>
       </div>
 
-      {provisioningUri && <QRCodeDisplay uri={provisioningUri} />}
+      {provisioningUri && (
+        <div className="flex flex-col items-center p-6 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <QRCodeSVG value={provisioningUri} size={200} level="M" />
+          <p className="mt-4 text-xs text-gray-500 dark:text-gray-400 text-center">
+            Scan with Google Authenticator, 1Password, or similar app
+          </p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="mt-6">
         <div className="space-y-5">

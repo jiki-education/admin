@@ -1,21 +1,27 @@
 "use client";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import TwoFactorSetupForm from "./components/TwoFactorSetupForm";
 
 export default function Setup2FAPage() {
   const router = useRouter();
   const { twoFactorPending, isAuthenticated } = useAuthStore();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
-    if (twoFactorPending !== "setup") {
+    if (twoFactorPending !== "setup" && !isRedirecting) {
+      setIsRedirecting(true);
       router.push(isAuthenticated ? "/dashboard" : "/signin");
     }
-  }, [twoFactorPending, isAuthenticated, router]);
+  }, [twoFactorPending, isAuthenticated, router, isRedirecting]);
 
-  if (twoFactorPending !== "setup") {
-    return null;
+  if (twoFactorPending !== "setup" || isRedirecting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500" />
+      </div>
+    );
   }
 
   return (

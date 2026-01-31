@@ -10,17 +10,28 @@ interface OTPInputProps {
 export default function OTPInput({ value, onChange, disabled }: OTPInputProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const handleChange = (index: number, digit: string) => {
-    if (!/^\d*$/.test(digit)) {
+  const handleChange = (index: number, inputValue: string) => {
+    // Filter to digits only
+    const digits = inputValue.replace(/\D/g, "");
+    if (!digits) {
       return;
     }
 
-    const newValue = value.split("");
-    newValue[index] = digit;
-    const result = newValue.join("").slice(0, 6);
-    onChange(result);
+    // Handle multi-character input (autocomplete or fast typing)
+    if (digits.length > 1) {
+      const newValue = (value.slice(0, index) + digits).slice(0, 6);
+      onChange(newValue);
+      const nextIndex = Math.min(index + digits.length, 5);
+      inputRefs.current[nextIndex]?.focus();
+      return;
+    }
 
-    if (digit && index < 5) {
+    // Single digit input
+    const newValue = value.split("");
+    newValue[index] = digits;
+    onChange(newValue.join("").slice(0, 6));
+
+    if (index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -35,10 +46,12 @@ export default function OTPInput({ value, onChange, disabled }: OTPInputProps) {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
     onChange(pastedData);
+    const focusIndex = Math.min(pastedData.length, 5);
+    inputRefs.current[focusIndex]?.focus();
   };
 
   return (
-    <div className="flex gap-2 justify-center">
+    <div className="flex gap-2 justify-center" role="group" aria-label="One-time password">
       {[0, 1, 2, 3, 4, 5].map((index) => (
         <input
           key={index}
@@ -47,7 +60,9 @@ export default function OTPInput({ value, onChange, disabled }: OTPInputProps) {
           }}
           type="text"
           inputMode="numeric"
-          maxLength={1}
+          maxLength={6}
+          autoComplete={index === 0 ? "one-time-code" : "off"}
+          aria-label={`Digit ${index + 1} of 6`}
           value={value[index] || ""}
           onChange={(e) => handleChange(index, e.target.value)}
           onKeyDown={(e) => handleKeyDown(index, e)}
