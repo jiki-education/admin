@@ -1,6 +1,6 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
 import { createLevel } from "@/lib/api/levels";
 import LevelForm from "../components/LevelForm";
@@ -8,13 +8,18 @@ import type { CreateLevelData } from "../types";
 
 export default function NewLevel() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const courseSlug = searchParams.get("course");
   const [error, setError] = useState<string | null>(null);
 
   const handleSaveLevel = useCallback(
     async (levelData: CreateLevelData) => {
+      if (!courseSlug) {
+        throw new Error("No course selected");
+      }
       try {
         setError(null);
-        const newLevel = await createLevel(levelData);
+        const newLevel = await createLevel(courseSlug, levelData);
 
         // Redirect to the new level's detail page
         router.push(`/dashboard/levels/${newLevel.id}`);
@@ -25,7 +30,7 @@ export default function NewLevel() {
         throw error;
       }
     },
-    [router]
+    [router, courseSlug]
   );
 
   const handleCancel = useCallback(() => {

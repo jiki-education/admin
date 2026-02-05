@@ -18,6 +18,7 @@ export interface AdminLesson {
 }
 
 export interface AdminLevelFilters {
+  course_slug?: string;
   title?: string;
   slug?: string;
   page?: number;

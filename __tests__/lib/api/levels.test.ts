@@ -37,11 +37,13 @@ describe("Levels API Client", () => {
 
     mockApi.post.mockResolvedValue({ ...mockResponse, status: 201, headers: new Headers() });
 
-    const result = await createLevel(levelData);
+    const result = await createLevel("python", levelData);
 
-    expect(mockApi.post).toHaveBeenCalledWith("/admin/levels", {
-      level: levelData
-    });
+    expect(mockApi.post).toHaveBeenCalledWith(
+      "/admin/levels",
+      { level: levelData },
+      { params: { course_slug: "python" } }
+    );
 
     expect(result).toEqual({
       id: 123,
@@ -105,7 +107,7 @@ describe("Levels API Client", () => {
       description: "Test"
     };
 
-    await expect(createLevel(levelData)).rejects.toThrow("API Error: Duplicate slug");
+    await expect(createLevel("python", levelData)).rejects.toThrow("API Error: Duplicate slug");
 
     await expect(
       createLesson(1, {

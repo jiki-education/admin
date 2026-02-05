@@ -8,11 +8,13 @@ import { getAdminLevels } from "@/lib/api/levels";
 import LevelFilters from "./components/LevelFilters";
 import LevelTable from "./components/LevelTable";
 import LevelPagination from "./components/LevelPagination";
+import CourseSelector from "./components/CourseSelector";
 
 export default function Levels() {
   const router = useRouter();
 
   const [levels, setLevels] = useState<AdminLevel[]>([]);
+  const [courseSlug, setCourseSlug] = useState<string | undefined>();
   const [filters, setFilters] = useState<AdminLevelFilters>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,11 +29,14 @@ export default function Levels() {
   });
 
   const loadLevels = useCallback(async () => {
+    if (!courseSlug) {
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
-      const response = await getAdminLevels(filters);
-      console.debug("Response:", response);
+      const response = await getAdminLevels({ ...filters, course_slug: courseSlug });
       setLevels(response.results);
       setMeta(response.meta);
     } catch (err) {
@@ -41,14 +46,18 @@ export default function Levels() {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, courseSlug]);
 
   useEffect(() => {
     void loadLevels();
   }, [loadLevels]);
 
+  const handleCourseChange = useCallback((slug: string) => {
+    setCourseSlug(slug);
+    setFilters({});
+  }, []);
+
   const handleFiltersChange = useCallback((newFilters: AdminLevelFilters) => {
-    // Reset to page 1 when filters change
     setFilters({ ...newFilters, page: 1 });
   }, []);
 
@@ -61,8 +70,8 @@ export default function Levels() {
   }, []);
 
   const handleAddNewLevel = useCallback(() => {
-    router.push("/dashboard/levels/new");
-  }, [router]);
+    router.push(`/dashboard/levels/new?course=${courseSlug}`);
+  }, [router, courseSlug]);
 
   return (
     <div>
@@ -71,7 +80,10 @@ export default function Levels() {
       <div className="space-y-6">
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Level Management</h1>
+            <div className="flex items-center gap-4">
+              <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Level Management</h1>
+              <CourseSelector selectedCourseSlug={courseSlug} onCourseChange={handleCourseChange} />
+            </div>
             <Button onClick={handleAddNewLevel}>Add New Level</Button>
           </div>
 
