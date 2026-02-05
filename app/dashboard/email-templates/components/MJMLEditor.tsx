@@ -154,13 +154,14 @@ export default function MJMLEditor({
           <div
             ref={lineNumbersRef}
             className="select-none overflow-hidden bg-gray-50 dark:bg-gray-800 py-2.5 text-right font-mono text-sm leading-[21px] text-gray-400 dark:text-gray-500"
-            style={{ minWidth: `${Math.max(3, String(lineCount).length + 1)}ch`, paddingRight: "8px", paddingLeft: "8px" }}
+            style={{
+              minWidth: `${Math.max(3, String(lineCount).length + 1)}ch`,
+              paddingRight: "8px",
+              paddingLeft: "8px"
+            }}
           >
             {Array.from({ length: lineCount }, (_, i) => (
-              <div
-                key={i + 1}
-                className={errorLines.has(i + 1) ? "text-red-500 font-bold dark:text-red-400" : ""}
-              >
+              <div key={i + 1} className={errorLines.has(i + 1) ? "text-red-500 font-bold dark:text-red-400" : ""}>
                 {i + 1}
               </div>
             ))}
