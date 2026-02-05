@@ -64,7 +64,11 @@ export async function getAdminLevels(filters?: AdminLevelFilters): Promise<Admin
 }
 
 export async function updateLevel(courseSlug: string, id: number, data: Partial<AdminLevel>): Promise<AdminLevel> {
-  const response = await api.patch<{ level: AdminLevel }>(`/admin/levels/${id}`, { level: data }, { params: { course_slug: courseSlug } });
+  const response = await api.patch<{ level: AdminLevel }>(
+    `/admin/levels/${id}`,
+    { level: data },
+    { params: { course_slug: courseSlug } }
+  );
   return response.data.level;
 }
 
@@ -85,7 +89,11 @@ export async function updateLesson(
 }
 
 export async function createLevel(courseSlug: string, data: CreateLevelData): Promise<AdminLevel> {
-  const response = await api.post<{ level: AdminLevel }>("/admin/levels", { level: data }, { params: { course_slug: courseSlug } });
+  const response = await api.post<{ level: AdminLevel }>(
+    "/admin/levels",
+    { level: data },
+    { params: { course_slug: courseSlug } }
+  );
   return response.data.level;
 }
 

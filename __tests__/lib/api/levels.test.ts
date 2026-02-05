@@ -39,7 +39,11 @@ describe("Levels API Client", () => {
 
     const result = await createLevel("python", levelData);
 
-    expect(mockApi.post).toHaveBeenCalledWith("/admin/levels", { level: levelData }, { params: { course_slug: "python" } });
+    expect(mockApi.post).toHaveBeenCalledWith(
+      "/admin/levels",
+      { level: levelData },
+      { params: { course_slug: "python" } }
+    );
 
     expect(result).toEqual({
       id: 123,

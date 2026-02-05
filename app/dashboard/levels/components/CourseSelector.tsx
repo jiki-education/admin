@@ -36,9 +36,7 @@ export default function CourseSelector({ selectedCourseSlug, onCourseChange }: C
   );
 
   if (loading) {
-    return (
-      <div className="w-48 h-11 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
-    );
+    return <div className="w-48 h-11 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />;
   }
 
   return (
