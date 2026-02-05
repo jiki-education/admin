@@ -3,9 +3,9 @@ import { useRedirectIfAuthenticated } from "@/lib/auth/hooks";
 import SignInForm from "@/components/auth/SignInForm";
 
 export default function SignInPage() {
-  const { isLoading } = useRedirectIfAuthenticated();
+  const { isReady } = useRedirectIfAuthenticated();
 
-  if (isLoading) {
+  if (!isReady) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">

@@ -75,9 +75,9 @@ export function useRequireAuth(options: RequireAuthOptions = {}) {
 
   return {
     isAuthenticated,
-    isLoading: authLoading || !hasCheckedAuth || !isReady,
+    isLoading: !isReady,
     user,
-    isReady: isReady && !authLoading && hasCheckedAuth
+    isReady
   };
 }
 
