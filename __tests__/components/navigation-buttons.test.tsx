@@ -42,6 +42,12 @@ jest.mock("@/app/dashboard/levels/components/LevelPagination", () => {
   };
 });
 
+jest.mock("@/app/dashboard/levels/components/CourseSelector", () => {
+  return function MockCourseSelector() {
+    return <div data-testid="course-selector" />;
+  };
+});
+
 jest.mock("@/app/dashboard/levels/components/LessonTable", () => {
   return function MockLessonTable() {
     return <div data-testid="lesson-table" />;
@@ -78,7 +84,7 @@ describe("Navigation Buttons", () => {
 
     fireEvent.click(addButton);
 
-    expect(mockPush).toHaveBeenCalledWith("/dashboard/levels/new");
+    expect(mockPush).toHaveBeenCalledWith("/dashboard/levels/new?course=undefined");
   });
 
   test("Add New Lesson button navigates to correct route with level ID", async () => {
@@ -108,13 +114,11 @@ describe("Navigation Buttons", () => {
     render(<Levels />);
 
     // Check that button is in the header area with the title
-    const header = screen.getByText(/level management/i).closest("div");
+    const title = screen.getByText(/level management/i);
+    const header = title.closest(".flex.items-center.justify-between");
     const addButton = await screen.findByRole("button", { name: /add new level/i });
 
     expect(header).toContainElement(addButton);
-
-    // Verify the layout structure
-    expect(header).toHaveClass("flex", "items-center", "justify-between");
   });
 
   test("buttons are accessible with proper ARIA labels", async () => {

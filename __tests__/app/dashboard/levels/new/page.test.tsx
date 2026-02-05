@@ -6,7 +6,8 @@ import { createLevel } from "@/lib/api/levels";
 
 // Mock dependencies
 jest.mock("next/navigation", () => ({
-  useRouter: jest.fn()
+  useRouter: jest.fn(),
+  useSearchParams: jest.fn(() => new URLSearchParams("course=python"))
 }));
 
 jest.mock("@/lib/api/levels", () => ({
@@ -66,7 +67,7 @@ describe("NewLevel Page", () => {
     });
 
     await waitFor(() => {
-      expect(mockCreateLevel).toHaveBeenCalledWith({
+      expect(mockCreateLevel).toHaveBeenCalledWith("python", {
         title: "Test",
         slug: "test",
         description: "Test desc"
