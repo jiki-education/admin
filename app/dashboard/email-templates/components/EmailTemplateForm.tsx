@@ -5,7 +5,7 @@ import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
 import Button from "@/components/ui/button/Button";
-import MJMLEditor from "./MJMLEditor";
+import MJMLEditor, { wrapMJML } from "./MJMLEditor";
 import TextBodyEditor from "./TextBodyEditor";
 import mjml2html from "mjml-browser";
 import toast from "react-hot-toast";
@@ -105,7 +105,7 @@ export default function EmailTemplateForm({
     // Validate MJML syntax if provided
     if (formData.body_mjml.trim()) {
       try {
-        const result = mjml2html(formData.body_mjml, { validationLevel: "soft" });
+        const result = mjml2html(wrapMJML(formData.body_mjml), { validationLevel: "soft" });
         if (result.errors.length > 0) {
           newErrors.body_mjml = `MJML validation failed: ${result.errors[0].message}`;
         }
@@ -164,25 +164,26 @@ export default function EmailTemplateForm({
     }
   };
 
+  const copyToClipboard = async (text: string) => {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+  };
+
   const copyMJMLToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(formData.body_mjml);
+      await copyToClipboard(formData.body_mjml);
       toast.success("MJML copied to clipboard");
     } catch (error) {
       console.error("Failed to copy MJML to clipboard:", error);
-      // Fallback for older browsers or when clipboard API fails
-      const textArea = document.createElement("textarea");
-      textArea.value = formData.body_mjml;
-      document.body.appendChild(textArea);
-      textArea.select();
-      try {
-        document.execCommand("copy");
-        toast.success("MJML copied to clipboard");
-      } catch (fallbackError) {
-        console.error("Fallback copy failed:", fallbackError);
-        toast.success("MJML copied to clipboard");
-      }
-      document.body.removeChild(textArea);
+      toast.error("Failed to copy to clipboard");
     }
   };
 
