@@ -153,6 +153,7 @@ export default function MJMLEditor({
         >
           <div
             ref={lineNumbersRef}
+            aria-hidden="true"
             className="select-none overflow-hidden bg-gray-50 dark:bg-gray-800 py-2.5 text-right font-mono text-sm leading-[21px] text-gray-400 dark:text-gray-500"
             style={{
               minWidth: `${Math.max(3, String(lineCount).length + 1)}ch`,
@@ -173,7 +174,7 @@ export default function MJMLEditor({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onScroll={syncScroll}
-            className="w-full resize-y bg-transparent py-2.5 px-3 font-mono text-sm leading-[21px] text-gray-400 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+            className="w-full resize-y bg-transparent py-2.5 px-3 font-mono text-sm leading-[21px] text-gray-800 placeholder:text-gray-400 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
           />
         </div>
         {hint && (
@@ -231,12 +232,7 @@ export default function MJMLEditor({
           <div className="mb-4">
             <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">Email Preview (rendered):</div>
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-              <iframe
-                srcDoc={htmlPreview}
-                className="w-full h-96 bg-white"
-                title="Email Preview"
-                sandbox="allow-same-origin"
-              />
+              <iframe srcDoc={htmlPreview} className="w-full h-96 bg-white" title="Email Preview" sandbox="" />
             </div>
           </div>
 

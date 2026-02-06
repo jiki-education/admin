@@ -172,8 +172,11 @@ export default function EmailTemplateForm({
       textArea.value = text;
       document.body.appendChild(textArea);
       textArea.select();
-      document.execCommand("copy");
+      const success = document.execCommand("copy");
       document.body.removeChild(textArea);
+      if (!success) {
+        throw new Error("Copy command failed");
+      }
     }
   };
 
