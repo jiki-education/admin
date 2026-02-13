@@ -33,6 +33,7 @@
     "@remotion/media-utils": "^4.0.357",
     "@remotion/player": "^4.0.357",
     "@remotion/renderer": "^4.0.357",
+    "@sentry/nextjs": "^10.38.0",
     "@xyflow/react": "^12.9.0",
     "dagre": "^0.8.5",
     "marked": "^16.4.1",
