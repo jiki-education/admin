@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar, SIDEBAR_WIDTH_EXPANDED, SIDEBAR_WIDTH_COLLAPSED } from "../context/SidebarContext";
-import { BoxCubeIcon, ChevronDownIcon, GridIcon, HorizontaLDots, PageIcon, UserCircleIcon } from "../icons/index";
+import { ChevronDownIcon, GridIcon, HorizontaLDots, PageIcon, UserCircleIcon } from "../icons/index";
 
 interface NavItem {
   name: string;
@@ -32,14 +32,6 @@ const navItems: NavItem[] = [
       { name: "Concepts", path: "/dashboard/concepts", pro: false },
       { name: "Projects", path: "/dashboard/projects", pro: false }
     ]
-  }
-];
-
-const othersItems: NavItem[] = [
-  {
-    icon: <BoxCubeIcon />,
-    name: "System",
-    subItems: [{ name: "Email Templates", path: "/dashboard/email-templates", pro: false }]
   }
 ];
 
@@ -160,7 +152,7 @@ function AppSidebar() {
     let matchingSubmenu: { type: "main" | "others"; index: number } | null = null;
 
     ["main", "others"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : othersItems;
+      const items = navItems;
       items.forEach((nav, index) => {
         if (nav.subItems && !matchingSubmenu) {
           nav.subItems.forEach((subItem) => {
@@ -241,17 +233,6 @@ function AppSidebar() {
                 {isExpanded || isHovered || isMobileOpen ? "Menu" : <HorizontaLDots />}
               </h2>
               {renderMenuItems(navItems, "main")}
-            </div>
-
-            <div className="">
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? "Others" : <HorizontaLDots />}
-              </h2>
-              {renderMenuItems(othersItems, "others")}
             </div>
           </div>
         </nav>

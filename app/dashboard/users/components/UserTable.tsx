@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "next/navigation";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
 import Button from "@/components/ui/button/Button";
 import type { User } from "../types";
@@ -10,6 +11,7 @@ interface UserTableProps {
 }
 
 export default function UserTable({ users, loading = false, onDelete }: UserTableProps) {
+  const router = useRouter();
   if (loading) {
     return (
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -79,7 +81,11 @@ export default function UserTable({ users, loading = false, onDelete }: UserTabl
 
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {users.map((user) => (
-                <TableRow key={user.id}>
+                <TableRow
+                  key={user.id}
+                  onClick={() => router.push(`/dashboard/users/${user.id}`)}
+                  className="cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                >
                   <TableCell className="px-5 py-4 text-start">
                     <span className="font-medium text-gray-800 text-theme-sm dark:text-white/90">#{user.id}</span>
                   </TableCell>
@@ -110,7 +116,10 @@ export default function UserTable({ users, loading = false, onDelete }: UserTabl
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => onDelete(user)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(user);
+                        }}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
                       >
                         Delete

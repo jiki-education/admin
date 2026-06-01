@@ -69,7 +69,9 @@ describe("NewLesson Page", () => {
       title: "Test Level",
       slug: "test-level",
       description: "Test level description",
-      position: 1
+      position: 1,
+      milestone_summary: "",
+      milestone_content: ""
     };
 
     mockGetAdminLevels.mockResolvedValue({
@@ -97,7 +99,9 @@ describe("NewLesson Page", () => {
       title: "Test Level",
       slug: "test-level",
       description: "Test description",
-      position: 1
+      position: 1,
+      milestone_summary: "",
+      milestone_content: ""
     };
 
     const mockLesson = {
@@ -107,7 +111,8 @@ describe("NewLesson Page", () => {
       description: "Test desc",
       type: "exercise",
       position: 1,
-      data: {}
+      data: {},
+      walkthrough_video_data: null
     };
 
     mockGetAdminLevels.mockResolvedValue({

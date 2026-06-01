@@ -5,6 +5,8 @@ export interface AdminLevel {
   title: string;
   description: string;
   position: number;
+  milestone_summary: string;
+  milestone_content: string;
 }
 
 export interface AdminLesson {
@@ -15,6 +17,7 @@ export interface AdminLesson {
   type: string;
   position: number;
   data: Record<string, any>;
+  walkthrough_video_data: Record<string, any> | null;
 }
 
 export interface AdminLevelFilters {
@@ -35,5 +38,10 @@ export interface AdminLevelsResponse {
 }
 
 // Types for creating new levels and lessons
-export type CreateLevelData = Omit<AdminLevel, "id" | "position">;
-export type CreateLessonData = Omit<AdminLesson, "id" | "position">;
+export type CreateLevelData = Omit<AdminLevel, "id" | "position" | "milestone_summary" | "milestone_content"> & {
+  milestone_summary?: string;
+  milestone_content?: string;
+};
+export type CreateLessonData = Omit<AdminLesson, "id" | "position" | "walkthrough_video_data"> & {
+  walkthrough_video_data?: Record<string, any> | null;
+};
