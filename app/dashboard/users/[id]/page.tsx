@@ -267,7 +267,7 @@ function ResetPasswordModal({ isOpen, onClose, onSubmit, loading, userEmail }: R
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-md p-6">
+    <Modal isOpen={isOpen} onClose={onClose} showCloseButton={false} className="max-w-md p-6">
       <div className="mb-4">
         <h3 className="text-lg font-medium text-gray-900 dark:text-white">Reset password</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
