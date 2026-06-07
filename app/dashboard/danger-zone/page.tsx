@@ -33,9 +33,7 @@ export default function DangerZone() {
       <div className="space-y-6">
         <div className="rounded-xl border border-red-200 bg-white p-6 dark:border-red-800 dark:bg-white/[0.03]">
           <h1 className="text-xl font-semibold text-red-700 dark:text-red-400 mb-2">Danger Zone</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-            Destructive operations. Proceed with caution.
-          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Destructive operations. Proceed with caution.</p>
 
           <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-6">
             <div>
