@@ -30,7 +30,8 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Levels", path: "/dashboard/levels", pro: false },
       { name: "Concepts", path: "/dashboard/concepts", pro: false },
-      { name: "Projects", path: "/dashboard/projects", pro: false }
+      { name: "Projects", path: "/dashboard/projects", pro: false },
+      { name: "Danger Zone", path: "/dashboard/danger-zone", pro: false }
     ]
   }
 ];
