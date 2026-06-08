@@ -56,7 +56,15 @@ describe("NewLevel Page", () => {
   });
 
   test("handles successful level creation and navigation", async () => {
-    const mockLevel = { id: 123, title: "Test", slug: "test", description: "Test desc", position: 1 };
+    const mockLevel = {
+      id: 123,
+      title: "Test",
+      slug: "test",
+      description: "Test desc",
+      position: 1,
+      milestone_summary: "",
+      milestone_content: ""
+    };
     mockCreateLevel.mockResolvedValue(mockLevel);
 
     render(<NewLevel />);

@@ -23,6 +23,7 @@ interface TableBodyProps {
 interface TableRowProps {
   children: ReactNode; // Cells (th or td)
   className?: string; // Optional className for styling
+  onClick?: React.MouseEventHandler<HTMLTableRowElement>;
 }
 
 // Props for TableCell
@@ -48,8 +49,12 @@ function TableBody({ children, className }: TableBodyProps) {
 }
 
 // TableRow Component
-function TableRow({ children, className }: TableRowProps) {
-  return <tr className={className}>{children}</tr>;
+function TableRow({ children, className, onClick }: TableRowProps) {
+  return (
+    <tr className={className} onClick={onClick}>
+      {children}
+    </tr>
+  );
 }
 
 // TableCell Component

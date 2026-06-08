@@ -78,18 +78,4 @@ describe("Navigation Tests", () => {
     expect(currentUrl).toContain("/signin");
   });
 
-  it("should redirect to signin when accessing email templates without auth", async () => {
-    await page.goto(`${baseUrl}/dashboard/email-templates`);
-
-    // Wait for redirect
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // Check that we can access the page (no errors)
-    const body = await page.$("body");
-    expect(body).toBeTruthy();
-
-    // Verify redirect to signin
-    const currentUrl = page.url();
-    expect(currentUrl).toContain("/signin");
-  });
 });

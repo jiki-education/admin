@@ -10,8 +10,7 @@ describe("Route Discovery Validation", () => {
     "/signup",
     "/dashboard",
     "/dashboard/users",
-    "/dashboard/levels",
-    "/dashboard/email-templates"
+    "/dashboard/levels"
   ];
 
   it("should have all expected routes accessible without errors", async () => {

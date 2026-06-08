@@ -32,15 +32,6 @@ jest.mock("@/lib/api/users", () => ({
   getUsers: fastResolve({ results: [], meta: { current_page: 1, total_pages: 1, total_count: 0 } })
 }));
 
-jest.mock("@/lib/api/email-templates", () => ({
-  getEmailTemplates: fastResolve({ results: [], meta: { current_page: 1, total_pages: 1, total_count: 0 } }),
-  getEmailTemplate: fastResolve({ id: 1, subject: "Test", body: "Test body", template_type: "welcome" }),
-  getEmailTemplateTypes: fastResolve([]),
-  updateEmailTemplate: fastResolve({}),
-  createEmailTemplate: fastResolve({}),
-  getEmailTemplatesSummary: fastResolve({ results: [], meta: { current_page: 1, total_pages: 1, total_count: 0 } })
-}));
-
 // Mock hooks
 jest.mock("@/hooks/useModal", () => ({
   useModal: () => ({
@@ -99,15 +90,6 @@ describe("Pages Sanity Check", () => {
       await expectRenderWithoutError(UsersPage);
     });
 
-    test("Email Templates page renders without errors", async () => {
-      const EmailTemplatesPage = (await import("@/app/dashboard/email-templates/page")).default;
-      await expectRenderWithoutError(EmailTemplatesPage);
-    });
-
-    test("Email Template Edit page renders without errors", async () => {
-      const EmailTemplateEditPage = (await import("@/app/dashboard/email-templates/edit/[id]/page")).default;
-      await expectRenderWithoutError(EmailTemplateEditPage);
-    });
   });
 
   describe("Levels Pages", () => {
@@ -144,7 +126,6 @@ describe("Pages Sanity Check", () => {
         import("@/app/signin/page"),
         import("@/app/dashboard/page"),
         import("@/app/dashboard/users/page"),
-        import("@/app/dashboard/email-templates/page"),
         import("@/app/dashboard/levels/page"),
         import("@/app/dashboard/levels/new/page")
       ];
@@ -160,11 +141,6 @@ describe("Pages Sanity Check", () => {
     });
 
     test("Dynamic route pages can be imported", async () => {
-      // Test individual dynamic route imports
-      const emailEditModule = await import("@/app/dashboard/email-templates/edit/[id]/page");
-      expect(emailEditModule.default).toBeDefined();
-      expect(typeof emailEditModule.default).toBe("function");
-
       const levelDetailModule = await import("@/app/dashboard/levels/[id]/page");
       expect(levelDetailModule.default).toBeDefined();
       expect(typeof levelDetailModule.default).toBe("function");

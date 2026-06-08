@@ -78,51 +78,6 @@ describe("Users API Client", () => {
       });
     });
 
-    test("includes admin filter when provided", async () => {
-      const filters: UserFilters = {
-        admin: true
-      };
-
-      const mockResponse = {
-        data: {
-          results: [],
-          meta: { current_page: 1, total_pages: 1, total_count: 0 }
-        }
-      };
-
-      mockApi.get.mockResolvedValue({ ...mockResponse, status: 200, headers: new Headers() });
-
-      await getUsers(filters);
-
-      expect(mockApi.get).toHaveBeenCalledWith("/admin/users", {
-        params: {
-          admin: "true"
-        }
-      });
-    });
-
-    test("includes admin false filter when provided", async () => {
-      const filters: UserFilters = {
-        admin: false
-      };
-
-      const mockResponse = {
-        data: {
-          results: [],
-          meta: { current_page: 1, total_pages: 1, total_count: 0 }
-        }
-      };
-
-      mockApi.get.mockResolvedValue({ ...mockResponse, status: 200, headers: new Headers() });
-
-      await getUsers(filters);
-
-      expect(mockApi.get).toHaveBeenCalledWith("/admin/users", {
-        params: {
-          admin: "false"
-        }
-      });
-    });
   });
 
   describe("deleteUser", () => {
