@@ -4,13 +4,22 @@ import AppSidebar from "@/layout/AppSidebar";
 import AppHeader from "@/layout/AppHeader";
 import Backdrop from "@/layout/Backdrop";
 import { useSidebar } from "@/context/SidebarContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading, isReady } = useRequireAuth({
+  const { isAuthenticated, isLoading, isReady, user } = useRequireAuth({
     redirectTo: "/signin" // Consistent redirect to signin page
   });
+  const router = useRouter();
   const { getSidebarWidth } = useSidebar();
   const sidebarWidth = getSidebarWidth();
+
+  useEffect(() => {
+    if (isReady && isAuthenticated && user && !user.admin) {
+      router.replace("/403");
+    }
+  }, [isReady, isAuthenticated, user, router]);
 
   if (isLoading) {
     return (
@@ -25,6 +34,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!isAuthenticated || !isReady) {
     return null; // Will redirect via useRequireAuth
+  }
+
+  if (user && !user.admin) {
+    return null; // Will redirect via useEffect above
   }
 
   return (

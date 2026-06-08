@@ -15,6 +15,7 @@ export interface User {
   subscription: SubscriptionDetails | null;
   provider: string;
   email_confirmed: boolean;
+  admin: boolean;
 }
 
 export interface LoginCredentials {
