@@ -110,4 +110,11 @@ describe("Mailshots API client", () => {
     expect(mockApi.post).toHaveBeenCalledWith("/admin/mailshots/7/send", { segment: "all_users" });
     expect(result).toEqual({ mailshot: refreshed, audience_count: 42 });
   });
+
+  test("propagates API errors to the caller", async () => {
+    const apiError = new Error("422 Unprocessable Entity");
+    mockApi.post.mockRejectedValue(apiError);
+
+    await expect(createMailshot({ slug: "dupe", subject: "S", body_markdown: "" })).rejects.toBe(apiError);
+  });
 });

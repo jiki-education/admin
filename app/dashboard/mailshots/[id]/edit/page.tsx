@@ -4,14 +4,12 @@ import Button from "@/components/ui/button/Button";
 import { useRouter, useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { getMailshot } from "@/lib/api/mailshots";
-import { useRequireAuth } from "@/lib/auth/hooks";
 import { extractErrorMessage } from "../../errors";
 import MailshotForm from "../../components/MailshotForm";
 import MailshotActions from "../../components/MailshotActions";
 import type { Mailshot } from "../../types";
 
 export default function EditMailshot() {
-  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const router = useRouter();
   const params = useParams();
   const mailshotId = parseInt(params.id as string);
@@ -38,14 +36,12 @@ export default function EditMailshot() {
   }, [mailshotId]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      void loadMailshot();
-    }
-  }, [isAuthenticated, loadMailshot]);
+    void loadMailshot();
+  }, [loadMailshot]);
 
   const handleBack = () => router.push("/dashboard/mailshots");
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-lg">Loading...</div>

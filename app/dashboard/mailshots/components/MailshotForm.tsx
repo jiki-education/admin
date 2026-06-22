@@ -70,7 +70,7 @@ export default function MailshotForm({ mailshot, onSaved }: MailshotFormProps) {
         onChange={setBodyMarkdown}
         rows={18}
         error={fieldErrors.body_markdown?.join(", ")}
-        renderPreview={() => <ServerPreview mailshotId={mailshot.id} bodyMarkdown={bodyMarkdown} subject={subject} />}
+        renderPreview={(value) => <ServerPreview mailshotId={mailshot.id} bodyMarkdown={value} subject={subject} />}
       />
 
       <div className="flex justify-end">

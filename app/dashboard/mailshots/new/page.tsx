@@ -8,11 +8,9 @@ import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
 import { createMailshot } from "@/lib/api/mailshots";
-import { useRequireAuth } from "@/lib/auth/hooks";
 import { extractFieldErrors, extractErrorMessage } from "../errors";
 
 export default function NewMailshot() {
-  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const router = useRouter();
 
   const [slug, setSlug] = useState("");
@@ -34,14 +32,6 @@ export default function NewMailshot() {
       setCreating(false);
     }
   };
-
-  if (authLoading || !isAuthenticated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <div>
