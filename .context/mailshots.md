@@ -16,20 +16,21 @@ index per user+mailshot), so the UI never needs to dedup — it only warns.
 Base: `/admin/mailshots`. Session-cookie auth (same as `/admin/users`).
 All request bodies are **wrapped in the `mailshot` key** except `send` (raw).
 
-| Method | Path | Body | Response |
-|---|---|---|---|
-| GET | `/admin/mailshots` | query: `page`, `per` | `{ results: Mailshot[], meta }` |
-| GET | `/admin/mailshots/:id` | — | `{ mailshot }` |
-| POST | `/admin/mailshots` | `{ mailshot: { slug, subject, body_markdown } }` | `201 { mailshot }` |
-| PATCH | `/admin/mailshots/:id` | `{ mailshot: { slug?, subject?, body_markdown? } }` | `{ mailshot }` |
-| DELETE | `/admin/mailshots/:id` | — | `204` (drafts only) |
-| POST | `/admin/mailshots/:id/preview` | `{ mailshot: { subject, body_markdown } }` | `{ html }` |
-| POST | `/admin/mailshots/:id/test` | — | `{ success: true }` |
-| POST | `/admin/mailshots/:id/send` | `{ segment }` | `{ mailshot, audience_count }` |
+| Method | Path                           | Body                                                | Response                        |
+| ------ | ------------------------------ | --------------------------------------------------- | ------------------------------- |
+| GET    | `/admin/mailshots`             | query: `page`, `per`                                | `{ results: Mailshot[], meta }` |
+| GET    | `/admin/mailshots/:id`         | —                                                   | `{ mailshot }`                  |
+| POST   | `/admin/mailshots`             | `{ mailshot: { slug, subject, body_markdown } }`    | `201 { mailshot }`              |
+| PATCH  | `/admin/mailshots/:id`         | `{ mailshot: { slug?, subject?, body_markdown? } }` | `{ mailshot }`                  |
+| DELETE | `/admin/mailshots/:id`         | —                                                   | `204` (drafts only)             |
+| POST   | `/admin/mailshots/:id/preview` | `{ mailshot: { subject, body_markdown } }`          | `{ html }`                      |
+| POST   | `/admin/mailshots/:id/test`    | —                                                   | `{ success: true }`             |
+| POST   | `/admin/mailshots/:id/send`    | `{ segment }`                                       | `{ mailshot, audience_count }`  |
 
 `meta` = `{ current_page, total_count, total_pages }`.
 
 ### Mailshot shape
+
 ```ts
 interface Mailshot {
   id: number;
@@ -37,17 +38,20 @@ interface Mailshot {
   subject: string;
   body_markdown: string;
   email_communication_preferences_key: string; // "newsletters"
-  sent_to_audiences: Segment[];                 // e.g. ["premium_users"]
-  sent_count: number;                           // recipients recorded so far
-  created_at: string;                           // iso8601
-  updated_at: string;                           // iso8601
+  sent_to_audiences: Segment[]; // e.g. ["premium_users"]
+  sent_count: number; // recipients recorded so far
+  created_at: string; // iso8601
+  updated_at: string; // iso8601
 }
 type Segment = "all_users" | "premium_users" | "free_users" | "admin_users";
 ```
+
 The list endpoint omits `body_markdown` and `email_communication_preferences_key`.
 
 ### Errors
+
 Standard envelope `{ error: { type, message, ...extra } }`:
+
 - Validation (422): `{ error: { type: "validation_error", message, errors: { subject: ["can't be blank"], ... } } }` — `errors` is field → messages.
 - Unknown segment (422, from `send`): `type: "unknown_segment"`, plus `segment`.
 - Empty body (422, from `send`): `type: "mailshot_body_blank"` — body is required to send, but not to create/save a draft.
@@ -57,7 +61,7 @@ Standard envelope `{ error: { type, message, ...extra } }`:
 ## Endpoint semantics (important)
 
 - **preview**: markdown injected into the full MJML layout, rendered server-side,
-  **not persisted**. Sends the *current editor content* in the body, so it reflects
+  **not persisted**. Sends the _current editor content_ in the body, so it reflects
   unsaved edits. Render the returned `html` in an `<iframe srcDoc={html}>`. Do NOT
   client-render markdown — only the server reproduces the real email.
 - **test**: sends to the **currently-authenticated admin**, works on drafts,
@@ -86,10 +90,12 @@ app/dashboard/mailshots/
     ├── SegmentSelector.tsx      # dropdown of the 4 segments
     └── SendConfirmModal.tsx     # shows segment + warns from sent_to_audiences
 ```
+
 Plus `lib/api/mailshots.ts`: `getMailshots, getMailshot, createMailshot,
 updateMailshot, deleteMailshot, previewMailshot, testMailshot, sendMailshot`.
 
 ### Behaviour
+
 - **Editing**: reuse `components/ui/markdown-editor/` for the textarea, but wire the
   preview pane to `ServerPreview` (POST `/preview`, ~500ms debounce) instead of local
   `marked`. The iframe shows the exact email.
@@ -97,8 +103,8 @@ updateMailshot, deleteMailshot, previewMailshot, testMailshot, sendMailshot`.
   "Sent (n segments)".
 - **Send**: `SegmentSelector` + a Send button → `SendConfirmModal`. The modal shows
   the chosen segment and, if it's already in `sent_to_audiences`, warns. On confirm,
-  POST `/send`, then `toast.success(\`Queued for ~\${audience_count} users\`)` and
-  update the row from the returned `mailshot`.
+  POST `/send`, then `toast.success(\`Queued for ~\${audience_count} users\`)`and
+update the row from the returned`mailshot`.
 - **Test**: "Send test to me" button, always available (incl. drafts) → POST `/test`
   → toast. Copy can reassure it never counts as a real send.
 - **Delete**: only offer when `sent_to_audiences` is empty; on 422
