@@ -40,7 +40,10 @@ const othersItems: NavItem[] = [
   {
     icon: <BoxCubeIcon />,
     name: "System",
-    subItems: [{ name: "Email Templates", path: "/dashboard/email-templates", pro: false }]
+    subItems: [
+      { name: "Email Templates", path: "/dashboard/email-templates", pro: false },
+      { name: "Mailshots", path: "/dashboard/mailshots", pro: false }
+    ]
   }
 ];
 
