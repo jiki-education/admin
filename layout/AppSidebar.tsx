@@ -33,17 +33,11 @@ const navItems: NavItem[] = [
       { name: "Projects", path: "/dashboard/projects", pro: false },
       { name: "Danger Zone", path: "/dashboard/danger-zone", pro: false }
     ]
-  }
-];
-
-const othersItems: NavItem[] = [
+  },
   {
     icon: <BoxCubeIcon />,
-    name: "System",
-    subItems: [
-      { name: "Email Templates", path: "/dashboard/email-templates", pro: false },
-      { name: "Mailshots", path: "/dashboard/mailshots", pro: false }
-    ]
+    name: "Mailshots",
+    path: "/dashboard/mailshots"
   }
 ];
 
@@ -163,20 +157,17 @@ function AppSidebar() {
     // Check if the current path matches any submenu item
     let matchingSubmenu: { type: "main" | "others"; index: number } | null = null;
 
-    ["main", "others"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : othersItems;
-      items.forEach((nav, index) => {
-        if (nav.subItems && !matchingSubmenu) {
-          nav.subItems.forEach((subItem) => {
-            if (isActive(subItem.path)) {
-              matchingSubmenu = {
-                type: menuType as "main" | "others",
-                index
-              };
-            }
-          });
-        }
-      });
+    navItems.forEach((nav, index) => {
+      if (nav.subItems && !matchingSubmenu) {
+        nav.subItems.forEach((subItem) => {
+          if (isActive(subItem.path)) {
+            matchingSubmenu = {
+              type: "main",
+              index
+            };
+          }
+        });
+      }
     });
 
     setOpenSubmenu(matchingSubmenu);
@@ -245,17 +236,6 @@ function AppSidebar() {
                 {isExpanded || isHovered || isMobileOpen ? "Menu" : <HorizontaLDots />}
               </h2>
               {renderMenuItems(navItems, "main")}
-            </div>
-
-            <div className="">
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? "Others" : <HorizontaLDots />}
-              </h2>
-              {renderMenuItems(othersItems, "others")}
             </div>
           </div>
         </nav>
