@@ -8,10 +8,9 @@ export function isDraft(mailshot: Pick<Mailshot, "sent_to_audiences">): boolean 
   return mailshot.sent_to_audiences.length === 0;
 }
 
-export function statusLabel(mailshot: Pick<Mailshot, "sent_to_audiences">): string {
-  const count = mailshot.sent_to_audiences.length;
-  if (count === 0) {
+export function statusLabel(mailshot: Pick<Mailshot, "sent_to_audiences" | "sent_count">): string {
+  if (isDraft(mailshot)) {
     return "Draft";
   }
-  return `Sent (${count} ${count === 1 ? "segment" : "segments"})`;
+  return `Sent to ${mailshot.sent_count.toLocaleString()} ${mailshot.sent_count === 1 ? "user" : "users"}`;
 }

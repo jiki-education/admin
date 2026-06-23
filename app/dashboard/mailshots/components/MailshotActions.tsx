@@ -8,7 +8,12 @@ import { isDraft, statusLabel } from "../status";
 import { extractErrorMessage } from "../errors";
 import SegmentSelector from "./SegmentSelector";
 import SendConfirmModal from "./SendConfirmModal";
+import { SEGMENTS } from "../types";
 import type { Mailshot, Segment } from "../types";
+
+function segmentLabel(segment: Segment): string {
+  return SEGMENTS.find((s) => s.value === segment)?.label ?? segment;
+}
 
 interface MailshotActionsProps {
   mailshot: Mailshot;
@@ -66,12 +71,25 @@ export default function MailshotActions({ mailshot, onUpdated }: MailshotActions
       <div className="flex items-end gap-3">
         <div className="flex-1">
           <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Audience</label>
-          <SegmentSelector value={segment} onChange={setSegment} />
+          <SegmentSelector value={segment} onChange={setSegment} exclude={mailshot.sent_to_audiences} />
         </div>
         <Button variant="primary" onClick={() => setConfirmOpen(true)} disabled={!segment}>
           Send
         </Button>
       </div>
+
+      {!isDraft(mailshot) && (
+        <div>
+          <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Already sent to</p>
+          <div className="flex flex-wrap gap-2">
+            {mailshot.sent_to_audiences.map((s) => (
+              <Badge key={s} variant="light" color="success">
+                {segmentLabel(s)}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
 
       {segment && confirmOpen && (
         <SendConfirmModal

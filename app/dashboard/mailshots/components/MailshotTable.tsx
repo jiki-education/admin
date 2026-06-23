@@ -78,7 +78,7 @@ export default function MailshotTable({ mailshots, loading = false, onDelete }: 
                     <div className="flex items-center gap-2">
                       <Link href={`/dashboard/mailshots/${mailshot.id}/edit`}>
                         <Button size="sm" variant="outline">
-                          Edit
+                          View
                         </Button>
                       </Link>
                       {onDelete && isDraft(mailshot) && (
