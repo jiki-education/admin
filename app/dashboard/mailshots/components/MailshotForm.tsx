@@ -19,6 +19,7 @@ interface MailshotFormProps {
 export default function MailshotForm({ mailshot, onSaved }: MailshotFormProps) {
   const [slug, setSlug] = useState(mailshot.slug);
   const [subject, setSubject] = useState(mailshot.subject);
+  const [previewText, setPreviewText] = useState(mailshot.preview_text);
   const [bodyMarkdown, setBodyMarkdown] = useState(mailshot.body_markdown);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<string, string[]>>>({});
   const [saving, setSaving] = useState(false);
@@ -27,7 +28,12 @@ export default function MailshotForm({ mailshot, onSaved }: MailshotFormProps) {
     setSaving(true);
     setFieldErrors({});
     try {
-      const updated = await updateMailshot(mailshot.id, { slug, subject, body_markdown: bodyMarkdown });
+      const updated = await updateMailshot(mailshot.id, {
+        slug,
+        subject,
+        preview_text: previewText,
+        body_markdown: bodyMarkdown
+      });
       onSaved(updated);
       toast.success("Mailshot saved");
     } catch (err) {
@@ -64,13 +70,29 @@ export default function MailshotForm({ mailshot, onSaved }: MailshotFormProps) {
         />
       </div>
 
+      <div>
+        <Label htmlFor="mailshot-preview-text">Preview text</Label>
+        <Input
+          id="mailshot-preview-text"
+          value={previewText}
+          onChange={(e) => setPreviewText(e.target.value)}
+          error={Boolean(fieldErrors.preview_text)}
+          hint={
+            fieldErrors.preview_text?.join(", ") ||
+            "The snippet shown after the subject in inbox previews (e.g. Gmail). Leave blank to let clients use the email body."
+          }
+        />
+      </div>
+
       <MarkdownEditor
         label="Body"
         value={bodyMarkdown}
         onChange={setBodyMarkdown}
         rows={18}
         error={fieldErrors.body_markdown?.join(", ")}
-        renderPreview={(value) => <ServerPreview mailshotId={mailshot.id} bodyMarkdown={value} subject={subject} />}
+        renderPreview={(value) => (
+          <ServerPreview mailshotId={mailshot.id} bodyMarkdown={value} subject={subject} previewText={previewText} />
+        )}
       />
 
       <div className="flex justify-end">

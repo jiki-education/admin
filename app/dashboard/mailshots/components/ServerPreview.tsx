@@ -6,11 +6,12 @@ interface ServerPreviewProps {
   mailshotId: number;
   bodyMarkdown: string;
   subject: string;
+  previewText: string;
 }
 
 const DEBOUNCE_MS = 500;
 
-export default function ServerPreview({ mailshotId, bodyMarkdown, subject }: ServerPreviewProps) {
+export default function ServerPreview({ mailshotId, bodyMarkdown, subject, previewText }: ServerPreviewProps) {
   const [html, setHtml] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +27,11 @@ export default function ServerPreview({ mailshotId, bodyMarkdown, subject }: Ser
       try {
         setLoading(true);
         setError(null);
-        const rendered = await previewMailshot(mailshotId, { body_markdown: bodyMarkdown, subject });
+        const rendered = await previewMailshot(mailshotId, {
+          body_markdown: bodyMarkdown,
+          subject,
+          preview_text: previewText
+        });
         if (!cancelled) {
           setHtml(rendered);
         }
@@ -45,7 +50,7 @@ export default function ServerPreview({ mailshotId, bodyMarkdown, subject }: Ser
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [mailshotId, bodyMarkdown, subject]);
+  }, [mailshotId, bodyMarkdown, subject, previewText]);
 
   if (error) {
     return <p className="text-sm text-red-600 dark:text-red-400">{error}</p>;

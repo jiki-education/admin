@@ -26,6 +26,7 @@ const mailshot: Mailshot = {
   id: 7,
   slug: "launch",
   subject: "We launched!",
+  preview_text: "Big news inside",
   body_markdown: "# Hi",
   email_communication_preferences_key: "newsletter",
   sent_to_audiences: [],
@@ -87,10 +88,10 @@ describe("Mailshots API client", () => {
   test("previewMailshot wraps body and returns html", async () => {
     mockApi.post.mockResolvedValue(ok({ html: "<html></html>" }));
 
-    const html = await previewMailshot(7, { body_markdown: "# Hi", subject: "S" });
+    const html = await previewMailshot(7, { body_markdown: "# Hi", subject: "S", preview_text: "P" });
 
     expect(mockApi.post).toHaveBeenCalledWith("/admin/mailshots/7/preview", {
-      mailshot: { body_markdown: "# Hi", subject: "S" }
+      mailshot: { body_markdown: "# Hi", subject: "S", preview_text: "P" }
     });
     expect(html).toBe("<html></html>");
   });

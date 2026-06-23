@@ -11,6 +11,7 @@ export interface Mailshot {
   id: number;
   slug: string;
   subject: string;
+  preview_text: string;
   body_markdown: string;
   email_communication_preferences_key: string;
   sent_to_audiences: Segment[];
@@ -23,6 +24,7 @@ export interface Mailshot {
 export interface MailshotInput {
   slug: string;
   subject: string;
+  preview_text?: string;
   body_markdown: string;
 }
 
