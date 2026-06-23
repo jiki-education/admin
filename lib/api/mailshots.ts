@@ -70,7 +70,10 @@ export async function deleteMailshot(id: number): Promise<void> {
  * Not persisted; reflects the unsaved editor content sent in the request.
  * POST /admin/mailshots/:id/preview
  */
-export async function previewMailshot(id: number, input: { body_markdown: string; subject: string }): Promise<string> {
+export async function previewMailshot(
+  id: number,
+  input: { body_markdown: string; subject: string; preview_text: string }
+): Promise<string> {
   const response = await api.post<PreviewResponse>(`/admin/mailshots/${id}/preview`, { mailshot: input });
   return response.data.html;
 }
