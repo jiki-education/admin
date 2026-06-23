@@ -107,7 +107,7 @@ async function runE2ETests() {
         "/dashboard",
         "/dashboard/users",
         "/dashboard/levels",
-        "/dashboard/email-templates"
+        "/dashboard/mailshots"
       ].includes(route)
     );
 

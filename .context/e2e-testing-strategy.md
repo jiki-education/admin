@@ -129,13 +129,12 @@ describe("Feature Name", () => {
 ## Implementation Order
 
 1. ✅ Basic page loads (auth.test.ts - home page loading)
-2. ✅ Authentication flow (email-templates.test.ts - redirect to signin)
+2. ✅ Authentication flow (navigation.test.ts - redirect to signin)
 3. ✅ Main navigation (navigation.test.ts - all main pages)
 4. ✅ One feature at a time:
-   - ✅ email-templates (email-templates.test.ts - 11 comprehensive tests)
    - ⚠️ users (navigation.test.ts - basic page load only)
    - ⚠️ levels (navigation.test.ts - basic page load only)
 5. ❌ Form submissions (not implemented)
-6. ❌ Error handling (basic error cases in email-templates only)
+6. ❌ Error handling (not implemented)
 
 Remember: **Quality over quantity. One working test is infinitely better than 100 broken tests.**

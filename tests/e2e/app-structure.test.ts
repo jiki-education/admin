@@ -21,7 +21,7 @@ describe("App Structure and Integration Tests", () => {
     });
 
     it("should handle navigation between different admin sections", async () => {
-      const routes = ["/dashboard/users", "/dashboard/levels", "/dashboard/email-templates"];
+      const routes = ["/dashboard/users", "/dashboard/levels", "/dashboard/mailshots"];
 
       for (const route of routes) {
         await page.goto(`${baseUrl}${route}`);

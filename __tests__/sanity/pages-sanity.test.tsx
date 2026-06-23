@@ -32,13 +32,25 @@ jest.mock("@/lib/api/users", () => ({
   getUsers: fastResolve({ results: [], meta: { current_page: 1, total_pages: 1, total_count: 0 } })
 }));
 
-jest.mock("@/lib/api/email-templates", () => ({
-  getEmailTemplates: fastResolve({ results: [], meta: { current_page: 1, total_pages: 1, total_count: 0 } }),
-  getEmailTemplate: fastResolve({ id: 1, subject: "Test", body: "Test body", template_type: "welcome" }),
-  getEmailTemplateTypes: fastResolve([]),
-  updateEmailTemplate: fastResolve({}),
-  createEmailTemplate: fastResolve({}),
-  getEmailTemplatesSummary: fastResolve({ results: [], meta: { current_page: 1, total_pages: 1, total_count: 0 } })
+jest.mock("@/lib/api/mailshots", () => ({
+  getMailshots: fastResolve({ results: [], meta: { current_page: 1, total_pages: 1, total_count: 0 } }),
+  getMailshot: fastResolve({
+    id: 1,
+    slug: "test",
+    subject: "Test",
+    body_markdown: "# Test",
+    email_communication_preferences_key: "newsletter",
+    sent_to_audiences: [],
+    sent_count: 0,
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-01-01T00:00:00Z"
+  }),
+  createMailshot: fastResolve({}),
+  updateMailshot: fastResolve({}),
+  deleteMailshot: fastResolve(undefined),
+  previewMailshot: fastResolve("<html></html>"),
+  testMailshot: fastResolve(true),
+  sendMailshot: fastResolve({ mailshot: {}, audience_count: 0 })
 }));
 
 // Mock hooks
@@ -99,14 +111,19 @@ describe("Pages Sanity Check", () => {
       await expectRenderWithoutError(UsersPage);
     });
 
-    test("Email Templates page renders without errors", async () => {
-      const EmailTemplatesPage = (await import("@/app/dashboard/email-templates/page")).default;
-      await expectRenderWithoutError(EmailTemplatesPage);
+    test("Mailshots page renders without errors", async () => {
+      const MailshotsPage = (await import("@/app/dashboard/mailshots/page")).default;
+      await expectRenderWithoutError(MailshotsPage);
     });
 
-    test("Email Template Edit page renders without errors", async () => {
-      const EmailTemplateEditPage = (await import("@/app/dashboard/email-templates/edit/[id]/page")).default;
-      await expectRenderWithoutError(EmailTemplateEditPage);
+    test("New Mailshot page renders without errors", async () => {
+      const NewMailshotPage = (await import("@/app/dashboard/mailshots/new/page")).default;
+      await expectRenderWithoutError(NewMailshotPage);
+    });
+
+    test("Mailshot Edit page renders without errors", async () => {
+      const MailshotEditPage = (await import("@/app/dashboard/mailshots/[id]/edit/page")).default;
+      await expectRenderWithoutError(MailshotEditPage);
     });
   });
 
@@ -144,7 +161,7 @@ describe("Pages Sanity Check", () => {
         import("@/app/signin/page"),
         import("@/app/dashboard/page"),
         import("@/app/dashboard/users/page"),
-        import("@/app/dashboard/email-templates/page"),
+        import("@/app/dashboard/mailshots/page"),
         import("@/app/dashboard/levels/page"),
         import("@/app/dashboard/levels/new/page")
       ];
@@ -161,9 +178,9 @@ describe("Pages Sanity Check", () => {
 
     test("Dynamic route pages can be imported", async () => {
       // Test individual dynamic route imports
-      const emailEditModule = await import("@/app/dashboard/email-templates/edit/[id]/page");
-      expect(emailEditModule.default).toBeDefined();
-      expect(typeof emailEditModule.default).toBe("function");
+      const mailshotEditModule = await import("@/app/dashboard/mailshots/[id]/edit/page");
+      expect(mailshotEditModule.default).toBeDefined();
+      expect(typeof mailshotEditModule.default).toBe("function");
 
       const levelDetailModule = await import("@/app/dashboard/levels/[id]/page");
       expect(levelDetailModule.default).toBeDefined();

@@ -90,7 +90,7 @@ admin/
 │   │   ├── levels/         # Level & lesson management
 │   │   ├── concepts/       # Concept management
 │   │   ├── projects/       # Project management
-│   │   └── email-templates/# Email template management
+│   │   └── mailshots/      # Mailshot (bulk email) management
 │   ├── signin/             # Authentication pages
 │   └── signup/
 ├── components/             # React components

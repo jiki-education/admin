@@ -1,5 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
+import type { ReactNode } from "react";
 import { marked } from "marked";
 import Button from "@/components/ui/button/Button";
 
@@ -13,6 +14,9 @@ interface MarkdownEditorProps {
   rows?: number;
   className?: string;
   onImageUpload?: (file: File) => Promise<string>;
+  // When provided, the Preview pane renders this instead of the local marked-parsed HTML.
+  // Used to show a server-rendered preview (e.g. markdown injected into an email layout).
+  renderPreview?: (value: string) => ReactNode;
 }
 
 export default function MarkdownEditor({
@@ -24,7 +28,8 @@ export default function MarkdownEditor({
   required = false,
   rows = 10,
   className = "",
-  onImageUpload
+  onImageUpload,
+  renderPreview
 }: MarkdownEditorProps) {
   const [mode, setMode] = useState<"edit" | "preview">("edit");
   const [htmlContent, setHtmlContent] = useState("");
@@ -33,7 +38,7 @@ export default function MarkdownEditor({
 
   const handleModeSwitch = useCallback(
     async (newMode: "edit" | "preview") => {
-      if (newMode === "preview" && value.trim()) {
+      if (newMode === "preview" && !renderPreview && value.trim()) {
         try {
           const html = await marked.parse(value, {
             breaks: true,
@@ -48,7 +53,7 @@ export default function MarkdownEditor({
       }
       setMode(newMode);
     },
-    [value]
+    [value, renderPreview]
   );
 
   const handleTextareaChange = useCallback(
@@ -188,7 +193,9 @@ export default function MarkdownEditor({
             className={`w-full min-h-[${rows * 1.5}rem] rounded-lg border px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800/50 border-gray-300 dark:border-gray-700 overflow-auto`}
             style={{ minHeight: `${rows * 1.5}rem` }}
           >
-            {value.trim() ? (
+            {renderPreview ? (
+              renderPreview(value)
+            ) : value.trim() ? (
               <div
                 className="markdown-preview text-gray-900 dark:text-gray-100"
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
