@@ -4,7 +4,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar, SIDEBAR_WIDTH_EXPANDED, SIDEBAR_WIDTH_COLLAPSED } from "../context/SidebarContext";
-import { BoxCubeIcon, ChevronDownIcon, GridIcon, HorizontaLDots, PageIcon, UserCircleIcon } from "../icons/index";
+import {
+  BoxCubeIcon,
+  ChevronDownIcon,
+  GridIcon,
+  HorizontaLDots,
+  PageIcon,
+  PieChartIcon,
+  UserCircleIcon
+} from "../icons/index";
 
 interface NavItem {
   name: string;
@@ -33,6 +41,11 @@ const navItems: NavItem[] = [
       { name: "Projects", path: "/dashboard/projects", pro: false },
       { name: "Danger Zone", path: "/dashboard/danger-zone", pro: false }
     ]
+  },
+  {
+    icon: <PieChartIcon />,
+    name: "Analytics",
+    subItems: [{ name: "Exercises", path: "/analytics/exercises", pro: false }]
   },
   {
     icon: <BoxCubeIcon />,
