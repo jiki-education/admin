@@ -1,10 +1,11 @@
-export type Segment = "all_users" | "premium_users" | "free_users" | "admin_users";
+export type Segment = "all_users" | "premium_users" | "free_users" | "admin_users" | "completed_digital_clock";
 
 export const SEGMENTS: { value: Segment; label: string }[] = [
   { value: "all_users", label: "All users" },
   { value: "premium_users", label: "Premium users" },
   { value: "free_users", label: "Free users" },
-  { value: "admin_users", label: "Admin users" }
+  { value: "admin_users", label: "Admin users" },
+  { value: "completed_digital_clock", label: "Reached level 8 (completed Digital Clock)" }
 ];
 
 export interface Mailshot {
