@@ -67,7 +67,7 @@ export default function ProjectDetail() {
     try {
       setDeleting(true);
       await deleteProject(projectId);
-      toast.success(`Project "${project.title}" deleted successfully!`);
+      toast.success(`Project "${project.slug}" deleted successfully!`);
       router.push("/dashboard/projects");
     } catch (err) {
       console.error("Failed to delete project:", err);
@@ -109,13 +109,13 @@ export default function ProjectDetail() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle={`Project: ${project.title}`} />
+      <PageBreadcrumb pageTitle={`Project: ${project.slug}`} />
 
       <div className="space-y-6">
         {/* Project Overview */}
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">{project.title}</h1>
+            <h1 className="text-xl font-mono font-semibold text-gray-800 dark:text-white/90">{project.slug}</h1>
             <div className="flex gap-3">
               <Button variant="outline" onClick={handleEdit}>
                 Edit
@@ -148,14 +148,6 @@ export default function ProjectDetail() {
             <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg">
               <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Exercise Slug</h3>
               <p className="text-lg font-mono text-blue-800 dark:text-blue-400">{project.exercise_slug}</p>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="mb-8">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Description</h3>
-            <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg">
-              <p className="text-gray-700 dark:text-gray-300">{project.description}</p>
             </div>
           </div>
 
@@ -205,7 +197,7 @@ export default function ProjectDetail() {
           <div className="mb-6">
             <p className="text-sm text-gray-700 dark:text-gray-300">
               Are you sure you want to delete the project{" "}
-              <span className="font-medium text-gray-900 dark:text-white">&quot;{project?.title}&quot;</span>?
+              <span className="font-medium text-gray-900 dark:text-white">&quot;{project?.slug}&quot;</span>?
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
               This will permanently remove the project and all associated data.
