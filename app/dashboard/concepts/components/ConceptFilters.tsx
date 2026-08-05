@@ -9,11 +9,11 @@ interface ConceptFiltersProps {
 }
 
 export default function ConceptFilters({ filters, onFiltersChange, onClearFilters }: ConceptFiltersProps) {
-  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onFiltersChange({ ...filters, slug: e.target.value || undefined });
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onFiltersChange({ ...filters, query: e.target.value || undefined });
   };
 
-  const hasActiveFilters = filters.slug;
+  const hasActiveFilters = filters.query;
 
   return (
     <div className="mb-6 p-4 bg-gray-50 dark:bg-white/[0.02] rounded-lg border border-gray-200 dark:border-gray-800">
@@ -23,8 +23,8 @@ export default function ConceptFilters({ filters, onFiltersChange, onClearFilter
           <input
             type="text"
             placeholder="Search by slug..."
-            value={filters.slug || ""}
-            onChange={handleSlugChange}
+            value={filters.query || ""}
+            onChange={handleQueryChange}
             className="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
           />
         </div>

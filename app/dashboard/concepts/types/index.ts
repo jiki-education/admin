@@ -11,7 +11,7 @@ export interface AdminConcept {
 }
 
 export interface AdminConceptFilters {
-  slug?: string;
+  query?: string;
   page?: number;
   per?: number;
 }

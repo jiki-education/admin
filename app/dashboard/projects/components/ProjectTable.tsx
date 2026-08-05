@@ -96,6 +96,12 @@ export default function ProjectTable({ projects, loading = false, error = null, 
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
+                  Title
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
                   Slug
                 </TableCell>
                 <TableCell
@@ -103,6 +109,12 @@ export default function ProjectTable({ projects, loading = false, error = null, 
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Exercise Slug
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Description
                 </TableCell>
                 <TableCell
                   isHeader
@@ -119,6 +131,9 @@ export default function ProjectTable({ projects, loading = false, error = null, 
                   <TableCell className="px-5 py-4 text-start">
                     <span className="font-medium text-gray-800 text-theme-sm dark:text-white/90">#{project.id}</span>
                   </TableCell>
+                  <TableCell className="px-5 py-4 text-start">
+                    <div className="font-medium text-gray-900 dark:text-white">{project.title}</div>
+                  </TableCell>
                   <TableCell className="px-5 py-4 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">{project.slug}</code>
                   </TableCell>
@@ -126,6 +141,11 @@ export default function ProjectTable({ projects, loading = false, error = null, 
                     <code className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded text-xs font-mono">
                       {project.exercise_slug}
                     </code>
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start max-w-xs">
+                    <div className="text-gray-600 dark:text-gray-400 text-sm truncate">
+                      {project.description || "No description"}
+                    </div>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start">
                     <Link href={`/dashboard/projects/${project.id}`}>

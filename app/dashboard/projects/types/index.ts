@@ -2,13 +2,15 @@
 
 export interface AdminProject {
   id: number;
+  title: string;
   slug: string;
+  description: string;
   exercise_slug: string;
   unlocked_by_lesson_id?: number | null;
 }
 
 export interface AdminProjectFilters {
-  slug?: string;
+  title?: string;
   page?: number;
   per?: number;
 }

@@ -43,10 +43,10 @@ describe("Concepts API Client", () => {
 
     mockApi.get.mockResolvedValue(createMockResponse(responseData));
 
-    const result = await getAdminConcepts({ slug: "var", page: 1 });
+    const result = await getAdminConcepts({ query: "var", page: 1 });
 
     expect(mockApi.get).toHaveBeenCalledWith("/admin/concepts", {
-      params: { slug: "var", page: "1" }
+      params: { query: "var", page: "1" }
     });
 
     expect(result).toEqual(responseData);

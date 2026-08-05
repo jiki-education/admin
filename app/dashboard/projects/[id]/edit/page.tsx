@@ -94,7 +94,7 @@ export default function EditProject() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle={`Edit: ${project.slug}`} />
+      <PageBreadcrumb pageTitle={`Edit: ${project.title}`} />
 
       <div className="space-y-6">
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
