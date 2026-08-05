@@ -1,8 +1,6 @@
 export interface Level {
   id: number;
   slug: string;
-  title: string;
-  description: string;
   position: number;
   lessons: Lesson[];
 }
@@ -10,8 +8,6 @@ export interface Level {
 export interface Lesson {
   id: number;
   slug: string;
-  title: string;
-  description: string;
   type: string;
   position: number;
   data: Record<string, any>;

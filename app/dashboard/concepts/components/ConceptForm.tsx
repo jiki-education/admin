@@ -2,7 +2,7 @@
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import Button from "@/components/ui/button/Button";
-import { generateSlug, isValidSlug } from "@/lib/utils/slug";
+import { isValidSlug } from "@/lib/utils/slug";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { mockUploadImage } from "@/lib/utils/imageUpload";
 import type { AdminConcept, VideoProvider } from "../types";
@@ -16,9 +16,7 @@ interface ConceptFormProps {
 
 export default function ConceptForm({ initialData, onSave, onCancel, mode }: ConceptFormProps) {
   const [formData, setFormData] = useState({
-    title: initialData?.title || "",
     slug: initialData?.slug || "",
-    description: initialData?.description || "",
     content_markdown: initialData?.content_markdown || "",
     standard_video_provider: (initialData?.standard_video_provider as VideoProvider) ?? null,
     standard_video_id: initialData?.standard_video_id ?? "",
@@ -28,30 +26,18 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [slugTouched, setSlugTouched] = useState(mode === "edit" || Boolean(initialData?.slug));
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       const { name, value } = e.target;
       setFormData((prev) => ({ ...prev, [name]: value ?? "" }));
 
-      // Auto-generate slug from title if slug hasn't been manually edited
-      if (name === "title" && !slugTouched && mode === "create") {
-        const autoSlug = generateSlug(value);
-        setFormData((prev) => ({ ...prev, slug: autoSlug }));
-      }
-
-      // Mark slug as manually edited if user types in slug field
-      if (name === "slug") {
-        setSlugTouched(true);
-      }
-
       // Clear error when user starts typing
       if (errors[name]) {
         setErrors((prev) => ({ ...prev, [name]: "" }));
       }
     },
-    [errors, slugTouched, mode]
+    [errors]
   );
 
   const handleMarkdownChange = useCallback(
@@ -70,17 +56,11 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
     const newErrors: Record<string, string> = {};
 
     // Required fields
-    if (!formData.title.trim()) {
-      newErrors.title = "Title is required";
-    }
-    if (!formData.description.trim()) {
-      newErrors.description = "Description is required";
-    }
     if (!formData.content_markdown.trim()) {
       newErrors.content_markdown = "Content is required";
     }
-    if (mode === "edit" && !formData.slug.trim()) {
-      newErrors.slug = "Slug is required for updates";
+    if (!formData.slug.trim()) {
+      newErrors.slug = "Slug is required";
     }
 
     // Video validation - if provider is set, ID is required
@@ -98,7 +78,7 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData, mode]);
+  }, [formData]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -114,11 +94,8 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
 
         // Prepare data based on mode
         const data = {
-          title: formData.title.trim(),
-          description: formData.description.trim(),
           content_markdown: formData.content_markdown.trim(),
-          ...(mode === "edit" && { slug: formData.slug.trim() }),
-          ...(mode === "create" && formData.slug.trim() && { slug: formData.slug.trim() }),
+          slug: formData.slug.trim(),
           standard_video_provider: formData.standard_video_provider ?? null,
           standard_video_id: formData.standard_video_id.trim() || null,
           premium_video_provider: formData.premium_video_provider ?? null,
@@ -142,10 +119,8 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
 
   const isFormValid = () => {
     return (
-      formData.title.trim() &&
-      formData.description.trim() &&
+      formData.slug.trim() &&
       formData.content_markdown.trim() &&
-      (mode === "create" || formData.slug.trim()) &&
       (!formData.standard_video_provider || Boolean(formData.standard_video_id.trim())) &&
       (!formData.premium_video_provider || Boolean(formData.premium_video_id.trim()))
     );
@@ -172,31 +147,10 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
         </div>
       )}
 
-      {/* Title */}
-      <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Title <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          id="title"
-          name="title"
-          value={formData.title}
-          onChange={handleInputChange}
-          placeholder="Enter concept title"
-          className={`h-11 w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 ${
-            errors.title
-              ? "border-red-300 focus:border-red-300 focus:ring-red-500/10 dark:border-red-800"
-              : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
-          }`}
-        />
-        {errors.title && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.title}</p>}
-      </div>
-
       {/* Slug */}
       <div>
         <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Slug {mode === "edit" && <span className="text-red-500">*</span>}
+          Slug <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -211,33 +165,8 @@ export default function ConceptForm({ initialData, onSave, onCancel, mode }: Con
               : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
           }`}
         />
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          {mode === "create"
-            ? "URL-friendly identifier. Auto-generated from title, but you can customize it."
-            : "URL-friendly identifier. Required for updates."}
-        </p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">URL-friendly identifier for this concept.</p>
         {errors.slug && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.slug}</p>}
-      </div>
-
-      {/* Description */}
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Description <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleInputChange}
-          placeholder="Enter a brief description (a couple of sentences)"
-          rows={3}
-          className={`w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 ${
-            errors.description
-              ? "border-red-300 focus:border-red-300 focus:ring-red-500/10 dark:border-red-800"
-              : "border-gray-300 focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:focus:border-brand-800"
-          }`}
-        />
-        {errors.description && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.description}</p>}
       </div>
 
       {/* Content Markdown */}

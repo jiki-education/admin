@@ -8,8 +8,6 @@ export interface VideoSource {
 export interface LessonData {
   slug: string;
   type: "exercise" | "video";
-  title: string;
-  description?: string;
   data?:
     | {
         sources?: VideoSource[];

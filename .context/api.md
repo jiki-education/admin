@@ -347,8 +347,6 @@ Response structure:
 interface LessonData {
   slug: string;
   type: "exercise" | "video";
-  title: string;
-  description?: string;
   data?: {
     sources?: Array<{
       host: string; // e.g., "mux"

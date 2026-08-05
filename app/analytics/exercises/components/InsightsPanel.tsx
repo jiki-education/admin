@@ -52,8 +52,8 @@ function InsightCard({ insight }: { insight: ExerciseInsight }) {
   return (
     <li className={`rounded-lg border-l-4 p-4 ${styles.card}`}>
       <div className="flex items-center gap-2 mb-1">
-        <span className="font-medium text-gray-800 dark:text-white/90 hover:underline cursor-pointer">
-          {insight.title}
+        <span className="font-mono font-medium text-gray-800 dark:text-white/90 hover:underline cursor-pointer">
+          {insight.slug}
         </span>
         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-theme-xs font-medium ${styles.badge}`}>
           {humanizeInsightType(insight.type)}

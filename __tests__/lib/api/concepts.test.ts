@@ -30,9 +30,7 @@ describe("Concepts API Client", () => {
       results: [
         {
           id: 1,
-          title: "Variables",
           slug: "variables",
-          description: "Learn about variables",
           content_markdown: "# Variables\nContent here"
         }
       ],
@@ -45,10 +43,10 @@ describe("Concepts API Client", () => {
 
     mockApi.get.mockResolvedValue(createMockResponse(responseData));
 
-    const result = await getAdminConcepts({ title: "var", page: 1 });
+    const result = await getAdminConcepts({ slug: "var", page: 1 });
 
     expect(mockApi.get).toHaveBeenCalledWith("/admin/concepts", {
-      params: { title: "var", page: "1" }
+      params: { slug: "var", page: "1" }
     });
 
     expect(result).toEqual(responseData);
@@ -57,9 +55,7 @@ describe("Concepts API Client", () => {
   test("getAdminConcept sends correct API request and returns single concept", async () => {
     const concept = {
       id: 1,
-      title: "Variables",
       slug: "variables",
-      description: "Learn about variables",
       content_markdown: "# Variables\nContent here"
     };
 
@@ -73,16 +69,13 @@ describe("Concepts API Client", () => {
 
   test("createConcept sends correct API request and returns new concept", async () => {
     const conceptData: CreateConceptData = {
-      title: "Functions",
-      description: "Learn about functions",
+      slug: "functions",
       content_markdown: "# Functions\nContent here"
     };
 
     const concept = {
       id: 2,
-      title: "Functions",
       slug: "functions",
-      description: "Learn about functions",
       content_markdown: "# Functions\nContent here"
     };
 
@@ -99,16 +92,12 @@ describe("Concepts API Client", () => {
 
   test("updateConcept sends correct API request and returns updated concept", async () => {
     const conceptData: UpdateConceptData = {
-      title: "Updated Functions",
-      slug: "updated-functions",
-      description: "Updated description"
+      slug: "updated-functions"
     };
 
     const concept = {
       id: 2,
-      title: "Updated Functions",
       slug: "updated-functions",
-      description: "Updated description",
       content_markdown: "# Functions\nContent here"
     };
 

@@ -50,51 +50,15 @@ describe("Levels Management E2E Tests", () => {
 
       // Try to find form elements (they should exist if we reached the new level page)
       try {
-        const titleInput = await page.waitForSelector('input[id="title"]', { timeout: 2000 });
         const slugInput = await page.waitForSelector('input[id="slug"]', { timeout: 2000 });
-        const descriptionTextarea = await page.waitForSelector('textarea[id="description"]', { timeout: 2000 });
 
-        expect(titleInput).toBeTruthy();
         expect(slugInput).toBeTruthy();
-        expect(descriptionTextarea).toBeTruthy();
 
         // Check for form buttons
         const saveButton = await page.$('button[type="submit"]');
         expect(saveButton).toBeTruthy();
       } catch {
         console.debug("Form elements not found - likely redirected or not loaded");
-      }
-    });
-
-    it("should auto-generate slug from title when authenticated", async () => {
-      await page.goto(`${baseUrl}/dashboard/levels/new`);
-      await page.waitForSelector("body", { timeout: 5000 });
-
-      const currentUrl = page.url();
-      if (currentUrl.includes("/signin")) {
-        console.debug("Redirected to signin - skipping slug generation test");
-        return;
-      }
-
-      try {
-        const titleInput = await page.waitForSelector('input[id="title"]', { timeout: 2000 });
-        const slugInput = await page.waitForSelector('input[id="slug"]', { timeout: 2000 });
-
-        // Type in the title
-        await titleInput.click();
-        await titleInput.type("Introduction to Programming");
-
-        // Blur the title field to trigger slug generation
-        await page.keyboard.press("Tab");
-
-        // Wait a bit for auto-generation
-        await page.waitForTimeout(500);
-
-        // Check that slug was generated
-        const slugValue = await slugInput.evaluate((el: HTMLInputElement) => el.value);
-        expect(slugValue).toBe("introduction-to-programming");
-      } catch {
-        console.debug("Could not test slug generation - form not accessible");
       }
     });
 

@@ -29,12 +29,6 @@ export default function LessonTableSkeleton({ rows = 5 }: LessonTableSkeletonPro
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Title
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
                   Type
                 </TableCell>
                 <TableCell
@@ -42,12 +36,6 @@ export default function LessonTableSkeleton({ rows = 5 }: LessonTableSkeletonPro
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Slug
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Description
                 </TableCell>
                 <TableCell
                   isHeader
@@ -71,11 +59,6 @@ export default function LessonTableSkeleton({ rows = 5 }: LessonTableSkeletonPro
                     <div className="w-8 h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                   </TableCell>
 
-                  {/* Title skeleton */}
-                  <TableCell className="px-5 py-4 text-start">
-                    <div className="w-32 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                  </TableCell>
-
                   {/* Type skeleton */}
                   <TableCell className="px-5 py-4 text-start">
                     <div className="w-16 h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
@@ -84,11 +67,6 @@ export default function LessonTableSkeleton({ rows = 5 }: LessonTableSkeletonPro
                   {/* Slug skeleton */}
                   <TableCell className="px-5 py-4 text-start">
                     <div className="w-24 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                  </TableCell>
-
-                  {/* Description skeleton */}
-                  <TableCell className="px-5 py-4 text-start max-w-xs">
-                    <div className="w-40 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                   </TableCell>
 
                   {/* Actions skeleton */}

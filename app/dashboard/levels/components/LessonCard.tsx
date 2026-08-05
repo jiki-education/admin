@@ -39,7 +39,7 @@ export default function LessonCard({
             checked={isSelected}
             onChange={(e) => onSelect(e.target.checked)}
             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            aria-label={`Select lesson: ${lesson.title}`}
+            aria-label={`Select lesson: ${lesson.slug}`}
           />
           <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
             Position {lesson.position}
@@ -50,24 +50,12 @@ export default function LessonCard({
         </span>
       </div>
 
-      {/* Title */}
-      <div>
-        <h3 className="font-medium text-gray-900 dark:text-white text-sm">{lesson.title}</h3>
-      </div>
-
       {/* Slug */}
       <div>
         <code className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-600 dark:text-gray-300">
           {lesson.slug}
         </code>
       </div>
-
-      {/* Description */}
-      {lesson.description && (
-        <div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{lesson.description}</p>
-        </div>
-      )}
 
       {/* Actions */}
       <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-600">
@@ -77,7 +65,7 @@ export default function LessonCard({
             disabled={!canMoveUp}
             className="w-8 h-8 p-0 flex items-center justify-center border border-gray-300 rounded bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
             title="Move up"
-            aria-label={`Move ${lesson.title} up`}
+            aria-label={`Move ${lesson.slug} up`}
           >
             <span aria-hidden="true">↑</span>
           </button>
@@ -86,7 +74,7 @@ export default function LessonCard({
             disabled={!canMoveDown}
             className="w-8 h-8 p-0 flex items-center justify-center border border-gray-300 rounded bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
             title="Move down"
-            aria-label={`Move ${lesson.title} down`}
+            aria-label={`Move ${lesson.slug} down`}
           >
             <span aria-hidden="true">↓</span>
           </button>

@@ -25,8 +25,7 @@ export default function ExerciseRow({ exercise }: ExerciseRowProps) {
   return (
     <TableRow className={exercise.low_sample ? "opacity-60" : undefined}>
       <TableCell className={CELL_CLASSES}>
-        <div className="font-medium text-gray-800 dark:text-white/90">{exercise.title}</div>
-        <div className={`text-theme-xs ${MUTED_CLASSES}`}>{exercise.slug}</div>
+        <div className="font-mono font-medium text-gray-800 dark:text-white/90">{exercise.slug}</div>
       </TableCell>
       <TableCell className={CELL_CLASSES}>
         <HealthBadge score={exercise.health_score} lowSample={exercise.low_sample} />

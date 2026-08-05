@@ -9,8 +9,6 @@ Based on analysis of the Jiki API codebase, here's comprehensive information abo
 ```ruby
 # Key attributes:
 - slug: unique identifier (string)
-- title: display name (string)
-- description: level description (string)
 - position: ordering (integer, auto-generated)
 
 # Relationships:
@@ -38,8 +36,6 @@ Based on analysis of the Jiki API codebase, here's comprehensive information abo
 ```ruby
 # Key attributes:
 - slug: unique identifier (string)
-- title: display name (string)
-- description: lesson description (string)
 - type: lesson type ("exercise", "tutorial", etc.)
 - position: ordering within level (integer, auto-generated)
 - data: flexible JSON data field for lesson-specific content
@@ -209,7 +205,6 @@ Based on analysis of the Jiki API codebase, here's comprehensive information abo
 
 **Query Parameters:**
 
-- `title`: filter by title (partial match)
 - `slug`: filter by slug (partial match)
 - `page`: page number (default: 1)
 - `per`: items per page (default: 24)
@@ -222,8 +217,6 @@ Based on analysis of the Jiki API codebase, here's comprehensive information abo
     {
       "id": 1,
       "slug": "basics",
-      "title": "Programming Basics",
-      "description": "Learn the fundamentals",
       "position": 1
     }
   ],
@@ -243,8 +236,6 @@ Based on analysis of the Jiki API codebase, here's comprehensive information abo
 ```json
 {
   "level": {
-    "title": "Updated Title",
-    "description": "Updated description",
     "position": 2,
     "slug": "updated-slug"
   }
@@ -263,8 +254,6 @@ Based on analysis of the Jiki API codebase, here's comprehensive information abo
     {
       "id": 1,
       "slug": "lesson-1",
-      "title": "Hello World",
-      "description": "Your first program",
       "type": "exercise",
       "position": 1,
       "data": { "slug": "hello-world" }
@@ -280,8 +269,6 @@ Based on analysis of the Jiki API codebase, here's comprehensive information abo
 ```json
 {
   "lesson": {
-    "title": "Updated Lesson",
-    "description": "Updated description",
     "type": "tutorial",
     "position": 2,
     "data": { "instructions": "New instructions" }
@@ -474,7 +461,7 @@ const LessonList = ({ level, userProgress }) => {
         return (
           <div key={lesson.slug} className="lesson-item">
             <div className="lesson-info">
-              <h3>{lesson.title}</h3>
+              <h3>{lesson.slug}</h3>
               <span className="lesson-type">{lesson.type}</span>
             </div>
             <LessonStatus userLesson={userLesson} lesson={lesson} />
@@ -491,7 +478,7 @@ const LessonList = ({ level, userProgress }) => {
 ```javascript
 // Admin level search/filter
 const AdminLevels = () => {
-  const [filters, setFilters] = useState({ title: "", slug: "", page: 1 });
+  const [filters, setFilters] = useState({ slug: "", page: 1 });
 
   const { data: levels } = useQuery({
     queryKey: ["admin-levels", filters],
@@ -518,8 +505,8 @@ const AdminLevels = () => {
 
 ### 2. Admin Interface
 
-- **Level Search**: Filter by title/slug with pagination
-- **Level Editor**: Form to update title, description, position, slug
+- **Level Search**: Filter by slug with pagination
+- **Level Editor**: Form to update position and slug
 - **Level Ordering**: Drag-and-drop or input for position changes
 - **Lesson Management**: CRUD operations for lessons within levels
 - **Lesson Editor**: Form to update lesson content, type, and data

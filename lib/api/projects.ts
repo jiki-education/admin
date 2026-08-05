@@ -18,7 +18,7 @@ import type {
  */
 export async function getAdminProjects(filters?: AdminProjectFilters): Promise<AdminProjectsResponse> {
   const params: Record<string, string> = {
-    ...(filters?.title && { title: filters.title }),
+    ...(filters?.slug && { slug: filters.slug }),
     ...(filters?.page && { page: filters.page.toString() }),
     ...(filters?.per && { per: filters.per.toString() })
   };

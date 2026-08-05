@@ -2,16 +2,12 @@
 export interface AdminLevel {
   id: number;
   slug: string;
-  title: string;
-  description: string;
   position: number;
 }
 
 export interface AdminLesson {
   id: number;
   slug: string;
-  title: string;
-  description: string;
   type: string;
   position: number;
   data: Record<string, any>;
@@ -19,7 +15,6 @@ export interface AdminLesson {
 
 export interface AdminLevelFilters {
   course_slug?: string;
-  title?: string;
   slug?: string;
   page?: number;
   per?: number;

@@ -6,7 +6,7 @@ export interface ColumnDef {
 }
 
 export const COLUMNS: ColumnDef[] = [
-  { key: "title", label: "Exercise" },
+  { key: "slug", label: "Exercise" },
   { key: "health_score", label: "Health" },
   { key: "num_starts", label: "Starts" },
   { key: "completion_pct", label: "Done %" },

@@ -18,13 +18,7 @@ describe("LevelForm Component", () => {
     const submitButton = screen.getByRole("button", { name: /create level/i });
     expect(submitButton).toBeDisabled(); // Should be disabled when form is invalid
 
-    // Fill in title and description, but clear slug to test validation
-    const titleInput = screen.getByLabelText(/title/i);
-    const descriptionInput = screen.getByLabelText(/description/i);
     const slugInput = screen.getByLabelText(/slug/i);
-
-    fireEvent.change(titleInput, { target: { value: "Test Title" } });
-    fireEvent.change(descriptionInput, { target: { value: "Test description" } });
 
     // Clear slug to test validation
     fireEvent.change(slugInput, { target: { value: "" } });
@@ -50,11 +44,8 @@ describe("LevelForm Component", () => {
     render(<LevelForm mode="create" onSave={mockSave} onCancel={mockOnCancel} />);
 
     // Fill in form with valid data first
-    fireEvent.change(screen.getByLabelText(/title/i), {
-      target: { value: "Test Title" }
-    });
-    fireEvent.change(screen.getByLabelText(/description/i), {
-      target: { value: "Test description" }
+    fireEvent.change(screen.getByLabelText(/slug/i), {
+      target: { value: "test-slug" }
     });
 
     // Now form is valid and submit should be enabled
@@ -72,20 +63,16 @@ describe("LevelForm Component", () => {
     expect(mockSave).toHaveBeenCalled();
   });
 
-  test("auto-generates slug from title and allows manual override", () => {
+  test("rejects a slug that is not URL-friendly", () => {
     render(<LevelForm mode="create" onSave={mockOnSave} onCancel={mockOnCancel} />);
 
-    const titleInput = screen.getByLabelText(/title/i);
-    const slugInput = screen.getByLabelText(/slug/i);
+    const submitButton = screen.getByRole("button", { name: /create level/i });
 
-    // Type title and check auto-generated slug
-    fireEvent.change(titleInput, { target: { value: "Introduction to Programming" } });
-    expect(slugInput).toHaveValue("introduction-to-programming");
+    fireEvent.change(screen.getByLabelText(/slug/i), { target: { value: "Not A Slug" } });
+    expect(submitButton).toBeDisabled();
 
-    // Manually edit slug - should not auto-update anymore
-    fireEvent.change(slugInput, { target: { value: "custom-slug" } });
-    fireEvent.change(titleInput, { target: { value: "New Title" } });
-    expect(slugInput).toHaveValue("custom-slug"); // Should stay custom
+    fireEvent.change(screen.getByLabelText(/slug/i), { target: { value: "not-a-slug" } });
+    expect(submitButton).not.toBeDisabled();
   });
 
   test("submits valid form data correctly", async () => {
@@ -94,11 +81,8 @@ describe("LevelForm Component", () => {
     render(<LevelForm mode="create" onSave={mockSave} onCancel={mockOnCancel} />);
 
     // Fill in valid form data
-    fireEvent.change(screen.getByLabelText(/title/i), {
-      target: { value: "Test Level" }
-    });
-    fireEvent.change(screen.getByLabelText(/description/i), {
-      target: { value: "Test description" }
+    fireEvent.change(screen.getByLabelText(/slug/i), {
+      target: { value: "test-level" }
     });
 
     const submitButton = screen.getByRole("button", { name: /create level/i });
@@ -106,9 +90,7 @@ describe("LevelForm Component", () => {
 
     await waitFor(() => {
       expect(mockSave).toHaveBeenCalledWith({
-        title: "Test Level",
-        slug: "test-level",
-        description: "Test description"
+        slug: "test-level"
       } as CreateLevelData);
     });
   });

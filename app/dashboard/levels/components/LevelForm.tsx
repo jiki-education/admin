@@ -20,7 +20,7 @@ interface LevelFormProps {
 export default function LevelForm({ initialData, onSave, onCancel, loading = false, mode }: LevelFormProps) {
   const { formData, errors, handleInputChange, handleSlugChange, validateForm, setFieldErrors } = useFormValidation({
     initialData,
-    fields: ["title", "slug", "description"],
+    fields: ["slug"],
     validationRules: LEVEL_VALIDATION_RULES
   });
 
@@ -30,19 +30,12 @@ export default function LevelForm({ initialData, onSave, onCancel, loading = fal
     validateForm,
     setFieldErrors,
     dataTransform: (data) => ({
-      title: data.title.trim(),
-      slug: data.slug.trim(),
-      description: data.description.trim()
+      slug: data.slug.trim()
     })
   });
 
   const isFormValid = () => {
-    return (
-      formData.title.trim().length > 0 &&
-      formData.slug.trim().length > 0 &&
-      formData.description.trim().length > 0 &&
-      isValidSlug(formData.slug)
-    );
+    return formData.slug.trim().length > 0 && isValidSlug(formData.slug);
   };
 
   const handleSlugInputChange = (_field: string, value: string) => {
@@ -56,17 +49,6 @@ export default function LevelForm({ initialData, onSave, onCancel, loading = fal
 
       <FormField
         type="text"
-        name="title"
-        label="Title"
-        value={formData.title}
-        onChange={handleInputChange}
-        error={errors.title}
-        placeholder="Enter level title"
-        required
-      />
-
-      <FormField
-        type="text"
         name="slug"
         label="Slug"
         value={formData.slug}
@@ -74,19 +56,7 @@ export default function LevelForm({ initialData, onSave, onCancel, loading = fal
         error={errors.slug}
         placeholder="level-slug"
         className="font-mono text-sm"
-        helpText="URL-friendly identifier. Auto-generated from title, but you can customize it."
-        required
-      />
-
-      <FormField
-        type="textarea"
-        name="description"
-        label="Description"
-        value={formData.description}
-        onChange={handleInputChange}
-        error={errors.description}
-        placeholder="Enter level description"
-        rows={4}
+        helpText="URL-friendly identifier for this level."
         required
       />
 

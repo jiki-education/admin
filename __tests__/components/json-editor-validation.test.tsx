@@ -49,11 +49,8 @@ describe("JSON Editor Validation Integration", () => {
     render(<LessonForm mode="create" levelId={1} onSave={mockOnSave} onCancel={mockOnCancel} />);
 
     // Fill in required fields
-    fireEvent.change(screen.getByLabelText(/title/i), {
-      target: { value: "Test Lesson" }
-    });
-    fireEvent.change(screen.getByLabelText(/description/i), {
-      target: { value: "Test description" }
+    fireEvent.change(screen.getByLabelText(/slug/i), {
+      target: { value: "test-lesson" }
     });
 
     const jsonEditor = screen.getByTestId("json-editor");
@@ -74,11 +71,8 @@ describe("JSON Editor Validation Integration", () => {
     render(<LessonForm mode="create" levelId={1} onSave={mockSave} onCancel={mockOnCancel} />);
 
     // Fill in all fields including JSON
-    fireEvent.change(screen.getByLabelText(/title/i), {
-      target: { value: "Test Lesson" }
-    });
-    fireEvent.change(screen.getByLabelText(/description/i), {
-      target: { value: "Test description" }
+    fireEvent.change(screen.getByLabelText(/slug/i), {
+      target: { value: "test-lesson" }
     });
 
     const jsonEditor = screen.getByTestId("json-editor");

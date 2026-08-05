@@ -2,9 +2,7 @@
 
 export interface AdminConcept {
   id: number;
-  title: string;
   slug: string;
-  description: string;
   content_markdown: string;
   standard_video_provider?: "youtube" | "mux" | null;
   standard_video_id?: string | null;
@@ -13,7 +11,7 @@ export interface AdminConcept {
 }
 
 export interface AdminConceptFilters {
-  title?: string;
+  slug?: string;
   page?: number;
   per?: number;
 }

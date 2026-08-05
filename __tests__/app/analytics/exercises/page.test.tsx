@@ -16,7 +16,6 @@ function buildExercise(overrides: Partial<ExerciseAnalytics> = {}): ExerciseAnal
   return {
     lesson_id: 5,
     slug: "fix-wall",
-    title: "Fix the Wall",
     health_score: 72,
     low_sample: false,
     num_starts: 100,
@@ -48,7 +47,6 @@ const RESPONSE: ExerciseAnalyticsResponse = {
       severity: "high",
       lesson_id: 5,
       slug: "fix-wall",
-      title: "Fix the Wall",
       message: "13.2% of learners attempt this exercise but give up - likely a difficulty wall.",
       value: 13.2
     },
@@ -57,18 +55,16 @@ const RESPONSE: ExerciseAnalyticsResponse = {
       severity: "medium",
       lesson_id: 7,
       slug: "paint-fence",
-      title: "Paint the Fence",
       message: "Learners rarely open Ask Jiki here despite struggling.",
       value: 2.1
     }
   ],
   exercises: [
-    buildExercise({ lesson_id: 7, slug: "paint-fence", title: "Paint the Fence", health_score: 90 }),
+    buildExercise({ lesson_id: 7, slug: "paint-fence", health_score: 90 }),
     buildExercise(),
     buildExercise({
       lesson_id: 9,
       slug: "empty-garden",
-      title: "Empty Garden",
       health_score: null,
       low_sample: true,
       num_starts: 5,
@@ -89,7 +85,7 @@ const RESPONSE: ExerciseAnalyticsResponse = {
   ]
 };
 
-function bodyRowTitles(): string[] {
+function bodyRowSlugs(): string[] {
   const [, ...rows] = screen.getAllByRole("row");
   return rows.map((row) => row.querySelector("td div")?.textContent ?? "");
 }
@@ -122,7 +118,7 @@ describe("ExerciseAnalyticsPage", () => {
     mockGetExerciseAnalytics.mockResolvedValue(RESPONSE);
     render(<ExerciseAnalyticsPage />);
 
-    expect(await screen.findByText("fix-wall")).toBeInTheDocument();
+    expect(await screen.findAllByText("fix-wall")).not.toHaveLength(0);
     // Header row + 3 exercise rows
     expect(screen.getAllByRole("row")).toHaveLength(4);
     // Percentages with one decimal, in-progress and p90 annotations
@@ -134,16 +130,16 @@ describe("ExerciseAnalyticsPage", () => {
   test("preserves course order by default and sorts worst-first when clicking Health", async () => {
     mockGetExerciseAnalytics.mockResolvedValue(RESPONSE);
     render(<ExerciseAnalyticsPage />);
-    await screen.findByText("fix-wall");
+    await screen.findAllByText("fix-wall");
 
-    expect(bodyRowTitles()).toEqual(["Paint the Fence", "Fix the Wall", "Empty Garden"]);
+    expect(bodyRowSlugs()).toEqual(["paint-fence", "fix-wall", "empty-garden"]);
 
     fireEvent.click(screen.getByRole("button", { name: "Health" }));
-    expect(bodyRowTitles()).toEqual(["Fix the Wall", "Paint the Fence", "Empty Garden"]);
+    expect(bodyRowSlugs()).toEqual(["fix-wall", "paint-fence", "empty-garden"]);
 
     // Clicking again reverses the sort (nulls stay last)
     fireEvent.click(screen.getByRole("button", { name: /Health/ }));
-    expect(bodyRowTitles()).toEqual(["Paint the Fence", "Fix the Wall", "Empty Garden"]);
+    expect(bodyRowSlugs()).toEqual(["paint-fence", "fix-wall", "empty-garden"]);
   });
 
   test("renders low-sample exercises muted with n/a health and dashes for nulls", async () => {
@@ -153,7 +149,7 @@ describe("ExerciseAnalyticsPage", () => {
     const healthNa = await screen.findByTitle("Fewer than 30 classifiable sessions");
     expect(healthNa).toHaveTextContent("n/a");
 
-    const lowSampleRow = screen.getByText("Empty Garden").closest("tr");
+    const lowSampleRow = screen.getByText("empty-garden").closest("tr");
     expect(lowSampleRow).toHaveClass("opacity-60");
     expect(lowSampleRow?.textContent).toContain("–");
   });

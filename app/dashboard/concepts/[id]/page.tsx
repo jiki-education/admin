@@ -68,7 +68,7 @@ export default function ConceptDetail() {
     }
 
     const confirmed = window.confirm(
-      `Are you sure you want to delete the concept "${concept.title}"? This action cannot be undone.`
+      `Are you sure you want to delete the concept "${concept.slug}"? This action cannot be undone.`
     );
 
     if (!confirmed) {
@@ -78,7 +78,7 @@ export default function ConceptDetail() {
     try {
       setDeleting(true);
       await deleteConcept(conceptId);
-      toast.success(`Concept "${concept.title}" deleted successfully!`);
+      toast.success(`Concept "${concept.slug}" deleted successfully!`);
       router.push("/dashboard/concepts");
     } catch (err) {
       console.error("Failed to delete concept:", err);
@@ -119,13 +119,13 @@ export default function ConceptDetail() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle={`Concept: ${concept.title}`} />
+      <PageBreadcrumb pageTitle={`Concept: ${concept.slug}`} />
 
       <div className="space-y-6">
         {/* Concept Overview */}
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">{concept.title}</h1>
+            <h1 className="text-xl font-mono font-semibold text-gray-800 dark:text-white/90">{concept.slug}</h1>
             <div className="flex gap-3">
               <Button variant="outline" onClick={handleEdit}>
                 Edit
@@ -172,14 +172,6 @@ export default function ConceptDetail() {
                   <span className="text-gray-400 text-sm">No videos</span>
                 )}
               </div>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="mb-8">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Description</h3>
-            <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg">
-              <p className="text-gray-700 dark:text-gray-300">{concept.description}</p>
             </div>
           </div>
 

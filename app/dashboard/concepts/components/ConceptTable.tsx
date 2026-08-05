@@ -48,19 +48,7 @@ export default function ConceptTable({ concepts, loading = false }: ConceptTable
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Title
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
                   Slug
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Description
                 </TableCell>
                 <TableCell
                   isHeader
@@ -83,16 +71,8 @@ export default function ConceptTable({ concepts, loading = false }: ConceptTable
                   <TableCell className="px-5 py-4 text-start">
                     <span className="font-medium text-gray-800 text-theme-sm dark:text-white/90">#{concept.id}</span>
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start">
-                    <div className="font-medium text-gray-900 dark:text-white">{concept.title}</div>
-                  </TableCell>
                   <TableCell className="px-5 py-4 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">{concept.slug}</code>
-                  </TableCell>
-                  <TableCell className="px-5 py-4 text-start max-w-xs">
-                    <div className="text-gray-600 dark:text-gray-400 text-sm truncate">
-                      {concept.description || "No description"}
-                    </div>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start">
                     <div className="flex flex-col gap-1">

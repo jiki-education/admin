@@ -129,7 +129,7 @@ export default function NewLesson() {
             <div>
               <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Add New Lesson</h1>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Adding lesson to: <span className="font-medium text-gray-700 dark:text-gray-300">{level.title}</span>
+                Adding lesson to: <span className="font-medium text-gray-700 dark:text-gray-300">{level.slug}</span>
               </p>
             </div>
           </div>
@@ -143,9 +143,7 @@ export default function NewLesson() {
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100">{level.title}</h3>
-                <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">{level.description}</p>
-                <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
+                <p className="text-xs text-blue-600 dark:text-blue-400">
                   Slug: <code className="bg-blue-100 dark:bg-blue-900/30 px-1 rounded">{level.slug}</code>
                 </p>
               </div>

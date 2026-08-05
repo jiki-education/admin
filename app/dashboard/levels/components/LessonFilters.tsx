@@ -29,15 +29,10 @@ export default function LessonFilters({ lessons, onFilterChange, className = "" 
     // Apply filters whenever search term, type, or lessons change
     let filteredLessons = [...lessons];
 
-    // Filter by search term (title and description)
+    // Filter by search term (slug)
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
-      filteredLessons = filteredLessons.filter(
-        (lesson) =>
-          lesson.title.toLowerCase().includes(searchLower) ||
-          (lesson.description && lesson.description.toLowerCase().includes(searchLower)) ||
-          lesson.slug.toLowerCase().includes(searchLower)
-      );
+      filteredLessons = filteredLessons.filter((lesson) => lesson.slug.toLowerCase().includes(searchLower));
     }
 
     // Filter by type
@@ -78,7 +73,7 @@ export default function LessonFilters({ lessons, onFilterChange, className = "" 
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search lessons by title, description, or slug..."
+            placeholder="Search lessons by slug..."
             className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400"
           />
         </div>
