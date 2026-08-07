@@ -69,44 +69,14 @@ describe("Concepts Management E2E Tests", () => {
       }
 
       try {
-        const titleInput = await page.waitForSelector('input[id="title"]', { timeout: 2000 });
         const slugInput = await page.waitForSelector('input[id="slug"]', { timeout: 2000 });
-        const descriptionTextarea = await page.waitForSelector('textarea[id="description"]', { timeout: 2000 });
 
-        expect(titleInput).toBeTruthy();
         expect(slugInput).toBeTruthy();
-        expect(descriptionTextarea).toBeTruthy();
 
         const saveButton = await page.$('button[type="submit"]');
         expect(saveButton).toBeTruthy();
       } catch {
         console.debug("Form elements not found - likely redirected or not loaded");
-      }
-    });
-
-    it("should auto-generate slug from title when authenticated", async () => {
-      await page.goto(`${baseUrl}/dashboard/concepts/new`);
-      await page.waitForSelector("body", { timeout: 5000 });
-
-      const currentUrl = page.url();
-      if (currentUrl.includes("/signin")) {
-        console.debug("Redirected to signin - skipping slug generation test");
-        return;
-      }
-
-      try {
-        const titleInput = await page.waitForSelector('input[id="title"]', { timeout: 2000 });
-        const slugInput = await page.waitForSelector('input[id="slug"]', { timeout: 2000 });
-
-        await titleInput.click();
-        await titleInput.type("Object Oriented Programming");
-        await page.keyboard.press("Tab");
-        await page.waitForTimeout(500);
-
-        const slugValue = await slugInput.evaluate((el: HTMLInputElement) => el.value);
-        expect(slugValue).toBe("object-oriented-programming");
-      } catch {
-        console.debug("Could not test slug generation - form not accessible");
       }
     });
 

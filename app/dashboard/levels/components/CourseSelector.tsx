@@ -47,7 +47,7 @@ export default function CourseSelector({ selectedCourseSlug, onCourseChange }: C
     >
       {courses.map((course) => (
         <option key={course.slug} value={course.slug}>
-          {course.title}
+          {course.slug}
         </option>
       ))}
     </select>

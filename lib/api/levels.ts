@@ -53,7 +53,6 @@ export async function fetchLevelsWithProgress(): Promise<LevelWithProgress[]> {
 export async function getAdminLevels(filters?: AdminLevelFilters): Promise<AdminLevelsResponse> {
   const params: Record<string, string> = {
     ...(filters?.course_slug && { course_slug: filters.course_slug }),
-    ...(filters?.title && { title: filters.title }),
     ...(filters?.slug && { slug: filters.slug }),
     ...(filters?.page && { page: filters.page.toString() }),
     ...(filters?.per && { per: filters.per.toString() })

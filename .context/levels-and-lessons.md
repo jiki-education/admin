@@ -14,8 +14,6 @@ Represents a learning level with basic metadata:
 interface AdminLevel {
   id: number; // Unique identifier
   slug: string; // URL-friendly identifier
-  title: string; // Display name
-  description: string; // Level description
   position: number; // Ordering position
 }
 ```
@@ -28,8 +26,6 @@ Represents individual lessons within a level:
 interface AdminLesson {
   id: number; // Unique identifier
   slug: string; // URL-friendly identifier
-  title: string; // Display name
-  description: string; // Lesson description
   type: string; // Lesson type (see types below)
   position: number; // Ordering within level
   data: Record<string, any>; // Flexible JSON data structure
@@ -100,7 +96,7 @@ updateLesson(levelId: number, lessonId: number, data: Partial<AdminLesson>): Pro
 
 ### Level Management
 
-- **Filterable listing** with title/slug search
+- **Filterable listing** with slug search
 - **Pagination** for large datasets
 - **Direct navigation** to lesson management
 
@@ -110,7 +106,7 @@ updateLesson(levelId: number, lessonId: number, data: Partial<AdminLesson>): Pro
 - **Bulk editing** for multiple lessons simultaneously
 - **Type-specific handling** based on lesson type
 - **JSON data editor** for flexible lesson content
-- **Real-time filtering** by type, title, or content
+- **Real-time filtering** by type or slug
 
 ### Lesson Data Structure
 

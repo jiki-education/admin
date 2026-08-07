@@ -42,11 +42,8 @@ describe("LessonForm Component", () => {
     expect(submitButton).toBeDisabled();
 
     // Fill in required fields
-    fireEvent.change(screen.getByLabelText(/title/i), {
-      target: { value: "Test Lesson" }
-    });
-    fireEvent.change(screen.getByLabelText(/description/i), {
-      target: { value: "Test description" }
+    fireEvent.change(screen.getByLabelText(/slug/i), {
+      target: { value: "test-lesson" }
     });
 
     // Select lesson type
@@ -65,11 +62,8 @@ describe("LessonForm Component", () => {
     render(<LessonForm mode="create" levelId={123} onSave={mockSave} onCancel={mockOnCancel} />);
 
     // Fill in all form fields
-    fireEvent.change(screen.getByLabelText(/title/i), {
-      target: { value: "Variables and Types" }
-    });
-    fireEvent.change(screen.getByLabelText(/description/i), {
-      target: { value: "Learn about variables" }
+    fireEvent.change(screen.getByLabelText(/slug/i), {
+      target: { value: "variables-and-types" }
     });
     fireEvent.change(screen.getByLabelText(/type/i), {
       target: { value: "exercise" }
@@ -85,9 +79,7 @@ describe("LessonForm Component", () => {
 
     await waitFor(() => {
       expect(mockSave).toHaveBeenCalledWith({
-        title: "Variables and Types",
         slug: "variables-and-types",
-        description: "Learn about variables",
         type: "exercise",
         data: { difficulty: "beginner", timeEstimate: 30 }
       } as CreateLessonData);

@@ -51,14 +51,10 @@ describe("Lessons Management E2E Tests", () => {
 
       // Try to find form elements (they should exist if we reached the new lesson page)
       try {
-        const titleInput = await page.waitForSelector('input[id="title"]', { timeout: 2000 });
         const slugInput = await page.waitForSelector('input[id="slug"]', { timeout: 2000 });
-        const descriptionTextarea = await page.waitForSelector('textarea[id="description"]', { timeout: 2000 });
         const typeSelect = await page.waitForSelector('select[id="type"]', { timeout: 2000 });
 
-        expect(titleInput).toBeTruthy();
         expect(slugInput).toBeTruthy();
-        expect(descriptionTextarea).toBeTruthy();
         expect(typeSelect).toBeTruthy();
 
         // Check for form buttons
@@ -82,38 +78,6 @@ describe("Lessons Management E2E Tests", () => {
       // Look for level context display (could be in various formats)
       const contextElements = await page.$$('.bg-blue-50, [class*="level"], [class*="context"]');
       console.debug(`Found ${contextElements.length} potential context elements`);
-    });
-
-    it("should auto-generate slug from lesson title when authenticated", async () => {
-      await page.goto(`${baseUrl}/dashboard/levels/1/lessons/new`);
-      await page.waitForSelector("body", { timeout: 5000 });
-
-      const currentUrl = page.url();
-      if (currentUrl.includes("/signin")) {
-        console.debug("Redirected to signin - skipping slug generation test");
-        return;
-      }
-
-      try {
-        const titleInput = await page.waitForSelector('input[id="title"]', { timeout: 2000 });
-        const slugInput = await page.waitForSelector('input[id="slug"]', { timeout: 2000 });
-
-        // Type in the title
-        await titleInput.click();
-        await titleInput.type("Variables and Data Types");
-
-        // Blur the title field to trigger slug generation
-        await page.keyboard.press("Tab");
-
-        // Wait a bit for auto-generation
-        await page.waitForTimeout(500);
-
-        // Check that slug was generated
-        const slugValue = await slugInput.evaluate((el: HTMLInputElement) => el.value);
-        expect(slugValue).toBe("variables-and-data-types");
-      } catch {
-        console.debug("Could not test slug generation - form not accessible");
-      }
     });
 
     it("should have lesson type dropdown with all expected options when authenticated", async () => {
@@ -256,16 +220,8 @@ describe("Lessons Management E2E Tests", () => {
         const slugInput = await page.waitForSelector('input[id="slug"]', { timeout: 2000 });
         const submitButton = await page.waitForSelector('button[type="submit"]', { timeout: 2000 });
 
-        // Fill required fields
-        const titleInput = await page.waitForSelector('input[id="title"]', { timeout: 2000 });
-        const descriptionTextarea = await page.waitForSelector('textarea[id="description"]', { timeout: 2000 });
-
-        await titleInput.type("Test Lesson");
-        await descriptionTextarea.type("Test description");
-
         // Enter invalid slug
         await slugInput.click();
-        await slugInput.evaluate((el: HTMLInputElement) => (el.value = "")); // Clear auto-generated slug
         await slugInput.type("Invalid Slug With Spaces!");
 
         await submitButton.click();

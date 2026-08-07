@@ -25,8 +25,7 @@ const LESSON_TYPES = [
 
 export default function BulkEditModal({ isOpen, onClose, lessons, selectedLessonIds, onSave }: BulkEditModalProps) {
   const [formData, setFormData] = useState({
-    type: "",
-    description: ""
+    type: ""
   });
   const [saving, setSaving] = useState(false);
 
@@ -53,17 +52,13 @@ export default function BulkEditModal({ isOpen, onClose, lessons, selectedLesson
       if (formData.type) {
         updates.type = formData.type;
       }
-      if (formData.description.trim()) {
-        updates.description = formData.description.trim();
-      }
-
       // Only save if there are actual updates
       if (Object.keys(updates).length > 0) {
         await onSave(updates);
       }
 
       onClose();
-      setFormData({ type: "", description: "" });
+      setFormData({ type: "" });
     } catch (error) {
       console.error("Failed to bulk edit lessons:", error);
       alert("Failed to update lessons. Please try again.");
@@ -74,7 +69,7 @@ export default function BulkEditModal({ isOpen, onClose, lessons, selectedLesson
 
   const handleCancel = () => {
     onClose();
-    setFormData({ type: "", description: "" });
+    setFormData({ type: "" });
   };
 
   return (
@@ -89,7 +84,7 @@ export default function BulkEditModal({ isOpen, onClose, lessons, selectedLesson
           <ul className="text-sm text-gray-800 dark:text-gray-200">
             {selectedLessons.map((lesson) => (
               <li key={lesson.id} className="truncate">
-                • {lesson.title}
+                • {lesson.slug}
               </li>
             ))}
           </ul>
@@ -114,21 +109,6 @@ export default function BulkEditModal({ isOpen, onClose, lessons, selectedLesson
               </option>
             ))}
           </select>
-        </div>
-
-        {/* Description Field */}
-        <div>
-          <label htmlFor="bulk-description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Set Description
-          </label>
-          <textarea
-            id="bulk-description"
-            value={formData.description}
-            onChange={(e) => handleInputChange("description", e.target.value)}
-            rows={3}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400"
-            placeholder="Leave empty to keep current descriptions"
-          />
         </div>
 
         <p className="text-xs text-gray-500 dark:text-gray-400">

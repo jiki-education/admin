@@ -8,25 +8,13 @@ interface ValidationRules {
 }
 
 export const LEVEL_VALIDATION_RULES: ValidationRules = {
-  title: {
-    required: true
-  },
   slug: {
-    required: true
-  },
-  description: {
     required: true
   }
 };
 
 export const LESSON_VALIDATION_RULES: ValidationRules = {
-  title: {
-    required: true
-  },
   slug: {
-    required: true
-  },
-  description: {
     required: true
   },
   type: {

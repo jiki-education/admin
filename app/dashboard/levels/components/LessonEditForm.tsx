@@ -23,8 +23,6 @@ const LESSON_TYPES = [
 
 export default function LessonEditForm({ lesson, onSave, onCancel, loading = false }: LessonEditFormProps) {
   const [formData, setFormData] = useState({
-    title: lesson.title,
-    description: lesson.description,
     type: lesson.type,
     data: JSON.stringify(lesson.data, null, 2)
   });
@@ -34,8 +32,6 @@ export default function LessonEditForm({ lesson, onSave, onCancel, loading = fal
 
   useEffect(() => {
     setFormData({
-      title: lesson.title,
-      description: lesson.description,
       type: lesson.type,
       data: JSON.stringify(lesson.data, null, 2)
     });
@@ -81,8 +77,6 @@ export default function LessonEditForm({ lesson, onSave, onCancel, loading = fal
       }
 
       const updatedLesson: Partial<AdminLesson> = {
-        title: formData.title.trim(),
-        description: formData.description.trim(),
         type: formData.type,
         data: parsedData
       };
@@ -97,42 +91,11 @@ export default function LessonEditForm({ lesson, onSave, onCancel, loading = fal
   };
 
   const isFormValid = () => {
-    return formData.title.trim().length > 0 && formData.type.length > 0 && !jsonError;
+    return formData.type.length > 0 && !jsonError;
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Title Field */}
-      <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Title *
-        </label>
-        <input
-          type="text"
-          id="title"
-          value={formData.title}
-          onChange={(e) => handleInputChange("title", e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-blue-400"
-          placeholder="Enter lesson title"
-          required
-        />
-      </div>
-
-      {/* Description Field */}
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Description
-        </label>
-        <textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) => handleInputChange("description", e.target.value)}
-          rows={3}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-blue-400"
-          placeholder="Enter lesson description (optional)"
-        />
-      </div>
-
       {/* Type Dropdown */}
       <div>
         <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

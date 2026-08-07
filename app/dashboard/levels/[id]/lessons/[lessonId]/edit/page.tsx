@@ -120,7 +120,7 @@ export default function EditLesson() {
         <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Edit Lesson: {lesson.title}</h1>
+              <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">Edit Lesson: {lesson.slug}</h1>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Level ID: {levelId} • Lesson ID: {lessonId} • Position: {lesson.position}
               </p>

@@ -18,7 +18,7 @@ import type {
  */
 export async function getAdminConcepts(filters?: AdminConceptFilters): Promise<AdminConceptsResponse> {
   const params: Record<string, string> = {
-    ...(filters?.title && { title: filters.title }),
+    ...(filters?.query && { query: filters.query }),
     ...(filters?.page && { page: filters.page.toString() }),
     ...(filters?.per && { per: filters.per.toString() })
   };

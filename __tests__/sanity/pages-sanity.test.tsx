@@ -12,13 +12,11 @@ function fastResolve(value: unknown) {
 
 jest.mock("@/lib/api/levels", () => ({
   getLevels: fastResolve({ results: [], meta: { current_page: 1, total_pages: 1, total_count: 0 } }),
-  getLevel: fastResolve({ id: 1, title: "Test Level", slug: "test-level", description: "Test", position: 1 }),
+  getLevel: fastResolve({ id: 1, slug: "test-level", position: 1 }),
   getLevelLessons: fastResolve([]),
   getLesson: fastResolve({
     id: 1,
-    title: "Test Lesson",
     slug: "test-lesson",
-    description: "Test",
     type: "exercise",
     data: {}
   }),

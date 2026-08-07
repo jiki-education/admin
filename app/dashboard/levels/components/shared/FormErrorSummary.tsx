@@ -19,9 +19,7 @@ export default function FormErrorSummary({ errors, fieldLabels = {} }: FormError
 
     // Default field labels
     const defaultLabels: Record<string, string> = {
-      title: "Title",
       slug: "Slug",
-      description: "Description",
       type: "Type",
       data: "Lesson Data (JSON)"
     };

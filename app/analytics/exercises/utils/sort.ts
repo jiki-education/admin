@@ -3,7 +3,7 @@ import type { ExerciseAnalytics, SortColumn, SortDirection } from "../types";
 // Health sorts ascending by default so the worst exercises appear first.
 // Title sorts alphabetically; all other (metric) columns default to descending.
 export function defaultDirectionFor(column: SortColumn): SortDirection {
-  return column === "health_score" || column === "title" ? "asc" : "desc";
+  return column === "health_score" || column === "slug" ? "asc" : "desc";
 }
 
 // A null column resets to course order (the order the API returns).

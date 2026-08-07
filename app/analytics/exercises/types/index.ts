@@ -6,7 +6,6 @@ export interface ExerciseInsight {
   severity: InsightSeverity;
   lesson_id: number;
   slug: string;
-  title: string;
   message: string;
   value: number;
 }
@@ -14,7 +13,6 @@ export interface ExerciseInsight {
 export interface ExerciseAnalytics {
   lesson_id: number;
   slug: string;
-  title: string;
   health_score: number | null;
   low_sample: boolean;
   num_starts: number;
@@ -43,7 +41,7 @@ export interface ExerciseAnalyticsResponse {
 }
 
 export type SortColumn =
-  | "title"
+  | "slug"
   | "health_score"
   | "num_starts"
   | "completion_pct"

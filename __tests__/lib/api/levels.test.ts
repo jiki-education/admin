@@ -18,18 +18,14 @@ describe("Levels API Client", () => {
 
   test("createLevel sends correct API request and returns level data", async () => {
     const levelData: CreateLevelData = {
-      title: "Introduction to Programming",
-      slug: "intro-to-programming",
-      description: "Learn the basics of programming"
+      slug: "intro-to-programming"
     };
 
     const mockResponse = {
       data: {
         level: {
           id: 123,
-          title: "Introduction to Programming",
           slug: "intro-to-programming",
-          description: "Learn the basics of programming",
           position: 5
         }
       }
@@ -47,9 +43,7 @@ describe("Levels API Client", () => {
 
     expect(result).toEqual({
       id: 123,
-      title: "Introduction to Programming",
       slug: "intro-to-programming",
-      description: "Learn the basics of programming",
       position: 5
     });
   });
@@ -57,9 +51,7 @@ describe("Levels API Client", () => {
   test("createLesson sends correct API request with level ID and returns lesson data", async () => {
     const levelId = 123;
     const lessonData: CreateLessonData = {
-      title: "Variables and Data Types",
       slug: "variables-and-types",
-      description: "Understanding variables and basic data types",
       type: "exercise",
       data: { difficulty: "beginner", estimatedTime: 30 }
     };
@@ -68,9 +60,7 @@ describe("Levels API Client", () => {
       data: {
         lesson: {
           id: 456,
-          title: "Variables and Data Types",
           slug: "variables-and-types",
-          description: "Understanding variables and basic data types",
           type: "exercise",
           position: 3,
           data: { difficulty: "beginner", estimatedTime: 30 }
@@ -88,9 +78,7 @@ describe("Levels API Client", () => {
 
     expect(result).toEqual({
       id: 456,
-      title: "Variables and Data Types",
       slug: "variables-and-types",
-      description: "Understanding variables and basic data types",
       type: "exercise",
       position: 3,
       data: { difficulty: "beginner", estimatedTime: 30 }
@@ -102,18 +90,14 @@ describe("Levels API Client", () => {
     mockApi.post.mockRejectedValue(apiError);
 
     const levelData: CreateLevelData = {
-      title: "Test",
-      slug: "duplicate-slug",
-      description: "Test"
+      slug: "duplicate-slug"
     };
 
     await expect(createLevel("python", levelData)).rejects.toThrow("API Error: Duplicate slug");
 
     await expect(
       createLesson(1, {
-        title: "Test",
         slug: "test",
-        description: "Test",
         type: "exercise",
         data: {}
       })

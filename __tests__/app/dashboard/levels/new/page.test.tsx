@@ -26,7 +26,7 @@ jest.mock("@/app/dashboard/levels/components/LevelForm", () => {
   return function MockLevelForm({ mode, onSave, onCancel }: any) {
     return (
       <div data-testid="level-form">
-        <button onClick={() => onSave({ title: "Test", slug: "test", description: "Test desc" })}>Save</button>
+        <button onClick={() => onSave({ slug: "test" })}>Save</button>
         <button onClick={onCancel}>Cancel</button>
         <span>Mode: {mode}</span>
       </div>
@@ -56,7 +56,7 @@ describe("NewLevel Page", () => {
   });
 
   test("handles successful level creation and navigation", async () => {
-    const mockLevel = { id: 123, title: "Test", slug: "test", description: "Test desc", position: 1 };
+    const mockLevel = { id: 123, slug: "test", position: 1 };
     mockCreateLevel.mockResolvedValue(mockLevel);
 
     render(<NewLevel />);
@@ -68,9 +68,7 @@ describe("NewLevel Page", () => {
 
     await waitFor(() => {
       expect(mockCreateLevel).toHaveBeenCalledWith("python", {
-        title: "Test",
-        slug: "test",
-        description: "Test desc"
+        slug: "test"
       });
       expect(mockPush).toHaveBeenCalledWith("/dashboard/levels/123");
     });

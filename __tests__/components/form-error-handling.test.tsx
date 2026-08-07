@@ -27,11 +27,8 @@ describe("Form Error Handling", () => {
     render(<LevelForm mode="create" onSave={mockOnSave} onCancel={mockOnCancel} />);
 
     // Fill in valid form data
-    fireEvent.change(screen.getByLabelText(/title/i), {
-      target: { value: "Test Level" }
-    });
-    fireEvent.change(screen.getByLabelText(/description/i), {
-      target: { value: "Test description" }
+    fireEvent.change(screen.getByLabelText(/slug/i), {
+      target: { value: "test-level" }
     });
 
     // Submit form - should fail first time
@@ -56,14 +53,8 @@ describe("Form Error Handling", () => {
     const submitButton = screen.getByRole("button", { name: /create lesson/i });
 
     // Fill form with invalid slug format
-    fireEvent.change(screen.getByLabelText(/title/i), {
-      target: { value: "Test Lesson" }
-    });
     fireEvent.change(screen.getByLabelText(/slug/i), {
       target: { value: "Invalid Slug!" }
-    });
-    fireEvent.change(screen.getByLabelText(/description/i), {
-      target: { value: "Test description" }
     });
 
     // Click submit - validation runs on submit
@@ -86,11 +77,8 @@ describe("Form Error Handling", () => {
     render(<LevelForm mode="create" onSave={mockOnSave} onCancel={mockOnCancel} />);
 
     // Fill in valid form data
-    fireEvent.change(screen.getByLabelText(/title/i), {
-      target: { value: "Test Level" }
-    });
-    fireEvent.change(screen.getByLabelText(/description/i), {
-      target: { value: "Test description" }
+    fireEvent.change(screen.getByLabelText(/slug/i), {
+      target: { value: "test-level" }
     });
 
     const submitButton = screen.getByRole("button", { name: /create level/i });

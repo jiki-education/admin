@@ -30,9 +30,7 @@ jest.mock("@/app/dashboard/levels/components/LessonForm", () => {
         <button
           onClick={() =>
             onSave({
-              title: "Test Lesson",
               slug: "test-lesson",
-              description: "Test desc",
               type: "exercise",
               data: {}
             })
@@ -66,9 +64,7 @@ describe("NewLesson Page", () => {
   test("loads level context and renders lesson form with level information", async () => {
     const mockLevel = {
       id: 123,
-      title: "Test Level",
       slug: "test-level",
-      description: "Test level description",
       position: 1
     };
 
@@ -82,29 +78,24 @@ describe("NewLesson Page", () => {
     await waitFor(() => {
       expect(screen.getByText(/add new lesson/i)).toBeInTheDocument();
       expect(screen.getByText(/adding lesson to:/i)).toBeInTheDocument();
-      expect(screen.getAllByText("Test Level")).toHaveLength(2); // One in subtitle, one in level card
+      expect(screen.getAllByText("test-level")).toHaveLength(2); // One in subtitle, one in level card
       expect(screen.getByText("Level ID: 123")).toBeInTheDocument();
     });
 
     // Check level context card is displayed
-    expect(screen.getByText("Test level description")).toBeInTheDocument();
     expect(screen.getByText(/slug:/i)).toBeInTheDocument();
   });
 
   test("handles successful lesson creation and navigation back to level", async () => {
     const mockLevel = {
       id: 123,
-      title: "Test Level",
       slug: "test-level",
-      description: "Test description",
       position: 1
     };
 
     const mockLesson = {
       id: 456,
-      title: "Test Lesson",
       slug: "test-lesson",
-      description: "Test desc",
       type: "exercise",
       position: 1,
       data: {}
@@ -125,9 +116,7 @@ describe("NewLesson Page", () => {
 
     await waitFor(() => {
       expect(mockCreateLesson).toHaveBeenCalledWith(123, {
-        title: "Test Lesson",
         slug: "test-lesson",
-        description: "Test desc",
         type: "exercise",
         data: {}
       });

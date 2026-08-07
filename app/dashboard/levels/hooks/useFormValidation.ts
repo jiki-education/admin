@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { generateSlug, isValidSlug } from "@/lib/utils/slug";
+import { isValidSlug } from "@/lib/utils/slug";
 
 interface ValidationRules {
   [fieldName: string]: {
@@ -35,7 +35,6 @@ export function useFormValidation({ initialData, fields, validationRules }: UseF
     return initial;
   });
 
-  const [slugTouched, setSlugTouched] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -61,15 +60,6 @@ export function useFormValidation({ initialData, fields, validationRules }: UseF
       [field]: value
     }));
 
-    // Auto-generate slug from title if slug hasn't been manually edited
-    if (field === "title" && !slugTouched && fields.includes("slug")) {
-      const autoSlug = generateSlug(value);
-      setFormData((prev) => ({
-        ...prev,
-        slug: autoSlug
-      }));
-    }
-
     // Clear field error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({
@@ -80,7 +70,6 @@ export function useFormValidation({ initialData, fields, validationRules }: UseF
   };
 
   const handleSlugChange = (value: string) => {
-    setSlugTouched(true);
     handleInputChange("slug", value);
   };
 

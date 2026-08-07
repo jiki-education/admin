@@ -2,8 +2,6 @@ import { api } from "./client";
 
 export interface Course {
   slug: string;
-  title: string;
-  description: string;
 }
 
 interface CoursesResponse {

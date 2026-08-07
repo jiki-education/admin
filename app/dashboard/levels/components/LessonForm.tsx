@@ -23,7 +23,7 @@ interface LessonFormProps {
 export default function LessonForm({ initialData, onSave, onCancel, loading = false, mode }: LessonFormProps) {
   const { formData, errors, handleInputChange, handleSlugChange, validateForm, setFieldErrors } = useFormValidation({
     initialData,
-    fields: ["title", "slug", "description", "type", "data"],
+    fields: ["slug", "type", "data"],
     validationRules: LESSON_VALIDATION_RULES
   });
 
@@ -36,9 +36,7 @@ export default function LessonForm({ initialData, onSave, onCancel, loading = fa
     setFieldErrors,
     errorParser: parseValidationErrors,
     dataTransform: (data) => ({
-      title: data.title.trim(),
       slug: data.slug.trim(),
-      description: data.description.trim(),
       type: data.type,
       data: data.data.trim() ? JSON.parse(data.data) : {}
     })
@@ -52,11 +50,7 @@ export default function LessonForm({ initialData, onSave, onCancel, loading = fa
 
   const isFormValid = () => {
     const hasRequiredFields =
-      formData.title.trim().length > 0 &&
-      formData.slug.trim().length > 0 &&
-      formData.description.trim().length > 0 &&
-      formData.type.length > 0 &&
-      formData.data.trim().length > 0;
+      formData.slug.trim().length > 0 && formData.type.length > 0 && formData.data.trim().length > 0;
 
     return hasRequiredFields && !jsonError && Object.keys(errors).length === 0;
   };
@@ -68,16 +62,6 @@ export default function LessonForm({ initialData, onSave, onCancel, loading = fa
 
       <FormField
         type="text"
-        name="title"
-        label="Title"
-        value={formData.title}
-        onChange={handleInputChange}
-        error={errors.title}
-        placeholder="Enter lesson title"
-        required
-      />
-      <FormField
-        type="text"
         name="slug"
         label="Slug"
         value={formData.slug}
@@ -85,18 +69,7 @@ export default function LessonForm({ initialData, onSave, onCancel, loading = fa
         error={errors.slug}
         placeholder="lesson-slug"
         className="font-mono text-sm"
-        helpText="URL-friendly identifier. Auto-generated from title."
-        required
-      />
-      <FormField
-        type="textarea"
-        name="description"
-        label="Description"
-        value={formData.description}
-        onChange={handleInputChange}
-        error={errors.description}
-        placeholder="Enter lesson description"
-        rows={3}
+        helpText="URL-friendly identifier for this lesson."
         required
       />
       <FormField
