@@ -1,4 +1,4 @@
-import { getUsers, deleteUser } from "@/lib/api/users";
+import { getUsers, deleteUser, updateUser } from "@/lib/api/users";
 import { api } from "@/lib/api/client";
 import type { UserFilters } from "@/app/dashboard/users/types";
 
@@ -6,6 +6,7 @@ import type { UserFilters } from "@/app/dashboard/users/types";
 jest.mock("@/lib/api/client", () => ({
   api: {
     get: jest.fn(),
+    patch: jest.fn(),
     delete: jest.fn()
   }
 }));
@@ -15,6 +16,18 @@ const mockApi = api as jest.Mocked<typeof api>;
 describe("Users API Client", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe("updateUser", () => {
+    test("sends a PATCH request with the user data and returns the updated user", async () => {
+      const user = { id: 7, email: "a@example.com", name: "A", admin: false, locale: "en", internal: true };
+      mockApi.patch.mockResolvedValue({ data: { user }, status: 200, headers: new Headers() });
+
+      const result = await updateUser(7, { internal: true });
+
+      expect(mockApi.patch).toHaveBeenCalledWith("/admin/users/7", { user: { internal: true } });
+      expect(result).toEqual(user);
+    });
   });
 
   describe("getUsers", () => {

@@ -4,7 +4,7 @@
  */
 
 import { api } from "@/lib/api";
-import type { UserFilters, UsersResponse } from "@/app/dashboard/users/types";
+import type { UpdateUserData, User, UserFilters, UsersResponse } from "@/app/dashboard/users/types";
 
 /**
  * Get list of users with filtering and pagination
@@ -22,6 +22,15 @@ export async function getUsers(filters?: UserFilters): Promise<UsersResponse> {
 
   const response = await api.get<UsersResponse>("/admin/users", { params });
   return response.data;
+}
+
+/**
+ * Update a user by ID
+ * PATCH /admin/users/:id
+ */
+export async function updateUser(userId: number, data: UpdateUserData): Promise<User> {
+  const response = await api.patch<{ user: User }>(`/admin/users/${userId}`, { user: data });
+  return response.data.user;
 }
 
 /**

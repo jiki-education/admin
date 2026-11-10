@@ -1,12 +1,14 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { useCallback, useEffect, useState } from "react";
-import type { User, UserFilters as UserFiltersType } from "./types";
+import type { User, UserBulkAction, UserFilters as UserFiltersType } from "./types";
 import { getUsers, deleteUser } from "@/lib/api/users";
 import UserFilters from "./components/UserFilters";
 import UserTable from "./components/UserTable";
 import UserPagination from "./components/UserPagination";
 import DeleteUserModal from "./components/DeleteUserModal";
+import UserBulkActions from "./components/UserBulkActions";
+import { useUserBulkActions } from "./hooks/useUserBulkActions";
 
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);
@@ -24,6 +26,8 @@ export default function Users() {
     total_pages: 0
   });
 
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+
   // Delete modal state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -35,6 +39,7 @@ export default function Users() {
       setError(null);
       const response = await getUsers({ ...filters, per: itemsPerPage });
       setUsers(response.results);
+      setSelectedIds(new Set());
       setMeta(response.meta);
     } catch (err) {
       console.error("Failed to load users:", err);
@@ -97,6 +102,13 @@ export default function Users() {
     }
   }, [selectedUser, loadUsers, handleCloseDeleteModal]);
 
+  const { bulkLoading, applyBulkAction } = useUserBulkActions({ onComplete: loadUsers, onError: setError });
+
+  const handleBulkAction = (action: UserBulkAction) => {
+    setError(null);
+    void applyBulkAction(action, Array.from(selectedIds));
+  };
+
   return (
     <div>
       <PageBreadcrumb pageTitle="Users" />
@@ -115,7 +127,20 @@ export default function Users() {
 
           <UserFilters filters={filters} onFiltersChange={handleFiltersChange} onClearFilters={handleClearFilters} />
 
-          <UserTable users={users} loading={loading} onDelete={handleDeleteUser} />
+          <UserBulkActions
+            selectedCount={selectedIds.size}
+            loading={bulkLoading}
+            onApply={handleBulkAction}
+            onClearSelection={() => setSelectedIds(new Set())}
+          />
+
+          <UserTable
+            users={users}
+            loading={loading}
+            selectedIds={selectedIds}
+            onSelectionChange={setSelectedIds}
+            onDelete={handleDeleteUser}
+          />
 
           <UserPagination
             currentPage={meta.current_page}

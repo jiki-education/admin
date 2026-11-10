@@ -4,6 +4,11 @@ export interface User {
   email: string;
   locale: string; // "en" | "hu"
   admin: boolean;
+  internal: boolean;
+}
+
+export interface UpdateUserData {
+  internal?: boolean;
 }
 
 export interface UserFilters {
@@ -23,3 +28,5 @@ export interface UsersResponse {
     total_pages: number;
   };
 }
+
+export type UserBulkAction = "set_internal";
