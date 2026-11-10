@@ -6,7 +6,7 @@ Administrative dashboard for the Jiki learning platform.
 
 Jiki Admin is a standalone Next.js application for managing the Jiki platform. It provides tools for user administration, content moderation, system monitoring, and other administrative tasks.
 
-**Tech Stack**: Next.js 15, React 19, TypeScript, Tailwind CSS v4
+**Tech Stack**: Next.js 16, React 19, TypeScript, Tailwind CSS v4
 
 ## Getting Started
 

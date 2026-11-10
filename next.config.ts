@@ -2,9 +2,9 @@ import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    reactCompiler: true
-  },
+  reactCompiler: true,
+  // The dev servers and E2E tests run on local.jiki.io, which Next.js blocks by default.
+  allowedDevOrigins: ["local.jiki.io"],
   webpack(config) {
     // SVG support with @svgr/webpack
     config.module.rules.push({
@@ -33,12 +33,11 @@ if (process.env.NODE_ENV === "production") {
     silent: !process.env.CI,
     widenClientFileUpload: true,
 
-    // Disable server-side auto-instrumentation for Cloudflare Workers compatibility
-    autoInstrumentServerFunctions: false,
-    autoInstrumentMiddleware: false,
-    autoInstrumentAppDirectory: false,
-
     webpack: {
+      // Disable server-side auto-instrumentation for Cloudflare Workers compatibility
+      autoInstrumentServerFunctions: false,
+      autoInstrumentMiddleware: false,
+      autoInstrumentAppDirectory: false,
       automaticVercelMonitors: false,
       treeshake: {
         removeDebugLogging: true
