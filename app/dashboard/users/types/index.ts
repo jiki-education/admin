@@ -23,3 +23,5 @@ export interface UsersResponse {
     total_pages: number;
   };
 }
+
+export type UserBulkAction = "set_internal";
