@@ -4,6 +4,11 @@ export interface User {
   email: string;
   locale: string; // "en" | "hu"
   admin: boolean;
+  internal: boolean;
+}
+
+export interface UpdateUserData {
+  internal?: boolean;
 }
 
 export interface UserFilters {

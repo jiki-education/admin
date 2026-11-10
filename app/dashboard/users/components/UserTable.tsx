@@ -11,7 +11,7 @@ interface UserTableProps {
   onDelete?: (user: User) => void;
 }
 
-const COLUMNS = ["ID", "Name", "Email", "Locale", "Admin", "Actions"];
+const COLUMNS = ["ID", "Name", "Email", "Locale", "Admin", "Internal", "Actions"];
 const HEADER_CLASS = "px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400";
 
 export default function UserTable({

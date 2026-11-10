@@ -47,6 +47,13 @@ export default function UserTableRow({ user, selected, onSelect, onDelete }: Use
         )}
       </TableCell>
       <TableCell className="px-5 py-4 text-start">
+        {user.internal && (
+          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
+            Internal
+          </span>
+        )}
+      </TableCell>
+      <TableCell className="px-5 py-4 text-start">
         {onDelete && (
           <Button
             size="sm"

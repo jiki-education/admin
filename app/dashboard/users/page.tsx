@@ -8,6 +8,7 @@ import UserTable from "./components/UserTable";
 import UserPagination from "./components/UserPagination";
 import DeleteUserModal from "./components/DeleteUserModal";
 import UserBulkActions from "./components/UserBulkActions";
+import { useUserBulkActions } from "./hooks/useUserBulkActions";
 
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);
@@ -101,10 +102,12 @@ export default function Users() {
     }
   }, [selectedUser, loadUsers, handleCloseDeleteModal]);
 
-  const handleBulkAction = useCallback((action: UserBulkAction) => {
-    // TODO: Call the API once the bulk "set internal" endpoint exists.
-    console.debug("Bulk action not yet connected to the API:", action);
-  }, []);
+  const { bulkLoading, applyBulkAction } = useUserBulkActions({ onComplete: loadUsers, onError: setError });
+
+  const handleBulkAction = (action: UserBulkAction) => {
+    setError(null);
+    void applyBulkAction(action, Array.from(selectedIds));
+  };
 
   return (
     <div>
@@ -126,6 +129,7 @@ export default function Users() {
 
           <UserBulkActions
             selectedCount={selectedIds.size}
+            loading={bulkLoading}
             onApply={handleBulkAction}
             onClearSelection={() => setSelectedIds(new Set())}
           />
